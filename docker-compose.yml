@@ -1,4 +1,4 @@
-version: '3.7'
+﻿version: '3.7'
 
 services:
   postgredb:
@@ -10,19 +10,19 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database/migrations/01_up.sql:/docker-entrypoint-initdb.d/01_up.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - fm-network
 
   backend:
-    container_name: api-system
+    container_name: api-friendmanagement
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-        - "8089:8089"
+        - "8080:8080"
     depends_on:
       - postgredb
     networks:
@@ -31,6 +31,3 @@ services:
 networks:
   fm-network:
     driver: bridge
-    
-volumes:
-  postgres-data:

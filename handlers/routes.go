@@ -1,23 +1,23 @@
 package handlers
 
 import (
-	"TTSH-API/cmd/server/routes/admin"
-	"TTSH-API/database"
+	"api-trainning-center/database"
+	"api-trainning-center/handlers/api"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )
 
-var DbInstance database.Database
+var dbInstance database.Database
 
 // NewHandler create router
 func NewHandler(db database.Database) http.Handler {
 	router := chi.NewRouter()
-	DbInstance = db
+	dbInstance = db
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
-	router.Route("/api", admin.Users)
+	router.Route("/api", api.Route)
 	return router
 }
 
