@@ -13,18 +13,13 @@ import (
 // ErrNoMatch is returned when we request a row that doesn't exist
 var ErrNoMatch = fmt.Errorf("no matching record")
 
-type Database struct {
-	Conn *sql.DB
-}
-
 const (
 	HOST = "localhost"
 	PORT = 5432
 )
 
 // Initialize executes create connection with postgres db
-func Initialize() (Database, error) {
-	db := Database{}
+func Initialize() (*sql.DB, error) {
 	// load .env file
 	err := godotenv.Load(".env")
 
@@ -40,13 +35,13 @@ func Initialize() (Database, error) {
 	// Open the connection
 	conn, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return db, err
+		return conn, err
 	}
-	db.Conn = conn
-	err = db.Conn.Ping()
+
+	err = conn.Ping()
 	if err != nil {
-		return db, err
+		return conn, err
 	}
 	log.Println("Database connection established")
-	return db, nil
+	return conn, nil
 }

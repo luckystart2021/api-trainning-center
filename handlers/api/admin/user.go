@@ -6,14 +6,12 @@ import (
 	"api-trainning-center/service/user"
 	"api-trainning-center/utils"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/go-chi/render"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateAccount handle Request
+// CreateAccount zcontroller for creating new users
 func CreateAccount(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := models.AccountRequest{}
@@ -24,7 +22,7 @@ func CreateAccount(service user.IUserService) http.HandlerFunc {
 			return
 		}
 
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(""); err != nil {
 			// If input is wrong, return an HTTP error
 			response.ERROR(w, http.StatusBadRequest, err)
 			return
@@ -36,13 +34,6 @@ func CreateAccount(service user.IUserService) http.HandlerFunc {
 			return
 		}
 
-		hashPassword, err := HashPassword(req.PassWord)
-		if err != nil {
-			response.ERROR(w, http.StatusBadRequest, err)
-			return
-		}
-		req.PassWord = string(hashPassword)
-
 		resp, err := service.CreateAccount(req)
 		if err != nil {
 			render.Render(w, r, utils.ServerErrorRenderer(err))
@@ -53,20 +44,27 @@ func CreateAccount(service user.IUserService) http.HandlerFunc {
 	}
 }
 
-// HashPassword hashes password from user input
-func HashPassword(password string) ([]byte, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10) // 10 is the cost for hashing the password.
-	if err != nil {
-		return nil, errors.New("hashes password error")
-	}
-	return bytes, err
-}
+func Login(service user.IUserService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := models.AccountRequest{}
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-// CheckPasswordHash checks password hash and password from user input if they match
-func CheckPasswordHash(password, hash string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	if err != nil {
-		return errors.New("password incorrect")
+		if err := req.Validate("login"); err != nil {
+			// If input is wrong, return an HTTP error
+			response.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
+
+		// resp, err := service.Login(req)
+		// if err != nil {
+		// 	render.Render(w, r, utils.ServerErrorRenderer(err))
+		// 	return
+		// }
+
 	}
-	return nil
 }

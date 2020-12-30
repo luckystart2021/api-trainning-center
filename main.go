@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	database, err := database.Initialize()
+	db, err := database.Initialize()
 	if err != nil {
 		log.Fatalf("Could not set up database: %v", err)
 	}
-	defer database.Conn.Close()
+	defer db.Close()
 
-	httpHandler := handlers.NewHandler(database)
+	httpHandler := handlers.NewHandler(db)
 	log.Println("Server started on: http://localhost:8080")
 	http.ListenAndServe(":8080", httpHandler)
 }
