@@ -18,7 +18,7 @@ type Database struct {
 }
 
 const (
-	HOST = "postgredb"
+	HOST = "localhost"
 	PORT = 5432
 )
 

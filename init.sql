@@ -13,3 +13,4 @@ CREATE TABLE public."user" (
 	CONSTRAINT user_pkey PRIMARY KEY (username)
 );
 CREATE UNIQUE INDEX user_unique_idx ON public."user" USING btree (username);
+CREATE UNIQUE INDEX user_unique_idx ON public."user" USING btree (email);
