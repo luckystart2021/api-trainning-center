@@ -8,11 +8,16 @@ import (
 )
 
 // EncodeAuthToken signs authentication token
-func EncodeAuthToken(us string) (string, error) {
+func EncodeAuthToken(us string, role string) (string, error) {
+	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
 	claims := jwt.MapClaims{}
 	claims["userID"] = us
-	claims["IssuedAt"] = time.Now().Unix()
+	claims["Role"] = role
 	claims["ExpiresAt"] = time.Now().Add(time.Hour * 24).Unix()
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-	return token.SignedString([]byte(os.Getenv("SECRET")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }

@@ -8,6 +8,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type AccessDetails struct {
+	Role     string
+	UserName string
+}
+
+type User struct {
+	UserName string
+	PassWord string
+	Role     string
+}
+
 type AccountRequest struct {
 	Email    string `json:"email"`
 	UserName string `json:"username"`
@@ -20,7 +31,8 @@ type AccountReponse struct {
 }
 
 type LoginReponse struct {
-	Token string `json:"token"`
+	Success bool   `json:"success"`
+	Token   string `json:"token"`
 }
 
 const (
@@ -48,8 +60,8 @@ func (acc AccountRequest) IsValid() (bool, error) {
 func (acc AccountRequest) Validate(action string) error {
 	switch strings.ToLower(action) {
 	case "login":
-		if acc.Email == "" {
-			return errors.New("Email is required")
+		if acc.UserName == "" {
+			return errors.New("UserName is required")
 		}
 		if acc.PassWord == "" {
 			return errors.New("Password is required")

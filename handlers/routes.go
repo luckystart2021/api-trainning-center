@@ -15,7 +15,7 @@ func NewHandler(db *sql.DB) http.Handler {
 	router := chi.NewRouter()
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
-	router.Route("/api", admin.Router(db))
+	router.Route("/api/admin", admin.Router(db))
 	return router
 }
 

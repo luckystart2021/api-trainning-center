@@ -14,18 +14,18 @@ services:
     networks:
       - fm-network
 
-  backend:
-    container_name: api-friendmanagement
-    restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-        - "8080:8080"
-    depends_on:
-      - postgredb
-    networks:
-      - fm-network
+  # backend:
+  #   container_name: api-friendmanagement
+  #   restart: unless-stopped
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #       - "8080:8080"
+  #   depends_on:
+  #     - postgredb
+  #   networks:
+  #     - fm-network
 
 networks:
   fm-network:

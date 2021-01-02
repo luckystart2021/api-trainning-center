@@ -3,6 +3,8 @@ package middlewares
 import (
 	"api-trainning-center/service/response"
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -21,23 +23,16 @@ func SetContentTypeMiddleware(next http.Handler) http.Handler {
 // AuthJwtVerify verify token and add userID to the request context
 func AuthJwtVerify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var resp = map[string]interface{}{"status": "failed", "message": "Missing authorization token"}
-
-		var header = r.Header.Get("Authorization")
-		header = strings.TrimSpace(header)
-
-		if header == "" {
-			response.RespondWithJSON(w, http.StatusForbidden, resp)
-			return
-		}
-
-		token, err := jwt.Parse(header, func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("SECRET")), nil
+		tokenString := ExtractToken(r)
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			//Make sure that the token method conform to "SigningMethodHMAC"
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(os.Getenv("ACCESS_SECRET")), nil
 		})
 		if err != nil {
-			resp["status"] = "failed"
-			resp["message"] = "Invalid token, please login"
-			response.RespondWithJSON(w, http.StatusForbidden, resp)
+			response.RespondWithJSON(w, http.StatusForbidden, errors.New("Invalid token, please login"))
 			return
 		}
 		claims, _ := token.Claims.(jwt.MapClaims)
@@ -45,4 +40,14 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), "userID", claims["userID"]) // adding the user ID to the context
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func ExtractToken(r *http.Request) string {
+	bearToken := r.Header.Get("Authorization")
+	//normally Authorization the_token_xxx
+	strArr := strings.Split(bearToken, " ")
+	if len(strArr) == 2 {
+		return strArr[1]
+	}
+	return ""
 }
