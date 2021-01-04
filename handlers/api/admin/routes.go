@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/middlewares"
 	"api-trainning-center/service/account"
 	"database/sql"
+	"net/http"
 
 	"github.com/go-chi/chi"
 )
@@ -12,9 +13,15 @@ import (
 func Router(db *sql.DB) func(chi.Router) {
 	return func(router chi.Router) {
 		st := account.NewStore(db)
-		router.Use(middlewares.SetContentTypeMiddleware)
 		router.Post("/login", Login(st))
-		router.Use(middlewares.AuthJwtVerify)
-		router.Post("/signup", CreateAccount(st))
 	}
+}
+
+// A completely separate router for administrator routes
+func CheckRouter(db *sql.DB) http.Handler {
+	router := chi.NewRouter()
+	router.Use(middlewares.AuthJwtVerify)
+	st := account.NewStore(db)
+	router.Post("/signup", CreateAccount(st))
+	return router
 }

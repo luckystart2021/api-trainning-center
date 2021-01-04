@@ -4,14 +4,22 @@ import (
 	"api-trainning-center/models"
 	"api-trainning-center/service/account"
 	"api-trainning-center/service/response"
+	"errors"
 
 	"encoding/json"
 	"net/http"
 )
 
+const ADMIN = "ADMIN"
+
 // CreateAccount zcontroller for creating new users
 func CreateAccount(service account.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		userRole := r.Context().Value("Role")
+		if userRole != ADMIN {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("You don't have permission to sign up"))
+			return
+		}
 		req := models.AccountRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
@@ -64,12 +72,6 @@ func Login(service account.IUserService) http.HandlerFunc {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
-
-		// resp, err := service.Login(req)
-		// if err != nil {
-		// 	render.Render(w, r, utils.ServerErrorRenderer(err))
-		// 	return
-		// }
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, login)
 	}
