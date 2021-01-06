@@ -4,24 +4,19 @@ import (
 	"api-trainning-center/middlewares"
 	"api-trainning-center/service/account"
 	"database/sql"
-	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-redis/redis"
 )
 
-// Router config
-func Router(db *sql.DB) func(chi.Router) {
-	return func(router chi.Router) {
-		st := account.NewStore(db)
-		router.Post("/login", Login(st))
-	}
-}
-
 // A completely separate router for administrator routes
-func CheckRouter(db *sql.DB) http.Handler {
-	router := chi.NewRouter()
-	router.Use(middlewares.AuthJwtVerify)
+func RouterLogin(db *sql.DB, client *redis.Client) func(chi.Router) {
 	st := account.NewStore(db)
-	router.Post("/signup", CreateAccount(st))
-	return router
+	return func(router chi.Router) {
+		router.Route("/admin", func(router chi.Router) {
+			router.Post("/login", Login(st, client))
+			router.With(middlewares.AuthJwtVerify).Post("/signup", CreateAccount(st))
+			router.With(middlewares.AuthJwtVerify).Post("/change_password", CreateAccount(st))
+		})
+	}
 }

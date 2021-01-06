@@ -8,14 +8,19 @@ import (
 
 	"encoding/json"
 	"net/http"
+
+	"github.com/go-redis/redis"
 )
 
-const ADMIN = "ADMIN"
+const (
+	ADMIN = "ADMIN"
+	ROLE  = "Role"
+)
 
 // CreateAccount zcontroller for creating new users
 func CreateAccount(service account.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userRole := r.Context().Value("Role")
+		userRole := r.Context().Value(ROLE)
 		if userRole != ADMIN {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("You don't have permission to sign up"))
 			return
@@ -50,7 +55,7 @@ func CreateAccount(service account.IUserService) http.HandlerFunc {
 	}
 }
 
-func Login(service account.IUserService) http.HandlerFunc {
+func Login(service account.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := models.AccountRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -66,8 +71,7 @@ func Login(service account.IUserService) http.HandlerFunc {
 			return
 		}
 
-		login, err := service.Login(req)
-
+		login, err := service.Login(req, client)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

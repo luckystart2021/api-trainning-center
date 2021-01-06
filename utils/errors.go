@@ -21,16 +21,3 @@ func (e *ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.StatusCode)
 	return nil
 }
-func ServerErrorRenderer(err error) *ErrorResponse {
-	return &ErrorResponse{
-		StatusCode: 500,
-		Message:    err.Error(),
-	}
-}
-
-func ServerSuccessRenderer(err error) *ErrorResponse {
-	return &ErrorResponse{
-		StatusCode: 201,
-		Message:    err.Error(),
-	}
-}

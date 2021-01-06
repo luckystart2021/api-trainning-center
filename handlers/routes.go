@@ -10,10 +10,11 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
+	"github.com/go-redis/redis"
 )
 
 // NewHandler create router
-func NewHandler(db *sql.DB) http.Handler {
+func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 	router := chi.NewRouter()
 	// A good base middleware stack
 	router.Use(middleware.RequestID)
@@ -25,13 +26,12 @@ func NewHandler(db *sql.DB) http.Handler {
 	// through ctx.Done() that the request has timed out and further
 	// processing should be stopped.
 	router.Use(middleware.Timeout(60 * time.Second))
-
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
-	router.Route("/api/", admin.Router(db))
-	// Mount the admin sub-router
-	router.Mount("/api/admin/", admin.CheckRouter(db))
-
+	// handle api
+	router.Group(func(chi.Router) {
+		router.Route("/api", admin.RouterLogin(db, client))
+	})
 	return router
 }
 

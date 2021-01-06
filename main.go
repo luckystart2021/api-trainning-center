@@ -13,12 +13,49 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/go-redis/redis"
 )
+
+var client *redis.Client
+
+func init() {
+	client = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6497",
+		Password: "admin123",
+		DB:       0,
+	})
+	pong, err := client.Ping().Result()
+
+	if err != nil {
+		fmt.Printf("Cannot Ping: %v\n", err.Error())
+	} else {
+		fmt.Printf("Pong: %v\n", pong)
+	}
+}
+
+// func init() {
+// 	//Initializing redis
+// 	dsn := os.Getenv("REDIS_DSN")
+// 	if len(dsn) == 0 {
+// 		dsn = "localhost:6397"
+// 	}
+// 	client = redis.NewClient(&redis.Options{
+// 		Addr:     dsn, //redis port
+// 		Password: "admin123",
+// 		DB:       0, // use default DB
+// 	})
+// 	_, err := client.Ping().Result()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 func main() {
 	addr := ":8080"
 	listener, err := net.Listen("tcp", addr)
 	db, err := database.Initialize()
+
 	if err != nil {
 		log.Fatalf("Could not set up database: %v", err)
 	}
@@ -36,7 +73,7 @@ func main() {
 	db.SetMaxIdleConns(maxIdleConn)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
-	httpHandler := handlers.NewHandler(db)
+	httpHandler := handlers.NewHandler(db, client)
 
 	server := &http.Server{
 		Handler: httpHandler,
