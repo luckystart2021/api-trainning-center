@@ -13,6 +13,17 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - fm-network
+  redis:
+    container_name: redis
+    image: redis:5-alpine
+    volumes:
+      - redis-data:/var/lib/redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass admin123
+    restart: always
+    networks:
+      - fm-network
 
   # backend:
   #   container_name: api-friendmanagement
@@ -30,3 +41,7 @@ services:
 networks:
   fm-network:
     driver: bridge
+
+volumes:
+  redis-data:
+    driver: local

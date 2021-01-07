@@ -37,17 +37,17 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 			}
 			return []byte(os.Getenv("ACCESS_SECRET")), nil
 		})
+		log.Print("Error ", err)
+		if err != nil {
+			response.RespondWithError(w, http.StatusForbidden, errors.New("Invalid token, please login"))
+			return
+		}
 
 		if !token.Valid { //Token is invalid, maybe not signed on this server
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Token is not valid"))
 			return
 		}
 
-		log.Print("Error ", err)
-		if err != nil {
-			response.RespondWithError(w, http.StatusForbidden, errors.New("Invalid token, please login"))
-			return
-		}
 		claims, ok := token.Claims.(jwt.MapClaims)
 
 		if !ok || claims["UserID"] == "" || claims["Role"] == "" || claims["ExpiresAt"] == "" {

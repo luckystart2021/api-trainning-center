@@ -5,8 +5,6 @@ import (
 	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
-	"net/http"
-	"strings"
 
 	"github.com/go-redis/redis"
 )
@@ -69,21 +67,13 @@ func (st Store) Login(req models.AccountRequest, client *redis.Client) (models.L
 	if err != nil {
 		return response, err
 	}
+
 	saveErr := utils.CreateAuth(user.UserName, token, client)
 	if saveErr != nil {
 		return response, saveErr
 	}
+
 	response.Success = true
 	response.Token = token.AccessToken
 	return response, nil
-}
-
-func ExtractToken(r *http.Request) string {
-	bearToken := r.Header.Get("Authorization")
-	//normally Authorization the_token_xxx
-	strArr := strings.Split(bearToken, " ")
-	if len(strArr) == 2 {
-		return strArr[1]
-	}
-	return ""
 }

@@ -45,7 +45,7 @@ func CreateAuth(userName string, td *TokenDetails, client *redis.Client) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	now := time.Now()
 
-	errAccess := client.Set(td.AccessUuid, userName, at.Sub(now)).Err()
+	errAccess := client.Set(td.AccessUuid, td.AccessToken, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}

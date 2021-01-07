@@ -20,10 +20,16 @@ import (
 var client *redis.Client
 
 func init() {
+	//Initializing redis
+	dsn := os.Getenv("REDIS_DSN")
+	if len(dsn) == 0 {
+		dsn = "localhost:6379"
+	}
 	client = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6497",
-		Password: "admin123",
-		DB:       0,
+		Addr:       dsn,
+		Password:   "admin123",
+		DB:         0,
+		MaxRetries: 3,
 	})
 	pong, err := client.Ping().Result()
 
@@ -33,23 +39,6 @@ func init() {
 		fmt.Printf("Pong: %v\n", pong)
 	}
 }
-
-// func init() {
-// 	//Initializing redis
-// 	dsn := os.Getenv("REDIS_DSN")
-// 	if len(dsn) == 0 {
-// 		dsn = "localhost:6397"
-// 	}
-// 	client = redis.NewClient(&redis.Options{
-// 		Addr:     dsn, //redis port
-// 		Password: "admin123",
-// 		DB:       0, // use default DB
-// 	})
-// 	_, err := client.Ping().Result()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
 
 func main() {
 	addr := ":8080"
