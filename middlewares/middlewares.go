@@ -14,12 +14,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// SetContentTypeMiddleware sets content-type to json
-func SetContentTypeMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
+type Vars struct {
+	Role       string
+	AccessUuid string
+	UserName   string
 }
 
 // AuthJwtVerify verify token and add userID to the request context
@@ -39,7 +37,7 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 		})
 		log.Print("Error ", err)
 		if err != nil {
-			response.RespondWithError(w, http.StatusForbidden, errors.New("Invalid token, please login"))
+			response.RespondWithError(w, http.StatusForbidden, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
 			return
 		}
 
@@ -50,12 +48,30 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 
-		if !ok || claims["UserID"] == "" || claims["Role"] == "" || claims["ExpiresAt"] == "" {
+		if !ok || claims["Access_uuid"] == "" || claims["Role"] == "" || claims["ExpiresAt"] == "" || claims["UserID"] == "" {
 			response.RespondWithError(w, http.StatusForbidden, errors.New("invalid token: authentication failed"))
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "Role", claims["Role"]) // adding the Role to the context
+		accessUuid, ok := claims["Access_uuid"].(string)
+		if !ok {
+			response.RespondWithError(w, http.StatusForbidden, errors.New("invalid token: authentication failed"))
+			return
+		}
+
+		role, ok := claims["Role"].(string)
+		if !ok {
+			response.RespondWithError(w, http.StatusForbidden, errors.New("invalid token: authentication failed"))
+			return
+		}
+
+		userName, ok := claims["UserID"].(string)
+		if !ok {
+			response.RespondWithError(w, http.StatusForbidden, errors.New("invalid token: authentication failed"))
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "values", Vars{Role: role, AccessUuid: accessUuid, UserName: userName}) // adding the Role to the context
 		if count := getTokenRemainingValidity(claims["ExpiresAt"]); count == -1 {
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Sorry! your token expired!"))
 			return

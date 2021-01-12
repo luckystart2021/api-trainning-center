@@ -29,8 +29,9 @@ func EncodeAuthToken(us string, role string) (*TokenDetails, error) {
 	// Creating Access Token
 	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
 	claims := jwt.MapClaims{}
-	claims["UserID"] = td.UserID
 	claims["Role"] = td.Role
+	claims["UserID"] = td.UserID
+	claims["Access_uuid"] = td.AccessUuid
 	claims["ExpiresAt"] = td.AtExpires
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
 	td.AccessToken, err = token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
@@ -41,11 +42,11 @@ func EncodeAuthToken(us string, role string) (*TokenDetails, error) {
 	return td, nil
 }
 
-func CreateAuth(userName string, td *TokenDetails, client *redis.Client) error {
+func CreateAuth(td *TokenDetails, client *redis.Client) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	now := time.Now()
 
-	errAccess := client.Set(td.AccessUuid, td.AccessToken, at.Sub(now)).Err()
+	errAccess := client.Set(td.AccessUuid, td.UserID, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}
