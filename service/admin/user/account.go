@@ -3,8 +3,10 @@ package user
 import (
 	"api-trainning-center/models/admin"
 	"api-trainning-center/utils"
+	"api-trainning-center/validate"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/go-redis/redis"
 )
@@ -13,6 +15,7 @@ type IUserService interface {
 	CreateAccount(req admin.AccountRequest) (admin.Reponse, error)
 	Login(req admin.AccountRequest, client *redis.Client) (admin.LoginReponse, error)
 	ChangePassword(req admin.ChangeAccountRequest) (admin.Reponse, error)
+	ResetPassword(email string) (admin.MessageResponse, error)
 }
 
 type Store struct {
@@ -95,12 +98,53 @@ func (st Store) ChangePassword(req admin.ChangeAccountRequest) (admin.Reponse, e
 		return response, err
 	}
 
-	req.NewPassWord = string(hashPassword)
+	newPassWord := string(hashPassword)
 
-	if err := admin.UpdateAccountByRequest(req, st.db); err != nil {
+	if err := admin.UpdateAccountByRequest(user.UserName, newPassWord, st.db); err != nil {
 		return response, err
 	}
 
 	response.Status = true
+	return response, nil
+}
+
+func (st Store) ResetPassword(userName string) (admin.MessageResponse, error) {
+	response := admin.MessageResponse{}
+	user, err := admin.CheckUserLogin(userName, st.db)
+	if err != nil {
+		return response, err
+	}
+	// user is not registered
+	if user.UserName == "" {
+		return response, errors.New("Tên đăng nhập không tồn tại")
+	}
+
+	if user.Role == validate.TEACHER {
+		hashPassword, err := admin.HashPassword("Teacher123@@")
+		if err != nil {
+			log.Println("hashPassword reset error ", err)
+			return response, err
+		}
+		newPassWord := string(hashPassword)
+		if err := admin.UpdateAccountByRequest(user.UserName, newPassWord, st.db); err != nil {
+			log.Println("UpdateAccountByRequest reset error ", err)
+			return response, err
+		}
+	}
+
+	if user.Role == validate.EDITOR {
+		hashPassword, err := admin.HashPassword("Editor123@@")
+		if err != nil {
+			log.Println("hashPassword reset error ", err)
+			return response, err
+		}
+		newPassWord := string(hashPassword)
+		if err := admin.UpdateAccountByRequest(user.UserName, newPassWord, st.db); err != nil {
+			log.Println("UpdateAccountByRequest reset error ", err)
+			return response, err
+		}
+	}
+	response.Status = true
+	response.Message = "Reset mật khẩu thành công"
 	return response, nil
 }

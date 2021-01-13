@@ -14,11 +14,20 @@ import (
 func RouterLogin(db *sql.DB, client *redis.Client) func(chi.Router) {
 	st := user.NewStore(db)
 	return func(router chi.Router) {
+		router.Post("/system/login", Login(st, client))
+		router.Group(adminRoute(db, client))
+	}
+}
+
+func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
+	st := user.NewStore(db)
+	return func(router chi.Router) {
+		router.Use(middlewares.AuthJwtVerify)
 		router.Route("/admin", func(router chi.Router) {
-			router.Post("/login", Login(st, client))
-			router.With(middlewares.AuthJwtVerify).Post("/signup", CreateAccount(st, client))
-			router.With(middlewares.AuthJwtVerify).Get("/logout", LogoutAccount(st, client))
-			router.With(middlewares.AuthJwtVerify).Post("/change_password", ChangePassword(st))
+			router.Post("/signup", CreateAccount(st, client))
+			router.Get("/logout", LogoutAccount(st, client))
+			router.Post("/change_password", ChangePassword(st, client))
+			router.Post("/reset_password", ResetPassword(st, client))
 		})
 	}
 }

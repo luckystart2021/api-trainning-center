@@ -17,9 +17,8 @@ import (
 
 const ADMIN = "ADMIN"
 
-type LogoutResponse struct {
-	Status  bool   `json:"status"`
-	Message string `json:"message"`
+type ResetPasswordRequest struct {
+	UserName string `json:"username"`
 }
 
 // CreateAccount zcontroller for creating new users
@@ -95,14 +94,20 @@ func LogoutAccount(service user.IUserService, client *redis.Client) http.Handler
 			return
 		}
 		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, LogoutResponse{Status: true, Message: "Đã đăng xuất"})
+		response.RespondWithJSON(w, http.StatusOK, admin.MessageResponse{Status: true, Message: "Đã đăng xuất"})
 	}
 }
 
-func ChangePassword(service user.IUserService) http.HandlerFunc {
+func ChangePassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		userRole := r.Context().Value("values").(middlewares.Vars)
+		_, err := FetchAuth(userRole.AccessUuid, client)
+		if err != nil {
+			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
+			return
+		}
 		req := admin.ChangeAccountRequest{}
-		err := json.NewDecoder(r.Body).Decode(&req)
+		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			w.WriteHeader(http.StatusBadRequest)
@@ -122,6 +127,41 @@ func ChangePassword(service user.IUserService) http.HandlerFunc {
 		}
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, changePassword)
+	}
+}
+
+func ResetPassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userRole := r.Context().Value("values").(middlewares.Vars)
+		_, err := FetchAuth(userRole.AccessUuid, client)
+		if err != nil {
+			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
+			return
+		}
+		log.Println("Role", userRole.Role)
+		if userRole.Role != ADMIN {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Bạn không có quyền reset password"))
+			return
+		}
+		req := ResetPasswordRequest{}
+		err = json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if req.UserName == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Bạn chưa nhập tên đăng nhập"))
+			return
+		}
+
+		resetPassword, err := service.ResetPassword(req.UserName)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, resetPassword)
 	}
 }
 

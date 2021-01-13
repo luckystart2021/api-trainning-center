@@ -28,6 +28,11 @@ type AccountRequest struct {
 	FullName    string `json:"fullname"`
 }
 
+type MessageResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
 type Reponse struct {
 	Status bool `json:"status"`
 }
@@ -164,13 +169,13 @@ func CreateUserByRequest(req AccountRequest, db *sql.DB) error {
 }
 
 // CreateUserByRequest executes subscribe to updates from an email address
-func UpdateAccountByRequest(req ChangeAccountRequest, db *sql.DB) error {
+func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
 	query := `
 	UPDATE "user" SET
-		username = $1, password=$2
+		password=$1
 	WHERE 
-		username = $1;`
-	_, err := db.Exec(query, req.UserName, req.NewPassWord)
+		username = $2;`
+	_, err := db.Exec(query, newPassWord, userName)
 	if err != nil {
 		log.Println("Update DB err", err)
 		return err
