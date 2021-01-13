@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -37,6 +38,7 @@ func EncodeAuthToken(us string, role string) (*TokenDetails, error) {
 	td.AccessToken, err = token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 
 	if err != nil {
+		log.Println("EncodeAuthToken token error ", err)
 		return td, err
 	}
 	return td, nil

@@ -190,6 +190,7 @@ func CheckUserLogin(userName string, db *sql.DB) (User, error) {
 	row := db.QueryRow(query, userName)
 	err := row.Scan(&user.UserName, &user.PassWord, &user.Role)
 	if err != nil {
+		log.Println("CheckUserLogin error", err)
 		return user, errors.New("Tên đăng nhập hoặc mật khẩu không đúng")
 	}
 	return user, nil
@@ -199,7 +200,8 @@ func CheckUserLogin(userName string, db *sql.DB) (User, error) {
 func HashPassword(password string) ([]byte, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10) // 10 is the cost for hashing the password.
 	if err != nil {
-		return nil, errors.New("hashes password error")
+		log.Println("HashPassword error", err)
+		return nil, errors.New("Đăng nhập thất bại")
 	}
 	return bytes, err
 }
@@ -208,7 +210,8 @@ func HashPassword(password string) ([]byte, error) {
 func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		return errors.New("Mật khẩu không đúng")
+		log.Println("CheckPasswordHash error", err)
+		return errors.New("Đăng nhập thất bại")
 	}
 	return nil
 }

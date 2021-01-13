@@ -55,7 +55,7 @@ func (st Store) Login(req admin.AccountRequest, client *redis.Client) (admin.Log
 
 	err = admin.CheckPasswordHash(req.PassWord, user.PassWord)
 	if err != nil {
-		return response, errors.New("Mật khẩu không đúng")
+		return response, errors.New("Đăng nhập thất bại")
 	}
 
 	token, err := utils.EncodeAuthToken(user.UserName, user.Role)
