@@ -59,32 +59,6 @@ func CreateAccount(service user.IUserService, client *redis.Client) http.Handler
 	}
 }
 
-func Login(service user.IUserService, client *redis.Client) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := admin.AccountRequest{}
-		err := json.NewDecoder(r.Body).Decode(&req)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		if err := req.Validate("login"); err != nil {
-			// If input is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
-
-		login, err := service.Login(req, client)
-		if err != nil {
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
-		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, login)
-	}
-}
-
 func LogoutAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Context().Value("values").(middlewares.Vars)

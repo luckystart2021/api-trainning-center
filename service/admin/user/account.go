@@ -2,7 +2,6 @@ package user
 
 import (
 	"api-trainning-center/models/admin"
-	"api-trainning-center/utils"
 	"api-trainning-center/validate"
 	"database/sql"
 	"errors"
@@ -16,6 +15,7 @@ type IUserService interface {
 	Login(req admin.AccountRequest, client *redis.Client) (admin.LoginReponse, error)
 	ChangePassword(req admin.ChangeAccountRequest) (admin.Reponse, error)
 	ResetPassword(email string) (admin.MessageResponse, error)
+	ShowAllAccount() ([]admin.User, error)
 }
 
 type Store struct {
@@ -45,41 +45,9 @@ func (st Store) CreateAccount(req admin.AccountRequest) (admin.Reponse, error) {
 	return response, nil
 }
 
-func (st Store) Login(req admin.AccountRequest, client *redis.Client) (admin.LoginReponse, error) {
-	response := admin.LoginReponse{}
-	user, err := admin.CheckUserLogin(req.UserName, st.db)
-	if err != nil {
-		return response, err
-	}
-	// user is not registered
-	if user.UserName == "" {
-		return response, errors.New("Tên đăng nhập không tồn tại")
-	}
-
-	err = admin.CheckPasswordHash(req.PassWord, user.PassWord)
-	if err != nil {
-		return response, errors.New("Đăng nhập thất bại")
-	}
-
-	token, err := utils.EncodeAuthToken(user.UserName, user.Role)
-	if err != nil {
-		return response, err
-	}
-
-	saveErr := utils.CreateAuth(token, client)
-	if saveErr != nil {
-		return response, saveErr
-	}
-
-	response.Success = true
-	response.Token = token.AccessToken
-	response.UserID = user.UserName
-	return response, nil
-}
-
 func (st Store) ChangePassword(req admin.ChangeAccountRequest) (admin.Reponse, error) {
 	response := admin.Reponse{}
-	user, err := admin.CheckUserLogin(req.UserName, st.db)
+	user, err := admin.RetrieveAccountByUserName(req.UserName, st.db)
 	if err != nil {
 		return response, err
 	}
@@ -110,7 +78,7 @@ func (st Store) ChangePassword(req admin.ChangeAccountRequest) (admin.Reponse, e
 
 func (st Store) ResetPassword(userName string) (admin.MessageResponse, error) {
 	response := admin.MessageResponse{}
-	user, err := admin.CheckUserLogin(userName, st.db)
+	user, err := admin.RetrieveAccountByUserName(userName, st.db)
 	if err != nil {
 		return response, err
 	}

@@ -28,6 +28,7 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Get("/logout", LogoutAccount(st, client))
 			router.Post("/change_password", ChangePassword(st, client))
 			router.Post("/reset_password", ResetPassword(st, client))
+			router.Get("/view/accounts", ShowAllAccount(st, client))
 		})
 	}
 }

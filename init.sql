@@ -13,6 +13,7 @@ CREATE TABLE public."user" (
 	dateofbirth text NOT NULL,
 	phone text NOT NULL,
 	fullname text NOT NULL,
+	is_delete bool NULL DEFAULT false,
 	created_at timestamp(0) NOT NULL DEFAULT now(),
 
 	CONSTRAINT user_pkey PRIMARY KEY (username)

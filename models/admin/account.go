@@ -6,15 +6,23 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/badoux/checkmail"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	UserName string
-	PassWord string
-	Role     string
+	UserName    string    `json:"username"`
+	PassWord    string    `json:"password"`
+	Role        string    `json:"role"`
+	Email       string    `json:"email"`
+	DateOfBirth string    `json:"date_of_birth"`
+	Sex         string    `json:"sex"`
+	Phone       string    `json:"phone"`
+	FullName    string    `json:"fullname"`
+	CreatedAt   time.Time `json:"created_at"`
+	IsDelete    bool      `json:"is_delete"`
 }
 
 type AccountRequest struct {
@@ -38,9 +46,9 @@ type Reponse struct {
 }
 
 type LoginReponse struct {
-	Success bool   `json:"success"`
-	Token   string `json:"token"`
-	UserID  string `json:"userid"`
+	Success  bool   `json:"success"`
+	Token    string `json:"token"`
+	InfoUser User   `json:"infoUser"`
 }
 
 type ChangeAccountRequest struct {
@@ -183,22 +191,74 @@ func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
 	return nil
 }
 
-func CheckUserLogin(userName string, db *sql.DB) (User, error) {
+func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	user := User{}
 	query := `
 	SELECT 
-		username, password, role
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
 	FROM 
 		"user" u 
 	WHERE 
 		u.username = $1;`
 	row := db.QueryRow(query, userName)
-	err := row.Scan(&user.UserName, &user.PassWord, &user.Role)
+
+	err := row.Scan(&user.UserName, &user.PassWord, &user.Email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
 	if err != nil {
-		log.Println("CheckUserLogin error", err)
-		return user, errors.New("Tên đăng nhập hoặc mật khẩu không đúng")
+		log.Fatalln("RetrieveAccountByUserName scan error", err)
+		return user, errors.New("Tên đăng nhập không đúng")
 	}
 	return user, nil
+}
+
+func RetrieveAccounts(db *sql.DB) ([]User, error) {
+	users := []User{}
+	query := `
+	SELECT 
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
+	FROM 
+		"user"`
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatalln("[RetrieveAccounts] query error ", err)
+		return users, err
+	}
+
+	for rows.Next() {
+		var err error
+		var username, password, email, role, sex, dateofbirth, phone, fullname string
+		var created_at time.Time
+		var is_delete bool
+		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete)
+		if err != nil {
+			log.Fatalln("[RetrieveAccounts] Scan error ", err)
+			return users, err
+		}
+		user := User{
+			UserName:    username,
+			PassWord:    password,
+			Role:        role,
+			Email:       email,
+			Sex:         sex,
+			DateOfBirth: dateofbirth,
+			Phone:       phone,
+			FullName:    fullname,
+			IsDelete:    is_delete,
+		}
+		user.CreatedAt, err = TimeIn(created_at, "Local")
+		if err != nil {
+			log.Println("<time unknown>")
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+func TimeIn(t time.Time, name string) (time.Time, error) {
+	loc, err := time.LoadLocation(name)
+	if err == nil {
+		t = t.In(loc)
+	}
+	return t, err
 }
 
 // HashPassword hashes password from user input
