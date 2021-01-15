@@ -3,8 +3,6 @@ package admin
 import (
 	"api-trainning-center/middlewares"
 	"api-trainning-center/models/admin"
-	"log"
-	"strconv"
 
 	"api-trainning-center/service/admin/user"
 	"api-trainning-center/service/response"
@@ -21,22 +19,11 @@ type ResetPasswordRequest struct {
 	UserName string `json:"username"`
 }
 
-// CreateAccount zcontroller for creating new users
+// CreateAccount controller for creating new users
 func CreateAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userRole := r.Context().Value("values").(middlewares.Vars)
-		_, err := FetchAuth(userRole.AccessUuid, client)
-		if err != nil {
-			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
-			return
-		}
-		log.Println("Role", userRole.Role)
-		if userRole.Role != ADMIN {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Bạn không có quyền tạo tài khoản"))
-			return
-		}
 		req := admin.AccountRequest{}
-		err = json.NewDecoder(r.Body).Decode(&req)
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			w.WriteHeader(http.StatusBadRequest)
@@ -59,6 +46,7 @@ func CreateAccount(service user.IUserService, client *redis.Client) http.Handler
 	}
 }
 
+// LogoutAccount controller for logout
 func LogoutAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Context().Value("values").(middlewares.Vars)
@@ -72,10 +60,11 @@ func LogoutAccount(service user.IUserService, client *redis.Client) http.Handler
 	}
 }
 
+// ChangePassword controller for change password of account
 func ChangePassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		_, err := FetchAuth(userRole.AccessUuid, client)
+		_, err := middlewares.FetchAuth(userRole.AccessUuid, client)
 		if err != nil {
 			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
 			return
@@ -104,21 +93,11 @@ func ChangePassword(service user.IUserService, client *redis.Client) http.Handle
 	}
 }
 
+// ResetPassword controller for account just have Admin
 func ResetPassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userRole := r.Context().Value("values").(middlewares.Vars)
-		_, err := FetchAuth(userRole.AccessUuid, client)
-		if err != nil {
-			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
-			return
-		}
-		log.Println("Role", userRole.Role)
-		if userRole.Role != ADMIN {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Bạn không có quyền reset password"))
-			return
-		}
 		req := ResetPasswordRequest{}
-		err = json.NewDecoder(r.Body).Decode(&req)
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			w.WriteHeader(http.StatusBadRequest)
@@ -145,13 +124,4 @@ func DeleteAuth(givenUuid string, client *redis.Client) (int64, error) {
 		return 0, err
 	}
 	return deleted, nil
-}
-
-func FetchAuth(givenUuid string, client *redis.Client) (uint64, error) {
-	userid, err := client.Get(givenUuid).Result()
-	if err != nil {
-		return 0, err
-	}
-	userID, _ := strconv.ParseUint(userid, 10, 64)
-	return userID, nil
 }

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/sirupsen/logrus"
 )
 
 var client *redis.Client
@@ -38,6 +39,15 @@ func init() {
 	} else {
 		fmt.Printf("Pong: %v\n", pong)
 	}
+}
+
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableColors: false,
+		FullTimestamp: true,
+		ForceColors:   true,
+	})
+	logrus.SetReportCaller(true)
 }
 
 func main() {

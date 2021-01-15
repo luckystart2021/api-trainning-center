@@ -202,7 +202,13 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 		u.username = $1;`
 	row := db.QueryRow(query, userName)
 
-	err := row.Scan(&user.UserName, &user.PassWord, &user.Email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
+	var email sql.NullString
+
+	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
+	if email.Valid {
+		user.Email = email.String
+	}
+
 	if err != nil {
 		log.Fatalln("RetrieveAccountByUserName scan error", err)
 		return user, errors.New("Tên đăng nhập không đúng")
@@ -225,7 +231,8 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 
 	for rows.Next() {
 		var err error
-		var username, password, email, role, sex, dateofbirth, phone, fullname string
+		var email sql.NullString
+		var username, password, role, sex, dateofbirth, phone, fullname string
 		var created_at time.Time
 		var is_delete bool
 		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete)
@@ -237,28 +244,20 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 			UserName:    username,
 			PassWord:    password,
 			Role:        role,
-			Email:       email,
 			Sex:         sex,
+			CreatedAt:   created_at,
 			DateOfBirth: dateofbirth,
 			Phone:       phone,
 			FullName:    fullname,
 			IsDelete:    is_delete,
 		}
-		user.CreatedAt, err = TimeIn(created_at, "Local")
-		if err != nil {
-			log.Println("<time unknown>")
+
+		if email.Valid {
+			user.Email = email.String
 		}
 		users = append(users, user)
 	}
 	return users, nil
-}
-
-func TimeIn(t time.Time, name string) (time.Time, error) {
-	loc, err := time.LoadLocation(name)
-	if err == nil {
-		t = t.In(loc)
-	}
-	return t, err
 }
 
 // HashPassword hashes password from user input
