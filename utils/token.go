@@ -16,10 +16,11 @@ type TokenDetails struct {
 	UserID      string
 	Role        string
 	AtExpires   int64
+	IsDelete    bool
 }
 
 // EncodeAuthToken signs authentication token
-func EncodeAuthToken(us string, role string) (*TokenDetails, error) {
+func EncodeAuthToken(us, role string) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	td.AccessUuid = uuid.NewV4().String()
 	td.UserID = us
@@ -49,6 +50,7 @@ func CreateAuth(td *TokenDetails, client *redis.Client) error {
 	now := time.Now()
 
 	errAccess := client.Set(td.AccessUuid, td.UserID, at.Sub(now)).Err()
+
 	if errAccess != nil {
 		return errAccess
 	}

@@ -1,25 +1,29 @@
 package user
 
 import (
-	"api-trainning-center/models/admin"
+	"api-trainning-center/models/admin/account"
 	"api-trainning-center/utils"
 	"errors"
 
 	"github.com/go-redis/redis"
 )
 
-func (st Store) Login(req admin.AccountRequest, client *redis.Client) (admin.LoginReponse, error) {
-	response := admin.LoginReponse{}
-	user, err := admin.RetrieveAccountByUserName(req.UserName, st.db)
+func (st Store) Login(req account.AccountRequest, client *redis.Client) (account.LoginReponse, error) {
+	response := account.LoginReponse{}
+	user, err := account.RetrieveAccountByUserName(req.UserName, st.db)
 	if err != nil {
 		return response, err
 	}
 	// user is not registered
-	if user.UserName == "" {
+	if user.UserName == "" || len(user.UserName) == 0 {
 		return response, errors.New("Tên đăng nhập không tồn tại")
 	}
 
-	err = admin.CheckPasswordHash(req.PassWord, user.PassWord)
+	if user.IsDelete == true {
+		return response, errors.New("Tài khoản của bạn đã bị khóa")
+	}
+
+	err = account.CheckPasswordHash(req.PassWord, user.PassWord)
 	if err != nil {
 		return response, errors.New("Đăng nhập thất bại")
 	}

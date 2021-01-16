@@ -1,4 +1,4 @@
-package admin
+package account
 
 import (
 	"api-trainning-center/middlewares"
@@ -29,7 +29,9 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Post("/signup", CreateAccount(st, client))
 			router.Get("/logout", LogoutAccount(st, client))
 			router.Post("/reset_password", ResetPassword(st, client))
-			router.Get("/view/accounts", ShowAllAccount(st, client))
+			router.Get("/view/accounts", RetrieveAccounts(st, client))
+			router.Get("/view/account/{username}", RetrieveAccount(st, client))
+			router.Get("/delete/account/{username}", DeleteAccount(st, client))
 		})
 	}
 }

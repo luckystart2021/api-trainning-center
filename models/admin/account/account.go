@@ -1,29 +1,15 @@
-package admin
+package account
 
 import (
 	"api-trainning-center/validate"
 	"database/sql"
 	"errors"
-	"log"
 	"strings"
-	"time"
 
 	"github.com/badoux/checkmail"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type User struct {
-	UserName    string    `json:"username"`
-	PassWord    string    `json:"password"`
-	Role        string    `json:"role"`
-	Email       string    `json:"email"`
-	DateOfBirth string    `json:"date_of_birth"`
-	Sex         string    `json:"sex"`
-	Phone       string    `json:"phone"`
-	FullName    string    `json:"fullname"`
-	CreatedAt   time.Time `json:"created_at"`
-	IsDelete    bool      `json:"is_delete"`
-}
 
 type AccountRequest struct {
 	Email       string `json:"email"`
@@ -63,7 +49,7 @@ func (acc AccountRequest) Validate(action string) error {
 		if acc.UserName == "" {
 			return errors.New("Bạn chưa nhập tên đăng nhập")
 		} else {
-			if len(acc.FullName) > 50 {
+			if len(acc.UserName) > 50 {
 				return errors.New("Tên đăng nhập quá dài")
 			}
 		}
@@ -170,13 +156,13 @@ func CreateUserByRequest(req AccountRequest, db *sql.DB) error {
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
 	_, err := db.Exec(query, req.UserName, req.PassWord, req.Email, req.Role, req.Sex, req.DateOfBirth, req.Phone, req.FullName)
 	if err != nil {
-		log.Println("Insert DB err", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[CreateUserByRequest]Insert DB err  %v", err)
 		return err
 	}
 	return nil
 }
 
-// CreateUserByRequest executes subscribe to updates from an email address
+// UpdateAccountByRequest executes subscribe to updates from an email address
 func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
 	query := `
 	UPDATE "user" SET
@@ -185,86 +171,32 @@ func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
 		username = $2;`
 	_, err := db.Exec(query, newPassWord, userName)
 	if err != nil {
-		log.Println("Update DB err", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateAccountByRequest] Update DB err  %v", err)
 		return err
 	}
 	return nil
 }
 
-func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
-	user := User{}
+// DeleteAccountByUserName
+func DeleteAccountByUserName(userName string, db *sql.DB) error {
 	query := `
-	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
-	FROM 
-		"user" u 
+	UPDATE "user" SET
+		is_delete=$1
 	WHERE 
-		u.username = $1;`
-	row := db.QueryRow(query, userName)
-
-	var email sql.NullString
-
-	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
-	if email.Valid {
-		user.Email = email.String
-	}
-
+		username = $2;`
+	_, err := db.Exec(query, true, userName)
 	if err != nil {
-		log.Fatalln("RetrieveAccountByUserName scan error", err)
-		return user, errors.New("Tên đăng nhập không đúng")
+		logrus.WithFields(logrus.Fields{}).Errorf("[DeleteAccountByUserName] Delete DB err  %v", err)
+		return err
 	}
-	return user, nil
-}
-
-func RetrieveAccounts(db *sql.DB) ([]User, error) {
-	users := []User{}
-	query := `
-	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
-	FROM 
-		"user"`
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Fatalln("[RetrieveAccounts] query error ", err)
-		return users, err
-	}
-
-	for rows.Next() {
-		var err error
-		var email sql.NullString
-		var username, password, role, sex, dateofbirth, phone, fullname string
-		var created_at time.Time
-		var is_delete bool
-		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete)
-		if err != nil {
-			log.Fatalln("[RetrieveAccounts] Scan error ", err)
-			return users, err
-		}
-		user := User{
-			UserName:    username,
-			PassWord:    password,
-			Role:        role,
-			Sex:         sex,
-			CreatedAt:   created_at,
-			DateOfBirth: dateofbirth,
-			Phone:       phone,
-			FullName:    fullname,
-			IsDelete:    is_delete,
-		}
-
-		if email.Valid {
-			user.Email = email.String
-		}
-		users = append(users, user)
-	}
-	return users, nil
+	return nil
 }
 
 // HashPassword hashes password from user input
 func HashPassword(password string) ([]byte, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10) // 10 is the cost for hashing the password.
 	if err != nil {
-		log.Println("HashPassword error", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[HashPassword] error  %v", err)
 		return nil, errors.New("Đăng nhập thất bại")
 	}
 	return bytes, err
@@ -274,7 +206,7 @@ func HashPassword(password string) ([]byte, error) {
 func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		log.Println("CheckPasswordHash error", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[CheckPasswordHash] error  %v", err)
 		return errors.New("Đăng nhập thất bại")
 	}
 	return nil
