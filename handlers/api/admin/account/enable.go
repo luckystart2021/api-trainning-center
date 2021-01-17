@@ -7,11 +7,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 )
 
-func EnableAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func EnableAccount(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		username := chi.URLParam(r, "username")
 		if username == "" || len(username) == 0 || len(username) > 50 {

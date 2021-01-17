@@ -6,14 +6,12 @@ import (
 	"api-trainning-center/service/response"
 	"encoding/json"
 	"net/http"
-
-	"github.com/go-redis/redis"
 )
 
 const ADMIN = "ADMIN"
 
 // CreateAccount controller for creating new users
-func CreateAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func CreateAccount(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := account.AccountRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)

@@ -14,7 +14,7 @@ func EnableAccountByUserName(userName string, db *sql.DB) error {
 		username = $2;`
 	_, err := db.Exec(query, ACTIVE, userName)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[EnableAccountByUserName] Delete DB err  %v", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[EnableAccountByUserName] Update is delete DB err  %v", err)
 		return err
 	}
 	return nil

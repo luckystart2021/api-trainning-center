@@ -48,7 +48,7 @@ func ChangePassword(service user.IUserService, client *redis.Client) http.Handle
 }
 
 // UpdateAccount controller for update account information
-func UpdateAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func UpdateAccount(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := account.AccountRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)

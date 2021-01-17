@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-
-	"github.com/go-redis/redis"
 )
 
 type ResetPasswordRequest struct {
@@ -15,7 +13,7 @@ type ResetPasswordRequest struct {
 }
 
 // ResetPassword controller for account just have Admin
-func ResetPassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func ResetPassword(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := ResetPasswordRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)

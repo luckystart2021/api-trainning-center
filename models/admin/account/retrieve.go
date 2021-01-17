@@ -42,13 +42,14 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	var email sql.NullString
 
 	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
-	if email.Valid {
-		user.Email = email.String
-	}
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountByUserName scan error  %v", err)
 		return user, errors.New("Tên đăng nhập không tồn tại hoặc đã bị khóa")
+	}
+
+	if email.Valid {
+		user.Email = email.String
 	}
 	return user, nil
 }
@@ -67,14 +68,16 @@ func RetrieveAccountInActiveByUserName(userName string, db *sql.DB) (User, error
 	var email sql.NullString
 
 	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
-	if email.Valid {
-		user.Email = email.String
-	}
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountInActiveByUserName scan error  %v", err)
 		return user, errors.New("Tên đăng nhập không tồn tại")
 	}
+
+	if email.Valid {
+		user.Email = email.String
+	}
+
 	return user, nil
 }
 

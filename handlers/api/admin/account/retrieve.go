@@ -7,11 +7,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 )
 
-func RetrieveAccounts(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func RetrieveAccounts(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		showAllAccount, err := service.ShowAllAccount()
 		if err != nil {
@@ -23,7 +22,7 @@ func RetrieveAccounts(service user.IUserService, client *redis.Client) http.Hand
 	}
 }
 
-func RetrieveAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
+func RetrieveAccount(service user.IUserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		username := chi.URLParam(r, "username")
 		if username == "" || len(username) == 0 || len(username) > 50 {

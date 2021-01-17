@@ -14,7 +14,7 @@ const (
 	ADMIN  = "ADMIN"
 )
 
-func CheckScopeAccess(client *redis.Client) func(http.Handler) http.Handler {
+func CheckScopeAccess(client *redis.Client, scope string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userRole := r.Context().Value(VALUES).(Vars)
@@ -24,7 +24,7 @@ func CheckScopeAccess(client *redis.Client) func(http.Handler) http.Handler {
 				return
 			}
 			logrus.WithFields(logrus.Fields{}).Infof("User %s Role %s loging ", userRole.UserName, userRole.Role)
-			if userRole.Role != ADMIN {
+			if userRole.Role != scope {
 				response.RespondWithError(w, http.StatusBadRequest, errors.New("Bạn không có quyền truy cập"))
 				return
 			}
