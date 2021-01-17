@@ -12,6 +12,8 @@ import (
 	"github.com/go-redis/redis"
 )
 
+const UPDATE = "update"
+
 // ChangePassword controller for change password of account
 func ChangePassword(service user.IUserService, client *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -42,5 +44,31 @@ func ChangePassword(service user.IUserService, client *redis.Client) http.Handle
 		}
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, changePassword)
+	}
+}
+
+// UpdateAccount controller for update account information
+func UpdateAccount(service user.IUserService, client *redis.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := account.AccountRequest{}
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if err := req.Validate(UPDATE); err != nil {
+			// If input is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		updateAccount, err := service.UpdateAccountByRequest(req)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, updateAccount)
 	}
 }

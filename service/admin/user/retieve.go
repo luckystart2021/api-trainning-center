@@ -21,8 +21,8 @@ func (st Store) ShowAccount(username string) (account.User, error) {
 	user, err := account.RetrieveAccountByUserName(username, st.db)
 
 	// user is not registered
-	if user.UserName == "" || len(user.UserName) == 0 || len(user.UserName) > 0 {
-		return account.User{}, errors.New("Tên đăng nhập không tồn tại")
+	if user.UserName == "" || len(user.UserName) == 0 || len(user.UserName) > 50 {
+		return account.User{}, errors.New("Tên đăng nhập không tồn tại hoặc đã bị khóa")
 	}
 
 	if err != nil {

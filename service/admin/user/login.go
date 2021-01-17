@@ -19,10 +19,6 @@ func (st Store) Login(req account.AccountRequest, client *redis.Client) (account
 		return response, errors.New("Tên đăng nhập không tồn tại")
 	}
 
-	if user.IsDelete == true {
-		return response, errors.New("Tài khoản của bạn đã bị khóa")
-	}
-
 	err = account.CheckPasswordHash(req.PassWord, user.PassWord)
 	if err != nil {
 		return response, errors.New("Đăng nhập thất bại")

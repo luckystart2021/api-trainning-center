@@ -5,13 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 )
 
 type Vars struct {
@@ -25,7 +25,7 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := ExtractToken(r)
 		if err != nil {
-			log.Println("tokenString err ", err)
+			logrus.WithFields(logrus.Fields{}).Errorf("tokenString err : %v", err)
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã xác thực không tồn tại, vui lòng đăng nhập lại"))
 			return
 		}
@@ -37,7 +37,7 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 			return []byte(os.Getenv("ACCESS_SECRET")), nil
 		})
 		if err != nil {
-			log.Print("Parse token error ", err)
+			logrus.WithFields(logrus.Fields{}).Errorf("[AuthJwtVerify] Parse token error : %v", err)
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
 			return
 		}
@@ -50,24 +50,28 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 		claims, ok := token.Claims.(jwt.MapClaims)
 
 		if !ok || claims["Access_uuid"] == "" || claims["Role"] == "" || claims["ExpiresAt"] == "" || claims["UserID"] == "" {
+			logrus.WithFields(logrus.Fields{}).Error("[AuthJwtVerify] Access_uuid,Role,ExpiresAt,UserID is null")
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Mã xác thực không hợp lệ: xác thực không thành công"))
 			return
 		}
 
 		accessUuid, ok := claims["Access_uuid"].(string)
 		if !ok {
+			logrus.WithFields(logrus.Fields{}).Error("[AuthJwtVerify] Access_uuid parse string error")
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Mã xác thực không hợp lệ: xác thực không thành công"))
 			return
 		}
 
 		role, ok := claims["Role"].(string)
 		if !ok {
+			logrus.WithFields(logrus.Fields{}).Error("[AuthJwtVerify] Role parse string error")
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Mã xác thực không hợp lệ: xác thực không thành công"))
 			return
 		}
 
 		userName, ok := claims["UserID"].(string)
 		if !ok {
+			logrus.WithFields(logrus.Fields{}).Error("[AuthJwtVerify] UserID parse string error")
 			response.RespondWithError(w, http.StatusForbidden, errors.New("Mã xác thực không hợp lệ: xác thực không thành công"))
 			return
 		}

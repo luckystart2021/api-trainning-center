@@ -15,7 +15,7 @@ func RouterLogin(db *sql.DB, client *redis.Client) func(chi.Router) {
 	st := user.NewStore(db)
 	return func(router chi.Router) {
 		router.Post("/system/login", Login(st, client))
-		router.With(middlewares.AuthJwtVerify).Post("/change_password", ChangePassword(st, client))
+		router.With(middlewares.AuthJwtVerify).Post("/account/change_password", ChangePassword(st, client))
 		router.Group(adminRoute(db, client))
 	}
 }
@@ -30,8 +30,12 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Get("/logout", LogoutAccount(st, client))
 			router.Post("/reset_password", ResetPassword(st, client))
 			router.Get("/view/accounts", RetrieveAccounts(st, client))
-			router.Get("/view/account/{username}", RetrieveAccount(st, client))
-			router.Get("/delete/account/{username}", DeleteAccount(st, client))
+			router.Route("/{username}", func(router chi.Router) {
+				router.Get("/view/account", RetrieveAccount(st, client))
+				router.Get("/disable/account", DisableAccount(st, client))
+				router.Get("/enable/account", EnableAccount(st, client))
+			})
+			router.Post("/update/account", UpdateAccount(st, client))
 		})
 	}
 }

@@ -21,6 +21,13 @@ type User struct {
 	IsDelete    bool      `json:"is_delete"`
 }
 
+type IsDeleteStatus bool
+
+const (
+	ACTIVE   IsDeleteStatus = false
+	INACTIVE IsDeleteStatus = true
+)
+
 func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	user := User{}
 	query := `
@@ -30,7 +37,7 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 		"user" u 
 	WHERE 
 		u.username = $1 AND is_delete = $2;`
-	row := db.QueryRow(query, userName, false)
+	row := db.QueryRow(query, userName, ACTIVE)
 
 	var email sql.NullString
 
@@ -41,7 +48,32 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountByUserName scan error  %v", err)
-		return user, errors.New("Tên đăng nhập không đúng")
+		return user, errors.New("Tên đăng nhập không tồn tại hoặc đã bị khóa")
+	}
+	return user, nil
+}
+
+func RetrieveAccountInActiveByUserName(userName string, db *sql.DB) (User, error) {
+	user := User{}
+	query := `
+	SELECT 
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
+	FROM 
+		"user" u 
+	WHERE 
+		u.username = $1 AND is_delete = $2;`
+	row := db.QueryRow(query, userName, INACTIVE)
+
+	var email sql.NullString
+
+	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
+	if email.Valid {
+		user.Email = email.String
+	}
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountInActiveByUserName scan error  %v", err)
+		return user, errors.New("Tên đăng nhập không tồn tại")
 	}
 	return user, nil
 }
@@ -55,7 +87,7 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		"user"
 	WHERE 
 		is_delete = $1;`
-	rows, err := db.Query(query, false)
+	rows, err := db.Query(query, ACTIVE)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] query error  %v", err)
 		return users, err

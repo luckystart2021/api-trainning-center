@@ -70,11 +70,13 @@ func (acc AccountRequest) Validate(action string) error {
 			}
 		}
 
-		if acc.PassWord == "" {
-			return errors.New("Bạn chưa nhập mật khẩu")
-		} else {
-			if err := validate.VerifyPassword(acc.PassWord); err != nil {
-				return err
+		if action != "update" {
+			if acc.PassWord == "" {
+				return errors.New("Bạn chưa nhập mật khẩu")
+			} else {
+				if err := validate.VerifyPassword(acc.PassWord); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -157,36 +159,6 @@ func CreateUserByRequest(req AccountRequest, db *sql.DB) error {
 	_, err := db.Exec(query, req.UserName, req.PassWord, req.Email, req.Role, req.Sex, req.DateOfBirth, req.Phone, req.FullName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateUserByRequest]Insert DB err  %v", err)
-		return err
-	}
-	return nil
-}
-
-// UpdateAccountByRequest executes subscribe to updates from an email address
-func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
-	query := `
-	UPDATE "user" SET
-		password=$1
-	WHERE 
-		username = $2;`
-	_, err := db.Exec(query, newPassWord, userName)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateAccountByRequest] Update DB err  %v", err)
-		return err
-	}
-	return nil
-}
-
-// DeleteAccountByUserName
-func DeleteAccountByUserName(userName string, db *sql.DB) error {
-	query := `
-	UPDATE "user" SET
-		is_delete=$1
-	WHERE 
-		username = $2;`
-	_, err := db.Exec(query, true, userName)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[DeleteAccountByUserName] Delete DB err  %v", err)
 		return err
 	}
 	return nil

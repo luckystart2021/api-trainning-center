@@ -4,7 +4,6 @@ import (
 	"api-trainning-center/service/response"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
@@ -19,8 +18,8 @@ func CheckScopeAccess(client *redis.Client) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userRole := r.Context().Value(VALUES).(Vars)
-			_, err := FetchAuth(userRole.AccessUuid, client)
-			if err != nil {
+			uuid, err := FetchAuth(userRole.AccessUuid, client)
+			if err != nil || len(uuid) == 0 {
 				response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
 				return
 			}
@@ -34,11 +33,10 @@ func CheckScopeAccess(client *redis.Client) func(http.Handler) http.Handler {
 	}
 }
 
-func FetchAuth(givenUuid string, client *redis.Client) (uint64, error) {
+func FetchAuth(givenUuid string, client *redis.Client) (string, error) {
 	userid, err := client.Get(givenUuid).Result()
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	userID, _ := strconv.ParseUint(userid, 10, 64)
-	return userID, nil
+	return userid, nil
 }
