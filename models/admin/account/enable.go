@@ -8,7 +8,7 @@ import (
 
 func EnableAccountByUserName(userName string, db *sql.DB) error {
 	query := `
-	UPDATE "user" SET
+	UPDATE "users" SET
 		is_delete=$1
 	WHERE 
 		username = $2;`

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"api-trainning-center/handlers/api/admin/account"
+	"api-trainning-center/handlers/api/admin/course"
 	"api-trainning-center/utils"
 	"database/sql"
 	"net/http"
@@ -31,6 +32,7 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 	// handle api
 	router.Group(func(chi.Router) {
 		router.Route("/api", account.RouterLogin(db, client))
+		router.Route("/api/course", course.CourseRoute(db))
 	})
 	return router
 }

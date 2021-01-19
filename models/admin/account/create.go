@@ -20,6 +20,7 @@ type AccountRequest struct {
 	DateOfBirth string `json:"dateofbirth"`
 	Phone       string `json:"phone"`
 	FullName    string `json:"fullname"`
+	Address     string `json:"address"`
 }
 
 type MessageResponse struct {
@@ -120,6 +121,14 @@ func (acc AccountRequest) Validate(action string) error {
 			}
 		}
 
+		if acc.Address == "" {
+			return errors.New("Bạn chưa nhập địa chỉ")
+		} else {
+			if len(acc.Address) > 250 {
+				return errors.New("Địa chỉ quá dài")
+			}
+		}
+
 		if acc.Email != "" {
 			if err := checkmail.ValidateFormat(acc.Email); err != nil {
 				return errors.New("Email không đúng định dạng")
@@ -153,10 +162,10 @@ func (accChange ChangeAccountRequest) ChangeAccountValidate() error {
 // CreateUserByRequest executes subscribe to updates from an email address
 func CreateUserByRequest(req AccountRequest, db *sql.DB) error {
 	query := `
-	INSERT INTO "user" 
-		(username, password, email, role, sex, dateofbirth, phone, fullname) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
-	_, err := db.Exec(query, req.UserName, req.PassWord, req.Email, req.Role, req.Sex, req.DateOfBirth, req.Phone, req.FullName)
+	INSERT INTO "users" 
+		(username, password, email, role, sex, dateofbirth, phone, fullname, address) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
+	_, err := db.Exec(query, req.UserName, req.PassWord, req.Email, req.Role, req.Sex, req.DateOfBirth, req.Phone, req.FullName, req.Address)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateUserByRequest]Insert DB err  %v", err)
 		return err

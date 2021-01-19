@@ -19,6 +19,8 @@ type User struct {
 	FullName    string    `json:"fullname"`
 	CreatedAt   time.Time `json:"created_at"`
 	IsDelete    bool      `json:"is_delete"`
+	Available   bool      `json:"available"`
+	Address     string    `json:"address"`
 }
 
 type IsDeleteStatus bool
@@ -32,16 +34,16 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	user := User{}
 	query := `
 	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
 	FROM 
-		"user" u 
+		"users" u 
 	WHERE 
 		u.username = $1 AND is_delete = $2;`
 	row := db.QueryRow(query, userName, ACTIVE)
 
 	var email sql.NullString
 
-	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
+	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete, &user.Available, &user.Address)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountByUserName scan error  %v", err)
@@ -58,16 +60,16 @@ func RetrieveAccountInActiveByUserName(userName string, db *sql.DB) (User, error
 	user := User{}
 	query := `
 	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
 	FROM 
-		"user" u 
+		"users" u 
 	WHERE 
 		u.username = $1 AND is_delete = $2;`
 	row := db.QueryRow(query, userName, INACTIVE)
 
 	var email sql.NullString
 
-	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete)
+	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete, &user.Available, &user.Address)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountInActiveByUserName scan error  %v", err)
@@ -85,9 +87,9 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	users := []User{}
 	query := `
 	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete
+		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
 	FROM 
-		"user"
+		"users"
 	WHERE 
 		is_delete = $1;`
 	rows, err := db.Query(query, ACTIVE)
@@ -99,10 +101,10 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	for rows.Next() {
 		var err error
 		var email sql.NullString
-		var username, password, role, sex, dateofbirth, phone, fullname string
+		var username, password, role, sex, dateofbirth, phone, fullname, address string
 		var created_at time.Time
-		var is_delete bool
-		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete)
+		var is_delete, available bool
+		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete, &available, &address)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] Scan error  %v", err)
 			return users, err
@@ -117,6 +119,8 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 			Phone:       phone,
 			FullName:    fullname,
 			IsDelete:    is_delete,
+			Address:     address,
+			Available:   available,
 		}
 
 		if email.Valid {
