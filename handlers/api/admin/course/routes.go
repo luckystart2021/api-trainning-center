@@ -10,6 +10,7 @@ import (
 func CourseRoute(db *sql.DB) func(chi.Router) {
 	st := course.NewStoreCourse(db)
 	return func(router chi.Router) {
-		router.Get("/view", RetrieveCourse(st))
+		router.Get("/view", RetrieveCourses(st))
+		router.Get("/view/{id_course}", RetrieveCourse(st))
 	}
 }

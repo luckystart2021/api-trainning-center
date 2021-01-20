@@ -23,15 +23,13 @@ type Course struct {
 	UpdatedBy      string    `json:"updated_by"`
 }
 
-type CourseStatus bool
-
-const (
-	ACTIVE   CourseStatus = true
-	INACTIVE CourseStatus = false
+var (
+	statusActive   bool = true
+	statusInActive bool = false
 )
 
 func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
-	course, err := retrieveCoursesActive(tc.db)
+	course, err := retrieveCourses(statusActive, tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCoursesActive] error : ", err)
 		return []Course{}, err
@@ -40,7 +38,43 @@ func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
 	return course, nil
 }
 
-func retrieveCoursesActive(db *sql.DB) ([]Course, error) {
+func (tc StoreCourse) ShowCourses(idCourse int) (Course, error) {
+	course, err := retrieveCourse(idCourse, tc.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCourses] error : ", err)
+		return Course{}, err
+	}
+
+	return course, nil
+}
+
+func retrieveCourse(idCourse int, db *sql.DB) (Course, error) {
+	courses := Course{}
+	query := `
+	SELECT 
+		id, code, name, start_date, end_date, graduation_date, test_date, 
+		training_system, status, created_by, created_at, updated_by, updated_at
+	FROM 
+		course
+	WHERE
+		id = $1;`
+	rows := db.QueryRow(query, idCourse)
+
+	var graduationDate sql.NullTime
+	err := rows.Scan(&courses.Id, &courses.Code, &courses.Name, &courses.StartDate, &courses.EndDate, &graduationDate,
+		&courses.TestDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &courses.CreatedAt, &courses.UpdatedBy, &courses.UpdatedAt)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
+		return courses, err
+	}
+	if graduationDate.Valid {
+		courses.GraduationDate = graduationDate.Time
+	}
+
+	return courses, nil
+}
+
+func retrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	courses := []Course{}
 	query := `
 	SELECT 
@@ -50,11 +84,12 @@ func retrieveCoursesActive(db *sql.DB) ([]Course, error) {
 		course
 	WHERE
 		status = $1;`
-	rows, err := db.Query(query, ACTIVE)
+	rows, err := db.Query(query, status)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCoursesActive] query error  %v", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
 		return courses, err
 	}
+
 	for rows.Next() {
 		var err error
 		var graduationDate sql.NullTime
@@ -65,7 +100,7 @@ func retrieveCoursesActive(db *sql.DB) ([]Course, error) {
 
 		err = rows.Scan(&id, &code, &name, &startDate, &endDate, &graduationDate, &testDate, &trainingSystem, &status, &createdBy, &createdAt, &updatedBy, &updatedAt)
 		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCoursesActive] Scan error  %v", err)
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
 			return courses, err
 		}
 		course := Course{

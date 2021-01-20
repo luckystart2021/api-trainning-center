@@ -6,6 +6,7 @@ import (
 
 type ICourseService interface {
 	ShowCoursesActive() ([]Course, error)
+	ShowCourses(idCourse int) (Course, error)
 }
 
 type StoreCourse struct {
