@@ -32,7 +32,7 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 	// handle api
 	router.Group(func(chi.Router) {
 		router.Route("/api", account.RouterLogin(db, client))
-		router.Route("/api/course", course.CourseRoute(db))
+		router.Route("/api/course", course.CourseRoute(db, client))
 	})
 	return router
 }

@@ -29,7 +29,7 @@ var (
 )
 
 func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
-	course, err := retrieveCourses(statusActive, tc.db)
+	course, err := RetrieveCourses(statusActive, tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCoursesActive] error : ", err)
 		return []Course{}, err
@@ -39,7 +39,7 @@ func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
 }
 
 func (tc StoreCourse) ShowCourses(idCourse int) (Course, error) {
-	course, err := retrieveCourse(idCourse, tc.db)
+	course, err := RetrieveCourse(idCourse, tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCourses] error : ", err)
 		return Course{}, err
@@ -48,7 +48,7 @@ func (tc StoreCourse) ShowCourses(idCourse int) (Course, error) {
 	return course, nil
 }
 
-func retrieveCourse(idCourse int, db *sql.DB) (Course, error) {
+func RetrieveCourse(idCourse int, db *sql.DB) (Course, error) {
 	courses := Course{}
 	query := `
 	SELECT 
@@ -74,7 +74,7 @@ func retrieveCourse(idCourse int, db *sql.DB) (Course, error) {
 	return courses, nil
 }
 
-func retrieveCourses(status bool, db *sql.DB) ([]Course, error) {
+func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	courses := []Course{}
 	query := `
 	SELECT 
