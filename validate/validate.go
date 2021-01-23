@@ -24,6 +24,13 @@ func CheckNumber(number string) bool {
 	return re.MatchString(number)
 }
 
+func CheckInput(input string) bool {
+	if input == ";" || input == "'" {
+		return false
+	}
+	return true
+}
+
 func VerifyPassword(password string) error {
 	var uppercasePresent bool
 	var lowercasePresent bool
