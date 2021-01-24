@@ -31,7 +31,7 @@ func UpdateAccount(req AccountRequest, db *sql.DB) error {
 		dateofbirth=$5, 
 		phone=$6, 
 		fullname=$7,
-		address=&8
+		address=$8
 	WHERE 
 		username = $1;`
 	_, err := db.Exec(query, &user.UserName, &user.Email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.Address)

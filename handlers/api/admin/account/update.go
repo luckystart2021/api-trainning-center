@@ -42,6 +42,11 @@ func ChangePassword(service user.IUserService, client *redis.Client) http.Handle
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
+		deleted, delErr := DeleteAuth(userRole.AccessUuid, client)
+		if delErr != nil || deleted == 0 { //if any goes wrong
+			response.RespondWithError(w, http.StatusUnauthorized, errors.New("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"))
+			return
+		}
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, changePassword)
 	}

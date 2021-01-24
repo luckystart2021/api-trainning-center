@@ -7,6 +7,7 @@ import (
 
 type IContactService interface {
 	CreateContact(fullName, phone, email, message, subject string) (response.MessageResponse, error)
+	ShowContacts() ([]Contact, error)
 }
 
 type StoreContact struct {

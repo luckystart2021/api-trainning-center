@@ -26,17 +26,15 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 	return func(router chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
-		router.Route("/admin", func(router chi.Router) {
-			router.Post("/signup", CreateAccount(st))
-			router.Get("/logout", LogoutAccount(st, client))
-			router.Post("/reset_password", ResetPassword(st))
-			router.Get("/view/accounts", RetrieveAccounts(st))
-			router.Route("/{username}", func(router chi.Router) {
-				router.Get("/view/account", RetrieveAccount(st))
-				router.Put("/disable/account", DisableAccount(st))
-				router.Put("/enable/account", EnableAccount(st))
-			})
-			router.Put("/update/account", UpdateAccount(st))
+		router.Post("/signup", CreateAccount(st))
+		router.Get("/logout", LogoutAccount(st, client))
+		router.Post("/reset_password", ResetPassword(st))
+		router.Get("/view/accounts", RetrieveAccounts(st))
+		router.Route("/{username}", func(router chi.Router) {
+			router.Get("/view/account", RetrieveAccount(st))
+			router.Put("/disable/account", DisableAccount(st))
+			router.Put("/enable/account", EnableAccount(st))
 		})
+		router.Put("/update/account", UpdateAccount(st))
 	}
 }

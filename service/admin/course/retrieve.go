@@ -1,6 +1,7 @@
 package course
 
 import (
+	"api-trainning-center/utils"
 	"database/sql"
 	"time"
 
@@ -8,19 +9,19 @@ import (
 )
 
 type Course struct {
-	Id             int       `json:"id"`
-	Code           string    `json:"code"`
-	Name           string    `json:"name"`
-	StartDate      time.Time `json:"start_date"`
-	EndDate        time.Time `json:"end_date"`
-	GraduationDate time.Time `json:"graduation_date"`
-	TestDate       time.Time `json:"test_date"`
-	TrainingSystem string    `json:"training_system"`
-	Status         bool      `json:"status"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	CreatedBy      string    `json:"created_by"`
-	UpdatedBy      string    `json:"updated_by"`
+	Id             int    `json:"id"`
+	Code           string `json:"code"`
+	Name           string `json:"name"`
+	StartDate      string `json:"start_date"`
+	EndDate        string `json:"end_date"`
+	GraduationDate string `json:"graduation_date"`
+	TestDate       string `json:"test_date"`
+	TrainingSystem string `json:"training_system"`
+	Status         bool   `json:"status"`
+	CreatedAt      string `json:"created_at"`
+	UpdatedAt      string `json:"updated_at"`
+	CreatedBy      string `json:"created_by"`
+	UpdatedBy      string `json:"updated_by"`
 }
 
 var (
@@ -38,7 +39,7 @@ func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
 	return course, nil
 }
 
-func (tc StoreCourse) ShowCourses(idCourse int) (Course, error) {
+func (tc StoreCourse) ShowCourses(idCourse string) (Course, error) {
 	course, err := RetrieveCourse(idCourse, tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCourses] error : ", err)
@@ -48,7 +49,7 @@ func (tc StoreCourse) ShowCourses(idCourse int) (Course, error) {
 	return course, nil
 }
 
-func RetrieveCourse(idCourse int, db *sql.DB) (Course, error) {
+func RetrieveCourse(idCourse string, db *sql.DB) (Course, error) {
 	courses := Course{}
 	query := `
 	SELECT 
@@ -57,19 +58,25 @@ func RetrieveCourse(idCourse int, db *sql.DB) (Course, error) {
 	FROM 
 		course
 	WHERE
-		id = $1;`
+		code = $1;`
 	rows := db.QueryRow(query, idCourse)
-
 	var graduationDate sql.NullTime
-	err := rows.Scan(&courses.Id, &courses.Code, &courses.Name, &courses.StartDate, &courses.EndDate, &graduationDate,
-		&courses.TestDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &courses.CreatedAt, &courses.UpdatedBy, &courses.UpdatedAt)
+	var startDate, endDate, testDate, createdAt, updatedAt time.Time
+
+	err := rows.Scan(&courses.Id, &courses.Code, &courses.Name, &startDate, &endDate, &graduationDate,
+		&testDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &createdAt, &courses.UpdatedBy, &updatedAt)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
 		return courses, err
 	}
 	if graduationDate.Valid {
-		courses.GraduationDate = graduationDate.Time
+		courses.GraduationDate = utils.TimeIn(graduationDate.Time, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
 	}
+	courses.StartDate = utils.TimeIn(startDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+	courses.EndDate = utils.TimeIn(endDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+	courses.TestDate = utils.TimeIn(testDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+	courses.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	courses.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 
 	return courses, nil
 }
@@ -107,18 +114,18 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 			Id:             id,
 			Code:           code,
 			Name:           name,
-			StartDate:      startDate,
-			EndDate:        endDate,
-			TestDate:       testDate,
+			StartDate:      utils.TimeIn(startDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY),
+			EndDate:        utils.TimeIn(endDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY),
+			TestDate:       utils.TimeIn(testDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY),
 			TrainingSystem: trainingSystem,
 			Status:         status,
-			CreatedAt:      createdAt,
-			UpdatedAt:      updatedAt,
+			CreatedAt:      utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedAt:      utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
 			CreatedBy:      createdBy,
 			UpdatedBy:      updatedBy,
 		}
 		if graduationDate.Valid {
-			course.GraduationDate = graduationDate.Time
+			course.GraduationDate = utils.TimeIn(graduationDate.Time, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
 		}
 		courses = append(courses, course)
 	}
