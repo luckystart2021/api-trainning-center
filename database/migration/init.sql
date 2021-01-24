@@ -69,3 +69,22 @@ CREATE TABLE contact (
 	created_at timestamptz(0) NOT NULL DEFAULT now(),
 	CONSTRAINT contact_pk PRIMARY KEY (id)
 );
+
+-- public.information definition
+
+-- Drop table
+
+-- DROP TABLE public.information;
+
+CREATE TABLE information (
+	id serial NOT NULL,
+	address text NOT NULL,
+	email text NOT NULL,
+	phone text NOT NULL,
+	maps text NOT NULL,
+	title text NOT NULL,
+	description text NOT NULL,
+	img text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	CONSTRAINT information_pk PRIMARY KEY (id)
+);
