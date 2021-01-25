@@ -21,6 +21,7 @@ type Contact struct {
 
 func CreateContact(service contact.IContactService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		req := Contact{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
