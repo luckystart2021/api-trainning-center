@@ -1,0 +1,15 @@
+package question
+
+import (
+	"api-trainning-center/service/admin/question"
+	"database/sql"
+
+	"github.com/go-chi/chi"
+)
+
+func Router(db *sql.DB) func(chi.Router) {
+	st := question.NewStoreQuestion(db)
+	return func(router chi.Router) {
+		router.Get("/question", GetQuestionAnswer(st))
+	}
+}

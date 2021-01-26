@@ -88,3 +88,41 @@ CREATE TABLE information (
 	created_at timestamptz(0) NOT NULL DEFAULT now(),
 	CONSTRAINT information_pk PRIMARY KEY (id)
 );
+
+-- public.testsuite definition
+
+-- Drop table
+
+-- DROP TABLE public.testsuite;
+
+CREATE TABLE testsuite (
+	id serial NOT NULL,
+	"name" text NOT NULL,
+	CONSTRAINT testsuite_pk PRIMARY KEY (id)
+);
+
+-- public.question definition
+
+-- Drop table
+
+-- DROP TABLE public.question;
+
+CREATE TABLE question (
+	id serial NOT NULL,
+	"name" text NOT NULL,
+	"result" text NOT NULL,
+	paralysis bool NOT NULL DEFAULT false,
+	id_code_test int4 NOT NULL,
+	answera text NULL,
+	answerb text NULL,
+	answerc text NULL,
+	answerd text NULL,
+	img text NULL,
+	CONSTRAINT question_pk PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX question_name_idx ON public.question USING btree (name);
+
+
+-- public.question foreign keys
+
+ALTER TABLE public.question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
