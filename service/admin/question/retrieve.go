@@ -75,10 +75,8 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 		question := Question{
 			Id:           id,
 			QuestionName: questionName,
+			Img:          img.String,
 			Answers:      answers,
-		}
-		if img.String != "" || img.Valid {
-			question.Img = img.String
 		}
 		questions = append(questions, question)
 	}

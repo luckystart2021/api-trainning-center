@@ -6,6 +6,9 @@ import (
 	"api-trainning-center/utils"
 	"database/sql"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -45,6 +48,10 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 		router.Route("/api/admin", admin.Router(db, client))
 		router.Route("/api/user", user.Router(db))
 	})
+	workDir, _ := os.Getwd()
+	filesDir := http.Dir(filepath.Join(workDir, "upload"))``
+	FileServer(router, "/files", filesDir)
+
 	return router
 }
 
@@ -57,4 +64,25 @@ func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(405)
 	render.Render(w, r, utils.ErrMethodNotAllowed)
+}
+
+// FileServer conveniently sets up a http.FileServer handler to serve
+// static files from a http.FileSystem.
+func FileServer(r chi.Router, path string, root http.FileSystem) {
+	if strings.ContainsAny(path, "{}*") {
+		panic("FileServer does not permit any URL parameters.")
+	}
+
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
+		rctx := chi.RouteContext(r.Context())
+		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
+		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
+		fs.ServeHTTP(w, r)
+	})
 }

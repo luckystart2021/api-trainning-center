@@ -77,6 +77,7 @@ func main() {
 	server := &http.Server{
 		Handler: httpHandler,
 	}
+
 	go func() {
 		server.Serve(listener)
 	}()

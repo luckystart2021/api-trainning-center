@@ -10,6 +10,7 @@ import (
 func Router(db *sql.DB) func(chi.Router) {
 	st := question.NewStoreQuestion(db)
 	return func(router chi.Router) {
-		router.Get("/question", GetQuestionAnswer(st))
+		router.Get("/question/{id}", GetQuestionAnswer(st))
+		router.Post("/question/result", GetResult(st))
 	}
 }
