@@ -49,7 +49,7 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 		router.Route("/api/user", user.Router(db))
 	})
 	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "upload"))``
+	filesDir := http.Dir(filepath.Join(workDir, "upload"))
 	FileServer(router, "/files", filesDir)
 
 	return router

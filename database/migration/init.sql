@@ -126,3 +126,20 @@ CREATE UNIQUE INDEX question_name_idx ON public.question USING btree (name);
 -- public.question foreign keys
 
 ALTER TABLE public.question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
+
+
+-- public.notification definition
+
+-- Drop table
+
+-- DROP TABLE public.notification;
+
+CREATE TABLE public.notification (
+	id serial NOT NULL,
+	title text NOT NULL,
+	description text NOT NULL,
+	subtitle text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	img text NOT NULL,
+	CONSTRAINT notification_pk PRIMARY KEY (id)
+);

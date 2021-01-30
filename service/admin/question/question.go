@@ -17,13 +17,16 @@ type Answers struct {
 }
 
 type ResponseResult struct {
-	NumberOfCorrect   int    `json:"number_of_correct"`
-	NumberOfIncorrect int    `json:"number_of_incorrect"`
-	ResultTotal       string `json:"result_total"`
-	//ResultTests       []ResultTest `json:"result_tests"`
+	NumberOfCorrect   int          `json:"number_of_correct"`
+	NumberOfIncorrect int          `json:"number_of_incorrect"`
+	ResultTotal       string       `json:"result_total"`
+	ResultTests       []ResultTest `json:"result_tests"`
 }
 
 type ResultTest struct {
+	IdQuestion    string `json:"id_question"`
+	IdAnswer      string `json:"id_answer"`
+	CorrectAnswer string `json:"correct_answer"`
 }
 
 type IQuestionService interface {
