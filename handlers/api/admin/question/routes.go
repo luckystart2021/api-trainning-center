@@ -16,5 +16,6 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Post("/question/create", CreateQuestion(st))
+		router.Get("/questions/{code_de}/view", ShowQuestions(st))
 	}
 }

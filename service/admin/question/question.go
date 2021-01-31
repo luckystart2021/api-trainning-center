@@ -30,10 +30,24 @@ type ResultTest struct {
 	CorrectAnswer string `json:"correct_answer"`
 }
 
+type QuestionSystem struct {
+	Id      int64  `json:"id"`
+	CodeDe  int64  `json:"code_de"`
+	Name    string `json:"name"`
+	AnswerA string `json:"answer_a"`
+	AnswerB string `json:"answer_b"`
+	AnswerC string `json:"answer_c"`
+	AnswerD string `json:"answer_d"`
+	Img     string `json:"img"`
+	Result  string `json:"result"`
+	Liet    bool   `json:"liet"`
+}
+
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
 	ShowResult(result []result.Result) (ResponseResult, error)
 	CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	ShowQuestionsSystem(code string) ([]QuestionSystem, error)
 }
 
 type StoreQuestion struct {
