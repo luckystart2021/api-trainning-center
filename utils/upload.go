@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-func FileUpload(r *http.Request) (string, error) {
+func FileUpload(r *http.Request, fileName string) (string, error) {
 	//this function returns the filename(to save in database) of the saved file or an error if it occurs
-	
+
 	//ParseMultipartForm parses a request body as multipart/form-data
 	file, handler, err := r.FormFile("img") //retrieve the file from form data
 	//replace file with the key your sent your image with
@@ -17,7 +17,8 @@ func FileUpload(r *http.Request) (string, error) {
 	}
 	defer file.Close() //close the file when we finish
 	//this is path which  we want to store the file
-	f, err := os.OpenFile("upload/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	saveFileName := "upload/img/" + fileName + "/"
+	f, err := os.OpenFile(saveFileName+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return "", err
 	}

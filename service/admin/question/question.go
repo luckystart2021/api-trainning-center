@@ -2,6 +2,7 @@ package question
 
 import (
 	"api-trainning-center/models/admin/result"
+	"api-trainning-center/service/response"
 	"database/sql"
 )
 
@@ -32,6 +33,7 @@ type ResultTest struct {
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
 	ShowResult(result []result.Result) (ResponseResult, error)
+	CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 }
 
 type StoreQuestion struct {

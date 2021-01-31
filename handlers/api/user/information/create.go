@@ -27,7 +27,7 @@ func CreateInformation(service information.IInformationService) http.HandlerFunc
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseMultipartForm(32 << 20)
 		req := InformationRequest{}
-		imageName, err := utils.FileUpload(r)
+		imageName, err := utils.FileUpload(r, "information")
 		//here we call the function we made to get the image and save it
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
