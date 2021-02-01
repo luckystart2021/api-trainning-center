@@ -44,7 +44,7 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 			Title:       title,
 			Description: description,
 			SubTitle:    subtitle,
-			Img:         img,
+			Img:         "/files/img/about/" + img,
 		}
 		abouts = append(abouts, about)
 	}

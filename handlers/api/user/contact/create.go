@@ -49,7 +49,7 @@ func (c Contact) validate() error {
 	if c.FullName == "" {
 		return errors.New("Vui lòng nhập họ và tên")
 	}
-	if len(c.FullName) > 150 {
+	if len(c.FullName) > 200 {
 		return errors.New("Họ và tên không hợp lệ")
 	}
 
@@ -60,7 +60,7 @@ func (c Contact) validate() error {
 		return errors.New("Số điện thoại không hợp lệ")
 	}
 
-	if len(c.Email) > 64 {
+	if len(c.Email) > 200 {
 		return errors.New("Email không hợp lệ")
 	}
 	if c.Email != "" {
@@ -72,8 +72,8 @@ func (c Contact) validate() error {
 	if c.Message == "" {
 		return errors.New("Vui lòng nhập tin nhắn")
 	}
-	if len(c.Message) > 1000 {
-		return errors.New("Tin nhắn không được lớn hơn 1000 ký tự")
+	if len(c.Message) > 2000 {
+		return errors.New("Tin nhắn không được lớn hơn 2000 ký tự")
 	}
 
 	if len(c.Subject) > 200 {
