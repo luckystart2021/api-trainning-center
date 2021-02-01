@@ -2,6 +2,7 @@ package question
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -24,6 +25,64 @@ func (tc StoreQuestion) ShowQuestionsSystem(code string) ([]QuestionSystem, erro
 	}
 
 	return question, nil
+}
+
+func (tc StoreQuestion) ShowQuestionSystem(idQuestion string) (QuestionSystem, error) {
+	question, err := retrieveQuestionSystem(tc.db, idQuestion)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowQuestionSystem] error : ", err)
+		return QuestionSystem{}, err
+	}
+
+	return question, nil
+}
+
+func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, error) {
+	question := QuestionSystem{}
+	query := `
+	select
+		q.id,
+		q.name,
+		q.result,
+		q.id_code_test,
+		q.paralysis,
+		q.answera ,
+		q.answerb ,
+		q.answerc ,
+		q.answerd,
+		q.img
+	from
+		question q
+	where
+		q.id = $1
+	`
+	rows := db.QueryRow(query, idQuestion)
+	var id, codeDe int64
+	var paralysis bool
+	var questionName, result string
+	var answerA, answerB, answerC, answerD, img sql.NullString
+	err := rows.Scan(&id, &questionName, &result, &codeDe, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionSystem] No Data  %v", err)
+		return question, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionSystem] Scan error  %v", err)
+		return question, err
+	}
+	questionSystem := QuestionSystem{
+		Id:      id,
+		CodeDe:  codeDe,
+		Name:    questionName,
+		AnswerA: answerA.String,
+		AnswerB: answerB.String,
+		AnswerC: answerC.String,
+		AnswerD: answerD.String,
+		Img:     "/files/img/question/" + img.String,
+		Result:  result,
+		Liet:    paralysis,
+	}
+	return questionSystem, nil
 }
 
 func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) {
@@ -73,11 +132,15 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 			AnswerB: answerB.String,
 			AnswerC: answerC.String,
 			AnswerD: answerD.String,
-			Img:     img.String,
+			Img:     "/files/img/question/" + img.String,
 			Result:  result,
 			Liet:    paralysis,
 		}
 		questions = append(questions, questionSystem)
+	}
+	if len(questions) == 0 {
+		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestionsSystem] No Data  %v", err)
+		return questions, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return questions, nil
 }
@@ -145,6 +208,10 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 			Answers:      answers,
 		}
 		questions = append(questions, question)
+	}
+	if len(questions) == 0 {
+		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestions] No Data  %v", err)
+		return questions, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return questions, nil
 }

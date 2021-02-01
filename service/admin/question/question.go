@@ -48,6 +48,8 @@ type IQuestionService interface {
 	ShowResult(result []result.Result) (ResponseResult, error)
 	CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	ShowQuestionsSystem(code string) ([]QuestionSystem, error)
+	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
+	UpdateQuestion(idQuestion, codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 }
 
 type StoreQuestion struct {

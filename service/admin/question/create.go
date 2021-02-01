@@ -3,14 +3,12 @@ package question
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
-	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
 
 func (tc StoreQuestion) CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
-	fmt.Println("ssssssss", name)
 	if err := CreateQuestionByRequest(tc.db, codeDe, name, answerA, answerB, answerC, answerD, img, result, liet); err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateQuestion]Insert Question DB err  %v", err)
 		return resp, err
