@@ -12,5 +12,6 @@ func Router(db *sql.DB) func(chi.Router) {
 	return func(router chi.Router) {
 		router.Get("/question/{id}", GetQuestionAnswer(st))
 		router.Post("/question/result", GetResult(st))
+		router.Get("/question/exam", GetExam(st))
 	}
 }

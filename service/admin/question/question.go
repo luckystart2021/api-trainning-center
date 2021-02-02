@@ -43,6 +43,10 @@ type QuestionSystem struct {
 	Liet    bool   `json:"liet"`
 }
 
+type ResponseQuestionExam struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
 	ShowResult(result []result.Result) (ResponseResult, error)
@@ -50,6 +54,7 @@ type IQuestionService interface {
 	ShowQuestionsSystem(code string) ([]QuestionSystem, error)
 	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
 	UpdateQuestion(idQuestion, codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	ShowQuestionsExam() ([]ResponseQuestionExam, error)
 }
 
 type StoreQuestion struct {

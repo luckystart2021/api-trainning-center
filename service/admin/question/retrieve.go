@@ -7,6 +7,51 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func (tc StoreQuestion) ShowQuestionsExam() ([]ResponseQuestionExam, error) {
+	questionsExam, err := retrieveShowQuestionsExam(tc.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowQuestionsExam] error : ", err)
+		return []ResponseQuestionExam{}, err
+	}
+
+	return questionsExam, nil
+}
+
+func retrieveShowQuestionsExam(db *sql.DB) ([]ResponseQuestionExam, error) {
+	questionsExam := []ResponseQuestionExam{}
+	query := `
+	SELECT id, name
+	FROM testsuite
+	order by id;
+	`
+	rows, err := db.Query(query)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] query error  %v", err)
+		return questionsExam, err
+	}
+
+	for rows.Next() {
+		var err error
+		var id int
+		var name string
+		err = rows.Scan(&id, &name)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] Scan error  %v", err)
+			return questionsExam, err
+		}
+		questionExam := ResponseQuestionExam{
+			Id:   id,
+			Name: name,
+		}
+		questionsExam = append(questionsExam, questionExam)
+	}
+	if len(questionsExam) == 0 {
+		logrus.WithFields(logrus.Fields{}).Infof("[retrieveShowQuestionsExam] No Data  %v", err)
+		return questionsExam, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return questionsExam, nil
+}
+
 func (tc StoreQuestion) ShowQuestions(code string) ([]Question, error) {
 	question, err := retrieveQuestions(tc.db, code)
 	if err != nil {
