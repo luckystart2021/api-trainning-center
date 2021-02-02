@@ -55,6 +55,7 @@ type IQuestionService interface {
 	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
 	UpdateQuestion(idQuestion, codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	ShowQuestionsExam() ([]ResponseQuestionExam, error)
+	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 }
 
 type StoreQuestion struct {
