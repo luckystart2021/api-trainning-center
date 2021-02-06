@@ -41,5 +41,5 @@ services:
 #   fm-network:
 #     driver: bridge
     
-# volumes:
-#   postgres-data:
+volumes:
+  postgres-data:
