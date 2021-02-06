@@ -143,3 +143,6 @@ CREATE TABLE public.notification (
 	img text NOT NULL,
 	CONSTRAINT notification_pk PRIMARY KEY (id)
 );
+INSERT INTO public.notification
+(id, title, description, subtitle, created_at, img)
+VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
