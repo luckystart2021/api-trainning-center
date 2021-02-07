@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      # - postgres-data:/var/lib/postgresql/data
+      - database-data:/var/lib/postgresql/data/
     networks:
       - default
   redis:
@@ -21,8 +21,6 @@ services:
       - "6379:6379"
     command: redis-server --requirepass admin123
     restart: always
-    # networks:
-    #   - fm-network
 
   backend:
     container_name: api
@@ -37,9 +35,5 @@ services:
     networks:
       - default
 
-# networks:
-#   fm-network:
-#     driver: bridge
-    
-# volumes:
-#   postgres-data:
+volumes:
+  database-data:
