@@ -120,12 +120,12 @@ CREATE TABLE question (
 	img text NULL,
 	CONSTRAINT question_pk PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX question_name_idx ON public.question USING btree (name);
+CREATE UNIQUE INDEX question_name_idx ON question USING btree (name);
 
 
 -- public.question foreign keys
 
-ALTER TABLE public.question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
+ALTER TABLE question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
 
 
 -- public.notification definition
@@ -134,7 +134,7 @@ ALTER TABLE public.question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test
 
 -- DROP TABLE public.notification;
 
-CREATE TABLE public.notification (
+CREATE TABLE notification (
 	id serial NOT NULL,
 	title text NOT NULL,
 	description text NOT NULL,
@@ -143,6 +143,6 @@ CREATE TABLE public.notification (
 	img text NOT NULL,
 	CONSTRAINT notification_pk PRIMARY KEY (id)
 );
-INSERT INTO public.notification
+INSERT INTO "notification"
 (id, title, description, subtitle, created_at, img)
 VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
