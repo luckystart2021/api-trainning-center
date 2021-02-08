@@ -146,3 +146,7 @@ CREATE TABLE notification (
 INSERT INTO "notification"
 (id, title, description, subtitle, created_at, img)
 VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
+
+INSERT INTO public.information
+(id, address, email, phone, maps, title, description, img, created_at)
+VALUES(1, '38 Tây Hòa', '0832210125', 'thanhphong9718@gmail.com', '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.807549595758!2d106.76057895063911!3d10.826034992250055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317527bd92bda2c1%3A0x16607d0fd6c0392f!2zMzggVMOieSBIw7JhLCBQaMaw4bubYyBMb25nIEEsIFF14bqtbiA5LCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1612799368639!5m2!1svi!2s" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>', 'Phong', 'Phong', 'tt.jpg', '2021-02-08 22:49:34.000');
