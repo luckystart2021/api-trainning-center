@@ -5,9 +5,7 @@ import (
 	"api-trainning-center/service/response"
 	"api-trainning-center/utils"
 	"api-trainning-center/validate"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/badoux/checkmail"
@@ -26,7 +24,6 @@ type InformationRequest struct {
 func CreateInformation(service information.IInformationService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseMultipartForm(32 << 20)
-		req := InformationRequest{}
 		imageName, err := utils.FileUpload(r, "information")
 		//here we call the function we made to get the image and save it
 		if err != nil {
@@ -34,16 +31,17 @@ func CreateInformation(service information.IInformationService) http.HandlerFunc
 			return
 			//checking whether any error occurred retrieving image
 		}
-		req.Img = imageName
-		//fmt.Print("ssss", imageName)
-		fmt.Println("Address", req)
-		err = json.NewDecoder(r.Body).Decode(&req)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			w.WriteHeader(http.StatusBadRequest)
-			return
+		req := InformationRequest{
+			Address:     r.FormValue("address"),
+			Phone:       r.FormValue("phone"),
+			Email:       r.FormValue("email"),
+			Maps:        r.FormValue("maps"),
+			Title:       r.FormValue("title"),
+			Description: r.FormValue("description"),
+			Img:         imageName,
 		}
-		if err := req.validate(); err != nil {
+
+		if err := validateInfo(&req); err != nil {
 			// If input is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -59,7 +57,7 @@ func CreateInformation(service information.IInformationService) http.HandlerFunc
 	}
 }
 
-func (c InformationRequest) validate() error {
+func validateInfo(c *InformationRequest) error {
 	if c.Address == "" {
 		return errors.New("Vui lòng nhập địa chỉ")
 	}
@@ -84,7 +82,7 @@ func (c InformationRequest) validate() error {
 	if c.Maps == "" {
 		return errors.New("Vui lòng nhập địa chỉ maps")
 	}
-	if len(c.Maps) > 1000 {
+	if len(c.Maps) > 2500 {
 		return errors.New("Maps không được lớn hơn 1000 ký tự")
 	}
 

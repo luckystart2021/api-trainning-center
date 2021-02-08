@@ -5,6 +5,7 @@ import (
 	"api-trainning-center/handlers/api/user"
 	"api-trainning-center/utils"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -36,7 +37,6 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
-
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
 	// processing should be stopped.
@@ -48,22 +48,12 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 		router.Route("/api/admin", admin.Router(db, client))
 		router.Route("/api/user", user.Router(db))
 	})
+
 	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "upload"))
+	filesDir := http.Dir(filepath.Join(workDir, "./upload"))
 	FileServer(router, "/files", filesDir)
 
 	return router
-}
-
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(400)
-	render.Render(w, r, utils.ErrNotFound)
-}
-func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(405)
-	render.Render(w, r, utils.ErrMethodNotAllowed)
 }
 
 // FileServer conveniently sets up a http.FileServer handler to serve
@@ -79,10 +69,23 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	}
 	path += "*"
 
+	fmt.Println("ssss", path)
+
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
 		rctx := chi.RouteContext(r.Context())
 		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
 		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
 		fs.ServeHTTP(w, r)
 	})
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(400)
+	render.Render(w, r, utils.ErrNotFound)
+}
+func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(405)
+	render.Render(w, r, utils.ErrMethodNotAllowed)
 }
