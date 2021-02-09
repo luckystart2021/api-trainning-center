@@ -1,39 +1,48 @@
 FROM golang:alpine as builder
 
-ENV GO111MODULE=on
+RUN mkdir -p /go/src/app
+WORKDIR /go/src/app
 
-# The latest alpine images don't have some tools like (`git` and `bash`).
-# Adding git, bash and openssh to the image
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+ADD . /go/src/app
 
-# Add Maintainer Info
-LABEL maintainer="Phong.Nguyen"
+RUN go get -v
 
-WORKDIR /app
-COPY .env .
-COPY go.mod .
-COPY go.sum .
+# ENV GO111MODULE=on
 
-RUN go mod download
+# # The latest alpine images don't have some tools like (`git` and `bash`).
+# # Adding git, bash and openssh to the image
+# RUN apk update && apk upgrade && \
+#     apk add --no-cache bash git openssh
 
-COPY . .
+# # Add Maintainer Info
+# LABEL maintainer="Phong.Nguyen"
 
-# Build the Go app
-RUN go build -o main .
+# WORKDIR /app
+# COPY .env .
+# COPY go.mod .
+# COPY go.sum .
+# COPY upload .
 
-# Start a new stage from scratch
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+# RUN go mod download
 
-WORKDIR /root
+# COPY . .
 
-# Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
+# # Build the Go app
+# RUN go build -o main .
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# # Start a new stage from scratch
+# FROM alpine:latest
+# RUN apk --no-cache add ca-certificates
 
-#Command to run the executable
-CMD ["./main"]
+# WORKDIR /root
+
+# # Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
+# COPY --from=builder /app/main .
+# COPY --from=builder /app/.env .
+# COPY --from=builder /app/upload .
+
+# # Expose port 8080 to the outside world
+# EXPOSE 8089
+
+# #Command to run the executable
+# CMD ["./main"]

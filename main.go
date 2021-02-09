@@ -51,7 +51,7 @@ func init() {
 }
 
 func main() {
-	addr := ":8080"
+	addr := ":8089"
 	listener, err := net.Listen("tcp", addr)
 	db, err := database.Initialize()
 

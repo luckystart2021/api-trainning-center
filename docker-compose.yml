@@ -21,19 +21,30 @@ services:
       - "6379:6379"
     command: redis-server --requirepass admin123
     restart: always
-
-  backend:
-    container_name: api
-    restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
+    
+  app:
+    build: .
+    command: ["go", "run", "main.go"]
+    volumes:
+      - .:/go/src/app
     ports:
-        - "8089:8080"
+      - "8089:8089"
     depends_on:
       - postgredb
     networks:
       - default
+  # backend:
+  #   container_name: api
+  #   restart: unless-stopped
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #       - "8089:8089"
+  #   depends_on:
+  #     - postgredb
+  #   networks:
+  #     - default
 
 volumes:
   database-data:

@@ -5,7 +5,6 @@ import (
 	"api-trainning-center/handlers/api/user"
 	"api-trainning-center/utils"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -44,14 +43,14 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
 	// handle api
+	workDir, _ := os.Getwd()
+	filesDir := http.Dir(filepath.Join(workDir, "upload"))
+	FileServer(router, "/files", filesDir)
 	router.Group(func(chi.Router) {
 		router.Route("/api/admin", admin.Router(db, client))
 		router.Route("/api/user", user.Router(db))
 	})
-
-	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "./upload"))
-	FileServer(router, "/files", filesDir)
+	// http.Handle("/s", http.StripPrefix("/files", http.FileServer(http.Dir("upload"))))
 
 	return router
 }
@@ -68,8 +67,6 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 		path += "/"
 	}
 	path += "*"
-
-	fmt.Println("ssss", path)
 
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
 		rctx := chi.RouteContext(r.Context())
