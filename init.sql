@@ -105,53 +105,6 @@ CREATE TABLE testsuite (
 	"name" text NOT NULL,
 	CONSTRAINT testsuite_pk PRIMARY KEY (id)
 );
-
--- question definition
-
--- Drop table
-
--- DROP TABLE question;
-
-CREATE TABLE question (
-	id serial NOT NULL,
-	"name" text NOT NULL,
-	"result" text NOT NULL,
-	paralysis bool NOT NULL DEFAULT false,
-	id_code_test int4 NOT NULL,
-	answera text NULL,
-	answerb text NULL,
-	answerc text NULL,
-	answerd text NULL,
-	img text NULL,
-	CONSTRAINT question_pk PRIMARY KEY (id)
-);
-CREATE UNIQUE INDEX question_name_idx ON question USING btree (name);
-
-
--- question foreign keys
-
-ALTER TABLE question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
-
-
--- notification definition
-
--- Drop table
-
--- DROP TABLE notification;
-
-CREATE TABLE notification (
-	id serial NOT NULL,
-	title text NOT NULL,
-	description text NOT NULL,
-	subtitle text NOT NULL,
-	created_at timestamptz(0) NOT NULL DEFAULT now(),
-	img text NOT NULL,
-	CONSTRAINT notification_pk PRIMARY KEY (id)
-);
-INSERT INTO "notification"
-(id, title, description, subtitle, created_at, img)
-VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
-
 INSERT INTO testsuite
 (id, "name")
 VALUES(1, 'Đề 1');
@@ -206,6 +159,28 @@ VALUES(17, 'Đề 17');
 INSERT INTO testsuite
 (id, "name")
 VALUES(18, 'Đề 18');
+
+-- question definition
+
+-- Drop table
+
+-- DROP TABLE question;
+
+CREATE TABLE question (
+	id serial NOT NULL,
+	"name" text NOT NULL,
+	"result" text NOT NULL,
+	paralysis bool NOT NULL DEFAULT false,
+	id_code_test int4 NOT NULL,
+	answera text NULL,
+	answerb text NULL,
+	answerc text NULL,
+	answerd text NULL,
+	img text NULL,
+	CONSTRAINT question_pk PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX question_name_idx ON question USING btree (name);
+
 
 INSERT INTO question
 (id, "name", "result", paralysis, id_code_test, answera, answerb, answerc, answerd, img)
@@ -387,3 +362,30 @@ Trong tình huống dưới đây, xe con màu vàng vượt xe con màu đỏ l
 INSERT INTO question
 (id, "name", "result", paralysis, id_code_test, answera, answerb, answerc, answerd, img)
 VALUES(113, 'phong', 'A', true, 2, 'A', 'B', 'C', '', 'DSC_774820210211120431.jpg');
+
+
+-- question foreign keys
+
+ALTER TABLE question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
+
+
+-- notification definition
+
+-- Drop table
+
+-- DROP TABLE notification;
+
+CREATE TABLE notification (
+	id serial NOT NULL,
+	title text NOT NULL,
+	description text NOT NULL,
+	subtitle text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	img text NOT NULL,
+	CONSTRAINT notification_pk PRIMARY KEY (id)
+);
+INSERT INTO "notification"
+(id, title, description, subtitle, created_at, img)
+VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
+
+
