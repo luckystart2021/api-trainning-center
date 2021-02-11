@@ -105,60 +105,61 @@ CREATE TABLE testsuite (
 	"name" text NOT NULL,
 	CONSTRAINT testsuite_pk PRIMARY KEY (id)
 );
+
 INSERT INTO "testsuite"
 (id, "name")
 VALUES(1, 'Đề 1');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(2, 'Đề 2');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(3, 'Đề 3');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(4, 'Đề 4');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(5, 'Đề 5');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(6, 'Đề 6');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(7, 'Đề 7');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(8, 'Đề 8');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(9, 'Đề 9');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(10, 'Đề 10');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(11, 'Đề 11');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(12, 'Đề 12');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(13, 'Đề 13');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(14, 'Đề 14');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(15, 'Đề 15');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(16, 'Đề 16');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(17, 'Đề 17');
-INSERT INTO "testsuite"
-(id, "name")
-VALUES(18, 'Đề 18');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(2, 'Đề 2');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(3, 'Đề 3');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(4, 'Đề 4');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(5, 'Đề 5');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(6, 'Đề 6');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(7, 'Đề 7');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(8, 'Đề 8');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(9, 'Đề 9');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(10, 'Đề 10');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(11, 'Đề 11');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(12, 'Đề 12');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(13, 'Đề 13');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(14, 'Đề 14');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(15, 'Đề 15');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(16, 'Đề 16');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(17, 'Đề 17');
+-- INSERT INTO "testsuite"
+-- (id, "name")
+-- VALUES(18, 'Đề 18');
 
 -- question definition
 
@@ -180,6 +181,9 @@ CREATE TABLE question (
 	CONSTRAINT question_pk PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX question_name_idx ON question USING btree (name);
+-- question foreign keys
+
+ALTER TABLE question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
 
 
 INSERT INTO "question"
@@ -362,11 +366,6 @@ Trong tình huống dưới đây, xe con màu vàng vượt xe con màu đỏ l
 INSERT INTO "question"
 (id, "name", "result", paralysis, id_code_test, answera, answerb, answerc, answerd, img)
 VALUES(113, 'phong', 'A', true, 2, 'A', 'B', 'C', '', 'DSC_774820210211120431.jpg');
-
-
--- question foreign keys
-
-ALTER TABLE question ADD CONSTRAINT question_fk FOREIGN KEY (id_code_test) REFERENCES testsuite(id);
 
 
 -- notification definition
