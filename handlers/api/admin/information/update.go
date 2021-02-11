@@ -41,7 +41,9 @@ func UpdateInformation(service information.IInformationService) http.HandlerFunc
 			Maps:        r.FormValue("maps"),
 			Title:       r.FormValue("title"),
 			Description: r.FormValue("description"),
-			Img:         imageName,
+		}
+		if imageName != "" || len(imageName) > 0 {
+			req.Img = imageName
 		}
 
 		if err := validateInfo(&req); err != nil {

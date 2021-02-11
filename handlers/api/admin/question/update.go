@@ -41,11 +41,12 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			AnswerB: r.FormValue("answer_b"),
 			AnswerC: r.FormValue("answer_c"),
 			AnswerD: r.FormValue("answer_d"),
-			Img:     imageName,
 			Result:  r.FormValue("result"),
 			Liet:    r.FormValue("liet"),
 		}
-
+		if imageName != "" || len(imageName) > 0 {
+			req.Img = imageName
+		}
 		if err := validate(&req); err != nil {
 			// If input is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, err)

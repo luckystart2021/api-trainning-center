@@ -26,12 +26,13 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseMultipartForm(32 << 20)
 		imageName, err := utils.FileUpload(r, "question")
+
 		//here we call the function we made to get the image and save it
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
-			//checking whether any error occurred retrieving image
 		}
+
 		req := QuestionRequest{
 			CodeDe:  r.FormValue("code_de"),
 			Name:    r.FormValue("name"),
@@ -39,9 +40,11 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			AnswerB: r.FormValue("answer_b"),
 			AnswerC: r.FormValue("answer_c"),
 			AnswerD: r.FormValue("answer_d"),
-			Img:     imageName,
 			Result:  r.FormValue("result"),
 			Liet:    r.FormValue("liet"),
+		}
+		if imageName != "" || len(imageName) > 0 {
+			req.Img = imageName
 		}
 
 		if err := validate(&req); err != nil {

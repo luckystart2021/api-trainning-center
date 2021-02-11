@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Result struct {
@@ -18,6 +20,7 @@ func GetResult(service question.IQuestionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := []result.Result{}
 		err := json.NewDecoder(r.Body).Decode(&req)
+		logrus.WithFields(logrus.Fields{}).Info("[GetResult] request: ", req)
 		if len(req) == 0 {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng chọn câu trả lời"))
 			return

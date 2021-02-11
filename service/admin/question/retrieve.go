@@ -123,9 +123,11 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 		AnswerB: answerB.String,
 		AnswerC: answerC.String,
 		AnswerD: answerD.String,
-		Img:     "/files/img/question/" + img.String,
 		Result:  result,
 		Liet:    paralysis,
+	}
+	if img.Valid && img.String != "" {
+		questionSystem.Img = "/files/img/question/" + img.String
 	}
 	return questionSystem, nil
 }
@@ -177,9 +179,11 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 			AnswerB: answerB.String,
 			AnswerC: answerC.String,
 			AnswerD: answerD.String,
-			Img:     "/files/img/question/" + img.String,
 			Result:  result,
 			Liet:    paralysis,
+		}
+		if img.Valid && img.String != "" {
+			questionSystem.Img = "/files/img/question/" + img.String
 		}
 		questions = append(questions, questionSystem)
 	}
