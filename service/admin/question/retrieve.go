@@ -249,8 +249,10 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 		question := Question{
 			Id:           id,
 			QuestionName: questionName,
-			Img:          "/files/img/question/" + img.String,
 			Answers:      answers,
+		}
+		if img.Valid && img.String != "" {
+			question.Img = "/files/img/question/" + img.String
 		}
 		questions = append(questions, question)
 	}

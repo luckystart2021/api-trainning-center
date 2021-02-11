@@ -50,7 +50,6 @@ func NewHandler(db *sql.DB, client *redis.Client) http.Handler {
 		router.Route("/api/admin", admin.Router(db, client))
 		router.Route("/api/user", user.Router(db))
 	})
-	// http.Handle("/s", http.StripPrefix("/files", http.FileServer(http.Dir("upload"))))
 
 	return router
 }

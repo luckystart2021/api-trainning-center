@@ -18,6 +18,7 @@ type Information struct {
 type IInformationService interface {
 	ShowInformation() (Information, error)
 	CreateInformation(address, phone, email, maps, title, description, img string) (response.MessageResponse, error)
+	UpdateInformation(idInformationI int, address, phone, email, maps, title, description, img string) (response.MessageResponse, error)
 }
 
 type StoreInformation struct {

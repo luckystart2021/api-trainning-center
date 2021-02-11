@@ -16,5 +16,6 @@ func InfoRouter(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Post("/information/create", CreateInformation(st))
+		router.Post("/information/{id_information}/update", UpdateInformation(st))
 	}
 }
