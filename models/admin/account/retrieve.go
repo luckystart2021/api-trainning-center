@@ -38,9 +38,9 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	user := User{}
 	query := `
 	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
+		username, password, email, role, sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
 	FROM 
-		"users" u 
+		users u 
 	WHERE 
 		u.username = $1 AND is_delete = $2;`
 	row := db.QueryRow(query, userName, ACTIVE)
