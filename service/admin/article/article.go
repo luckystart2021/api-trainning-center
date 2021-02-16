@@ -5,6 +5,7 @@ import "database/sql"
 type IArticleService interface {
 	ShowArticles(idCategory int) ([]Article, error)
 	ShowArticle(idArticle int, meta string) (ArticleDetail, error)
+	ShowCategories(idCategoryParent int) ([]CategoriesResponse, error)
 }
 
 type StoreArticle struct {

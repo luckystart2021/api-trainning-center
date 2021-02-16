@@ -2,6 +2,7 @@ package about
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -29,6 +30,10 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 		id;
 	`
 	rows, err := db.Query(query)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] No Data  %v", err)
+		return abouts, errors.New("Không có dữ liệu từ hệ thống")
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] query error  %v", err)
 		return abouts, err

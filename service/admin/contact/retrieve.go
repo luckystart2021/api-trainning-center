@@ -3,6 +3,7 @@ package contact
 import (
 	"api-trainning-center/utils"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -37,6 +38,10 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 	ORDER BY created_at DESC
 	`
 	rows, err := db.Query(query)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] No Data  %v", err)
+		return contacts, errors.New("Không có dữ liệu từ hệ thống")
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] query error  %v", err)
 		return contacts, err

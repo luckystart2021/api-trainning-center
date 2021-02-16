@@ -60,3 +60,26 @@ func GetArticle(service article.IArticleService) http.HandlerFunc {
 		response.RespondWithJSON(w, http.StatusOK, showArticle)
 	}
 }
+
+func GetCategories(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		code := chi.URLParam(r, "id_category_parent")
+		if code == "" || len(code) == 0 {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không tồn tại"))
+			return
+		}
+		idCategoryParent, err := strconv.Atoi(code)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
+			return
+		}
+		showCategories, err := service.ShowCategories(idCategoryParent)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showCategories)
+	}
+}

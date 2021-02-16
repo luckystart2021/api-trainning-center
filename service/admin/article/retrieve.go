@@ -1,7 +1,6 @@
 package article
 
 import (
-	"api-trainning-center/models/admin/account"
 	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
@@ -11,36 +10,35 @@ import (
 )
 
 type Article struct {
-	Id        int64  `json:"id"`
-	Title     string `json:"title"`
-	Img       string `json:"img"`
-	Meta      string `json:"meta"`
-	View      int64  `json:"view"`
-	CreatedAt string `json:"created_at"`
+	Id          int64  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Img         string `json:"img"`
+	Meta        string `json:"meta"`
+	CreatedAt   string `json:"created_at"`
+	CreatedBy   string `json:"created_by"`
 }
 
 type Articles struct {
-	Id          int64  `json:"id"`
-	IdUser      int64  `json:"id_user"`
-	IdCategory  int64  `json:"id_category"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Detail      string `json:"detail"`
-	Img         string `json:"img"`
-	Meta        string `json:"meta"`
-	Keyword     string `json:"keyword"`
-	View        int64  `json:"view"`
-	Status      bool   `json:"status"`
-	IsDelete    bool   `json:"is_deleted"`
-	CreatedAt   string `json:"created_at"`
-	CreatedBy   string `json:"created_by"`
-	UpdatedAt   string `json:"updated_at"`
-	UpdatedBy   string `json:"updated_by"`
+	Id              int64  `json:"id"`
+	IdUser          int64  `json:"id_user"`
+	IdChildCategory int64  `json:"id_child_category"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	Detail          string `json:"detail"`
+	Img             string `json:"img"`
+	Meta            string `json:"meta"`
+	Keyword         string `json:"keyword"`
+	View            int64  `json:"view"`
+	Status          bool   `json:"status"`
+	IsDelete        bool   `json:"is_deleted"`
+	CreatedAt       string `json:"created_at"`
+	CreatedBy       string `json:"created_by"`
+	UpdatedAt       string `json:"updated_at"`
+	UpdatedBy       string `json:"updated_by"`
 }
 
 type ArticleDetail struct {
-	Id          int64  `json:"id"`
-	UserName    string `json:"user_name"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Detail      string `json:"detail"`
@@ -50,11 +48,6 @@ type ArticleDetail struct {
 	View        int64  `json:"view"`
 	CreatedAt   string `json:"created_at"`
 	CreatedBy   string `json:"created_by"`
-	Tags        []Tag  `json:"tags"`
-}
-
-type Tag struct {
-	Name string `json:"name"`
 }
 
 var (
@@ -69,59 +62,18 @@ func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, e
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveArticle] error : ", err)
 		return articleDetail, err
 	}
-	tags, err := retrieveTags(tc.db, article.Id)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[retrieveTags] error : ", err)
-		return articleDetail, err
-	}
-	account, err := account.RetrieveAccountInActiveById(article.IdUser, tc.db)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[RetrieveAccountInActiveById] error : ", err)
-		return articleDetail, err
-	}
 	articleDetails := ArticleDetail{
-		Title:    article.Title,
-		UserName: account.UserName,
-		Tags:     tags,
+		Title:       article.Title,
+		Description: article.Description,
+		Detail:      article.Detail,
+		Img:         article.Img,
+		Meta:        article.Meta,
+		Keyword:     article.Keyword,
+		View:        article.View,
+		CreatedAt:   article.CreatedAt,
+		CreatedBy:   article.CreatedBy,
 	}
 	return articleDetails, nil
-}
-
-func retrieveTags(db *sql.DB, idArticle int64) ([]Tag, error) {
-	tags := []Tag{}
-	query := `
-	select
-		t.title
-	from
-		articles_tags at2
-	inner join tags t on
-		t.id = at2.id_tag
-	where
-		id_article = $1;
-	`
-	rows, err := db.Query(query, idArticle)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTags] No Data  %v", err)
-		return tags, errors.New("Không có dữ liệu từ hệ thống")
-	}
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTags] query error  %v", err)
-		return tags, err
-	}
-
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTags] Scan error  %v", err)
-			return tags, err
-		}
-		tag := Tag{
-			Name: name,
-		}
-		tags = append(tags, tag)
-	}
-	return tags, nil
 }
 
 func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse bool, metaS string) (Articles, error) {
@@ -129,7 +81,7 @@ func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse 
 	select
 		articles.id,
 		articles.id_user,
-		articles.id_category,
+		articles.id_child_category,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -145,24 +97,18 @@ func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse 
 		articles.updated_by
 	from
 		articles
-	left join category c on
-		c.id = articles.id_category
 	where
 		articles.id = $1
 		and articles.status = $2
 		and articles.is_deleted = $3
-		and articles.meta = $4
-	group by
-		articles.id
-	order by
-		articles.created_at desc;				
+		and articles.meta = $4;				
 	`
 	rows := db.QueryRow(query, idArticle, statusInactive, isDeleteIsFalse, metaS)
-	var id, view, idUser, idCategory int64
+	var id, view, idUser, idChildCategory int64
 	var title, description, details, img, meta, keywordseo, createdBy, updateBy string
 	var createdAt, updatedAt time.Time
 	var status, isDeleted bool
-	err := rows.Scan(&id, &idUser, &idCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+	err := rows.Scan(&id, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticle] No Data  %v", err)
 		return Articles{}, errors.New("Không có dữ liệu từ hệ thống")
@@ -172,22 +118,22 @@ func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse 
 		return Articles{}, err
 	}
 	article := Articles{
-		Id:          id,
-		IdUser:      idUser,
-		IdCategory:  idCategory,
-		Title:       title,
-		Description: description,
-		Detail:      details,
-		Img:         img,
-		Meta:        meta,
-		Keyword:     keywordseo,
-		View:        view,
-		Status:      status,
-		IsDelete:    isDeleted,
-		CreatedAt:   utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		CreatedBy:   createdBy,
-		UpdatedAt:   utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		UpdatedBy:   updateBy,
+		Id:              id,
+		IdUser:          idUser,
+		IdChildCategory: idChildCategory,
+		Title:           title,
+		Description:     description,
+		Detail:          details,
+		Img:             "/files/img/news/" + img,
+		Meta:            meta,
+		Keyword:         keywordseo,
+		View:            view,
+		Status:          status,
+		IsDelete:        isDeleted,
+		CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		CreatedBy:       createdBy,
+		UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		UpdatedBy:       updateBy,
 	}
 	return article, nil
 }
@@ -201,12 +147,13 @@ func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	}
 	for _, data := range articels {
 		articleR := Article{
-			Id:        data.Id,
-			Title:     data.Title,
-			Img:       data.Img,
-			Meta:      data.Meta,
-			View:      data.View,
-			CreatedAt: data.CreatedAt,
+			Id:          data.Id,
+			Title:       data.Title,
+			Img:         "/files/img/news/" + data.Img,
+			Meta:        data.Meta,
+			Description: data.Description,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
 		}
 		article = append(article, articleR)
 	}
@@ -220,7 +167,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 	select
 		articles.id ,
 		articles.id_user,
-		articles.id_category,
+		articles.id_child_category,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -236,14 +183,14 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 		articles.updated_by
 	from
 		articles
-	left join category c on
-		c.id = articles.id_category
+	inner join child_category c on
+		c.id = articles.id_child_category
+	inner join category c2 on
+		c.id_category = c2.id
 	where
-		articles.id_category = $1
+		c2.id = $1
 		and articles.status = $2
 		and articles.is_deleted = $3
-	group by
-		articles.id
 	order by
 		articles.created_at desc;				
 	`
@@ -257,32 +204,32 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 		return articles, err
 	}
 	for rows.Next() {
-		var idArticle, view, idUser, idCategory int64
+		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
-		err = rows.Scan(&idArticle, &idUser, &idCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
 			return articles, err
 		}
 		article := Articles{
-			Id:          idArticle,
-			IdUser:      idUser,
-			IdCategory:  idCategory,
-			Title:       title,
-			Description: description,
-			Detail:      details,
-			Img:         img,
-			Meta:        meta,
-			Keyword:     keywordseo,
-			View:        view,
-			Status:      status,
-			IsDelete:    isDeleted,
-			CreatedAt:   utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-			CreatedBy:   createdBy,
-			UpdatedAt:   utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-			UpdatedBy:   updateBy,
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
 	}

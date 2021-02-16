@@ -12,5 +12,6 @@ func Router(db *sql.DB) func(chi.Router) {
 	return func(router chi.Router) {
 		router.Get("/{id_category}/news", GetArticles(st))
 		router.Get("/{meta}/{id_article}/news", GetArticle(st))
+		router.Get("/list/category/{id_category_parent}", GetCategories(st))
 	}
 }

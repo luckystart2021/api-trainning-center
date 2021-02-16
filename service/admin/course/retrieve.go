@@ -3,6 +3,7 @@ package course
 import (
 	"api-trainning-center/utils"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -94,6 +95,10 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	ORDER BY start_date DESC;
 	`
 	rows, err := db.Query(query, status)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] No Data  %v", err)
+		return courses, errors.New("Không có dữ liệu từ hệ thống")
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
 		return courses, err

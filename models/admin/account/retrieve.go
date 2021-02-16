@@ -97,6 +97,10 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	WHERE 
 		is_delete = $1;`
 	rows, err := db.Query(query, ACTIVE)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] No Data  %v", err)
+		return users, errors.New("Không có dữ liệu từ hệ thống")
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] query error  %v", err)
 		return users, err
