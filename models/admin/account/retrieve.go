@@ -23,6 +23,10 @@ type User struct {
 	Address     string    `json:"address"`
 }
 
+type UserR struct {
+	UserName string `json:"username"`
+}
+
 type IsDeleteStatus bool
 
 const (
@@ -129,4 +133,27 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		users = append(users, user)
 	}
 	return users, nil
+}
+
+func RetrieveAccountInActiveById(id int64, db *sql.DB) (UserR, error) {
+	user := UserR{}
+	query := `
+	SELECT 
+		username
+	FROM 
+		"users" u 
+	WHERE 
+		u.id = $1 AND is_delete = $2;`
+	row := db.QueryRow(query, id, ACTIVE)
+	err := row.Scan(&user.UserName)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccountInActiveById] No Data  %v", err)
+		return user, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccountInActiveById] scan error  %v", err)
+		return user, errors.New("Tên đăng nhập không tồn tại")
+	}
+
+	return user, nil
 }

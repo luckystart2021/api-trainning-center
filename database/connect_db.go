@@ -14,7 +14,7 @@ import (
 var ErrNoMatch = fmt.Errorf("no matching record")
 
 const (
-	HOST = "postgredb"
+	HOST = "localhost"
 	PORT = 5432
 )
 

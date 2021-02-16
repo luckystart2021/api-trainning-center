@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/handlers/api/user/about"
 	"api-trainning-center/handlers/api/user/contact"
 	"api-trainning-center/handlers/api/user/information"
+	"api-trainning-center/handlers/api/user/news"
 	"api-trainning-center/handlers/api/user/question"
 	"database/sql"
 
@@ -16,5 +17,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Group(information.Router(db))
 		router.Group(question.Router(db))
 		router.Group(about.Router(db))
+		router.Group(news.Router(db))
 	}
 }
