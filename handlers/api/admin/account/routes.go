@@ -26,7 +26,7 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 	return func(router chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
-		router.Post("/	", CreateAccount(st))
+		router.Post("/signup", CreateAccount(st))
 		router.Get("/logout", LogoutAccount(st, client))
 		router.Post("/reset_password", ResetPassword(st))
 		router.Get("/view/accounts", RetrieveAccounts(st))
