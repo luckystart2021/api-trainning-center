@@ -30,10 +30,6 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 		id;
 	`
 	rows, err := db.Query(query)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] No Data  %v", err)
-		return abouts, errors.New("Không có dữ liệu từ hệ thống")
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] query error  %v", err)
 		return abouts, err
@@ -41,6 +37,7 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 	for rows.Next() {
 		var title, description, subtitle, img string
 		err = rows.Scan(&title, &description, &subtitle, &img)
+
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] Scan error  %v", err)
 			return abouts, err
@@ -54,5 +51,11 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 
 		abouts = append(abouts, about)
 	}
+
+	if len(abouts) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] No Data  %v", err)
+		return abouts, errors.New("Không có dữ liệu từ hệ thống")
+	}
+
 	return abouts, nil
 }

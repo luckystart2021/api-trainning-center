@@ -197,7 +197,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 	rows, err := db.Query(query, idCategory, statusInactive, isDeleteIsFalse)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
-		return []Articles{}, errors.New("Không có dữ liệu từ hệ thống")
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
