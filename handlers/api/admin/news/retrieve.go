@@ -32,3 +32,26 @@ func ShowArticles(service article.IArticleService) http.HandlerFunc {
 		response.RespondWithJSON(w, http.StatusOK, showArticles)
 	}
 }
+
+func ShowDetailArticle(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idArticle := chi.URLParam(r, "id_article")
+		if idArticle == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không được rỗng"))
+			return
+		}
+		idArticleP, err := strconv.Atoi(idArticle)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
+			return
+		}
+		showArticleById, err := service.ShowArticleById(idArticleP)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showArticleById)
+	}
+}

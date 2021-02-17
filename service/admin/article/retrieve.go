@@ -136,15 +136,16 @@ func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bo
 		Title:           title,
 		Description:     description,
 		Detail:          details,
-		Img:             "/files/img/news/" + img, Meta: meta,
-		Keyword:   keywordseo,
-		View:      view,
-		Status:    status,
-		IsDelete:  isDeleted,
-		CreatedAt: utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		CreatedBy: createdBy,
-		UpdatedAt: utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		UpdatedBy: updateBy,
+		Img:             "/files/img/news/" + img,
+		Meta:            meta,
+		Keyword:         keywordseo,
+		View:            view,
+		Status:          status,
+		IsDelete:        isDeleted,
+		CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		CreatedBy:       createdBy,
+		UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		UpdatedBy:       updateBy,
 	}
 	return article, nil
 }
@@ -343,4 +344,72 @@ func (tc StoreArticle) ShowArticlesByChildCategory(idChildCategory int) ([]Admin
 	}
 
 	return articleLst, nil
+}
+
+func (tc StoreArticle) ShowArticleById(idArticle int) (Articles, error) {
+	articleInAdmin, err := retrieveArticleInAdmin(tc.db, idArticle)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowArticleById] error : ", err)
+		return Articles{}, err
+	}
+	return articleInAdmin, nil
+}
+
+func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles, error) {
+	query := `
+	select
+		articles.id,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	from
+		articles
+	where
+		articles.id = $1		
+	`
+	rows := db.QueryRow(query, idArticle)
+	var id, view, idUser, idChildCategory int64
+	var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+	var createdAt, updatedAt time.Time
+	var status, isDeleted bool
+	err := rows.Scan(&id, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticleInAdmin] No Data  %v", err)
+		return Articles{}, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticleInAdmin] Scan error  %v", err)
+		return Articles{}, err
+	}
+	article := Articles{
+		Id:              id,
+		IdUser:          idUser,
+		IdChildCategory: idChildCategory,
+		Title:           title,
+		Description:     description,
+		Detail:          details,
+		Img:             "/files/img/news/" + img,
+		Meta:            meta,
+		Keyword:         keywordseo,
+		View:            view,
+		Status:          status,
+		IsDelete:        isDeleted,
+		CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		CreatedBy:       createdBy,
+		UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		UpdatedBy:       updateBy,
+	}
+	return article, nil
 }
