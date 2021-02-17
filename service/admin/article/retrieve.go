@@ -38,6 +38,18 @@ type Articles struct {
 	UpdatedBy       string `json:"updated_by"`
 }
 
+type AdminArticlesList struct {
+	Id          int64  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Img         string `json:"img"`
+	View        int64  `json:"view"`
+	Status      bool   `json:"status"`
+	IsDelete    bool   `json:"is_deleted"`
+	CreatedAt   string `json:"created_at"`
+	CreatedBy   string `json:"created_by"`
+}
+
 type ArticleDetail struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -51,13 +63,13 @@ type ArticleDetail struct {
 }
 
 var (
-	statusInactive  = true
+	statusActive    = true
 	isDeleteIsFalse = false
 )
 
 func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, error) {
 	articleDetail := ArticleDetail{}
-	article, err := retrieveArticle(tc.db, idArticle, statusInactive, isDeleteIsFalse, meta)
+	article, err := retrieveArticle(tc.db, idArticle, statusActive, isDeleteIsFalse, meta)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveArticle] error : ", err)
 		return articleDetail, err
@@ -76,7 +88,7 @@ func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, e
 	return articleDetails, nil
 }
 
-func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse bool, metaS string) (Articles, error) {
+func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bool, metaS string) (Articles, error) {
 	query := `
 	select
 		articles.id,
@@ -103,7 +115,7 @@ func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse 
 		and articles.is_deleted = $3
 		and articles.meta = $4;				
 	`
-	rows := db.QueryRow(query, idArticle, statusInactive, isDeleteIsFalse, metaS)
+	rows := db.QueryRow(query, idArticle, statusActive, isDeleteIsFalse, metaS)
 	var id, view, idUser, idChildCategory int64
 	var title, description, details, img, meta, keywordseo, createdBy, updateBy string
 	var createdAt, updatedAt time.Time
@@ -124,23 +136,22 @@ func retrieveArticle(db *sql.DB, idArticle int, statusInactive, isDeleteIsFalse 
 		Title:           title,
 		Description:     description,
 		Detail:          details,
-		Img:             "/files/img/news/" + img,
-		Meta:            meta,
-		Keyword:         keywordseo,
-		View:            view,
-		Status:          status,
-		IsDelete:        isDeleted,
-		CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		CreatedBy:       createdBy,
-		UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
-		UpdatedBy:       updateBy,
+		Img:             "/files/img/news/" + img, Meta: meta,
+		Keyword:   keywordseo,
+		View:      view,
+		Status:    status,
+		IsDelete:  isDeleted,
+		CreatedAt: utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		CreatedBy: createdBy,
+		UpdatedAt: utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		UpdatedBy: updateBy,
 	}
 	return article, nil
 }
 
 func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	article := []Article{}
-	articels, err := retrieveArticles(tc.db, idCategory, statusInactive, isDeleteIsFalse)
+	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowArticles] error : ", err)
 		return article, err
@@ -161,7 +172,7 @@ func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	return article, nil
 }
 
-func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFalse bool) ([]Articles, error) {
+func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse bool) ([]Articles, error) {
 	articles := []Articles{}
 	query := `
 	select
@@ -194,7 +205,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 	order by
 		articles.created_at desc;				
 	`
-	rows, err := db.Query(query, idCategory, statusInactive, isDeleteIsFalse)
+	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")
@@ -234,4 +245,102 @@ func retrieveArticles(db *sql.DB, idCategory int, statusInactive, isDeleteIsFals
 		articles = append(articles, article)
 	}
 	return articles, nil
+}
+
+func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse bool) ([]Articles, error) {
+	articles := []Articles{}
+	query := `
+	select
+		articles.id ,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	from
+		articles
+	inner join child_category c on
+		c.id = articles.id_child_category
+	where
+		c.id = $1
+		and articles.status = $2
+		and articles.is_deleted = $3
+	order by
+		articles.created_at desc;				
+	`
+	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
+		return articles, err
+	}
+	for rows.Next() {
+		var idArticle, view, idUser, idChildCategory int64
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var createdAt, updatedAt time.Time
+		var status, isDeleted bool
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
+			return articles, err
+		}
+		article := Articles{
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
+		}
+		articles = append(articles, article)
+	}
+	return articles, nil
+}
+
+func (tc StoreArticle) ShowArticlesByChildCategory(idChildCategory int) ([]AdminArticlesList, error) {
+	articleLst := []AdminArticlesList{}
+	articels, err := retrieveArticlesByChildCategory(tc.db, idChildCategory, statusActive, isDeleteIsFalse)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowArticlesByChildCategory] error : ", err)
+		return articleLst, err
+	}
+	for _, data := range articels {
+		articleR := AdminArticlesList{
+			Id:          data.Id,
+			Title:       data.Title,
+			Description: data.Description,
+			Img:         "/files/img/news/" + data.Img,
+			View:        data.View,
+			Status:      data.Status,
+			IsDelete:    data.IsDelete,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
+		}
+		articleLst = append(articleLst, articleR)
+	}
+
+	return articleLst, nil
 }
