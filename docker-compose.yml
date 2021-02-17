@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - database-data:/var/lib/postgresql/data/
+      # - database-data:/var/lib/postgresql/data/
     networks:
       - default
   redis:
@@ -46,5 +46,5 @@ services:
   #   networks:
   #     - default
 
-volumes:
-  database-data:
+# volumes:
+#   database-data:
