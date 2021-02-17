@@ -46,7 +46,7 @@ func GetArticle(service article.IArticleService) http.HandlerFunc {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã thông tin không hợp lệ"))
 			return
 		}
-		meta := chi.URLParam(r, "meta")
+		meta := chi.URLParam(r, "meta_article")
 		if meta == "" || len(meta) == 0 {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã liên kết dữ liệu không tồn tại"))
 			return

@@ -12,18 +12,18 @@ import (
 
 func ShowArticles(service article.IArticleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		idChildArticle := chi.URLParam(r, "id_child_article")
+		idChildArticle := chi.URLParam(r, "id_child_category")
 		if idChildArticle == "" {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không được rỗng"))
 			return
 		}
-		idChildArticleP, err := strconv.Atoi(idChildArticle)
+		idChildCategory, err := strconv.Atoi(idChildArticle)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
 			return
 		}
-		showArticles, err := service.ShowArticlesByChildCategory(idChildArticleP)
+		showArticles, err := service.ShowArticlesByChildCategory(idChildCategory)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
