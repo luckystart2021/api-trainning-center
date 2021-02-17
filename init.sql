@@ -156,8 +156,7 @@ VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
 
 -- DROP TABLE public.category;
 
-CREATE TABLE public.category (
-	id serial NOT NULL,
+CREATE TABLE public.category (id serial NOT NULL,
 	title text NOT NULL,
 	created_by text NOT NULL,
 	created_at timestamptz(0) NOT NULL DEFAULT now(),
