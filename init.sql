@@ -148,3 +148,106 @@ INSERT INTO "notification"
 VALUES(1, 'PHONG', 'PHONG', 'OK', '2021-02-06 18:38:23.000', 'banner.jpg');
 
 
+
+
+-- public.category definition
+
+-- Drop table
+
+-- DROP TABLE public.category;
+
+CREATE TABLE public.category (
+	id serial NOT NULL,
+	title text NOT NULL,
+	created_by text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	updated_by text NOT NULL,
+	updated_at timestamptz(0) NOT NULL DEFAULT now(),
+	meta text NOT NULL,
+	CONSTRAINT category_pk PRIMARY KEY (id)
+);
+
+INSERT INTO public.category
+(id, title, created_by, created_at, updated_by, updated_at, meta)
+VALUES(1, 'Thông tin', 'admin', '2021-02-14 12:55:48.000', 'admin', '2021-02-14 12:55:48.000', 'thong-tin');
+INSERT INTO public.category
+(id, title, created_by, created_at, updated_by, updated_at, meta)
+VALUES(2, 'Tin tức', 'admin', '2021-02-14 12:55:48.000', 'admin', '2021-02-14 12:55:48.000', 'tin-tuc');
+
+-- public.child_category definition
+
+-- Drop table
+
+-- DROP TABLE public.child_category;
+
+CREATE TABLE public.child_category (
+	id serial NOT NULL,
+	title text NOT NULL,
+	id_category int4 NOT NULL,
+	meta text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	created_by text NOT NULL,
+	updated_at timestamptz(0) NOT NULL DEFAULT now(),
+	updated_by text NOT NULL,
+	CONSTRAINT child_category_pk PRIMARY KEY (id)
+);
+
+
+-- public.child_category foreign keys
+
+ALTER TABLE public.child_category ADD CONSTRAINT child_category_fk FOREIGN KEY (id_category) REFERENCES category(id);
+
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(1, 'Thông báo', 1, 'thong-bao', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(2, 'Thông báo - Chiêu Sinh', 1, 'thong-bao-chieu-sinh', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(3, 'Thông tin liên quan đến GPLX', 1, 'thong-tin-lien-quan-den-GPLX', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(4, 'Hoạt động từ TT Hoàng Gia', 2, 'hoat-dong', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(5, 'Những lưu ý khi thi GPLX', 2, 'nhung-luu-y-khi-thi-GPLX', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(6, 'An toàn giao thông', 2, 'an-toan-giao-thong', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+INSERT INTO public.child_category
+(id, title, id_category, meta, created_at, created_by, updated_at, updated_by)
+VALUES(7, 'Kinh Nghiệm', 2, 'kinh-nghiem', '2021-02-14 12:14:02.000', 'phong', '2021-02-14 12:14:02.000', 'phong');
+
+-- public.articles definition
+
+-- Drop table
+
+-- DROP TABLE public.articles;
+
+CREATE TABLE public.articles (
+	id serial NOT NULL,
+	id_user int4 NOT NULL,
+	id_child_category int4 NOT NULL,
+	title text NOT NULL,
+	description text NOT NULL,
+	details text NOT NULL,
+	image text NOT NULL,
+	meta text NOT NULL,
+	keywordseo text NOT NULL,
+	"view" int8 NOT NULL DEFAULT 0,
+	status bool NOT NULL DEFAULT false,
+	is_deleted bool NOT NULL DEFAULT false,
+	created_by text NOT NULL,
+	updated_by text NOT NULL,
+	created_at timestamptz(0) NOT NULL DEFAULT now(),
+	updated_at timestamptz(0) NOT NULL DEFAULT now(),
+	CONSTRAINT articles_pk PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX articles_title_idx ON public.articles USING btree (title);
+
+
+-- public.articles foreign keys
+
+ALTER TABLE public.articles ADD CONSTRAINT articles_fk FOREIGN KEY (id_child_category) REFERENCES child_category(id);
+ALTER TABLE public.articles ADD CONSTRAINT articles_user_fk FOREIGN KEY (id_user) REFERENCES users(id);
