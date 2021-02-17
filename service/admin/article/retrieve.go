@@ -65,6 +65,7 @@ type ArticleDetail struct {
 var (
 	statusActive    = true
 	isDeleteIsFalse = false
+	isDeleteIsTrue  = true
 )
 
 func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, error) {
