@@ -75,6 +75,11 @@ func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, e
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveArticle] error : ", err)
 		return articleDetail, err
 	}
+	countView, err := updateViewArticle(tc.db, idArticle, article.View)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[updateViewArticle] error : ", err)
+		return articleDetail, err
+	}
 	articleDetails := ArticleDetail{
 		Title:       article.Title,
 		Description: article.Description,
@@ -82,11 +87,29 @@ func (tc StoreArticle) ShowArticle(idArticle int, meta string) (ArticleDetail, e
 		Img:         article.Img,
 		Meta:        article.Meta,
 		Keyword:     article.Keyword,
-		View:        article.View,
+		View:        countView,
 		CreatedAt:   article.CreatedAt,
 		CreatedBy:   article.CreatedBy,
 	}
 	return articleDetails, nil
+}
+
+func updateViewArticle(db *sql.DB, idArticle int, view int64) (int64, error) {
+	countview := view + 1
+	query := `
+	update
+		articles
+	set
+		view = $2
+	where
+		id = $1
+	`
+	_, err := db.Exec(query, idArticle, countview)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[updateViewArticle] Update view Article DB err  %v", err)
+		return view, err
+	}
+	return countview, nil
 }
 
 func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bool, metaS string) (Articles, error) {
