@@ -9,6 +9,7 @@ import (
 )
 
 type User struct {
+	Id          int       `json:"id"`
 	UserName    string    `json:"username"`
 	PassWord    string    `json:"password"`
 	Role        string    `json:"role"`
@@ -38,7 +39,7 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	user := User{}
 	query := `
 	SELECT 
-		username, password, email, role, sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
+		id, username, password, email, role, sex, dateofbirth, phone, fullname, created_at, is_delete, available, address
 	FROM 
 		users u 
 	WHERE 
@@ -47,7 +48,7 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 
 	var email sql.NullString
 
-	err := row.Scan(&user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete, &user.Available, &user.Address)
+	err := row.Scan(&user.Id, &user.UserName, &user.PassWord, &email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.CreatedAt, &user.IsDelete, &user.Available, &user.Address)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("RetrieveAccountByUserName scan error  %v", err)

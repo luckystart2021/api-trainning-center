@@ -56,14 +56,14 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 		liet, err := strconv.ParseBool(req.Liet)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Không thể chuyển đổi string to boolean"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
 			return
 		}
 
 		CodeDe, err := strconv.Atoi(req.CodeDe)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Không thể chuyển đổi string to int"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
 			return
 		}
 

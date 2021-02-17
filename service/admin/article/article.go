@@ -1,12 +1,16 @@
 package article
 
-import "database/sql"
+import (
+	"api-trainning-center/service/response"
+	"database/sql"
+)
 
 type IArticleService interface {
 	ShowArticles(idCategory int) ([]Article, error)
 	ShowArticle(idArticle int, meta string) (ArticleDetail, error)
 	ShowCategories(idCategoryParent int) ([]CategoriesResponse, error)
 	ShowChildArticles(idChildCategoryP int, meta string) ([]ChildCategoryNewsList, error)
+	CreateArticle(idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (response.MessageResponse, error)
 }
 
 type StoreArticle struct {
