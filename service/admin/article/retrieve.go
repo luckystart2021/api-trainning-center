@@ -208,10 +208,6 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse 
 		articles.created_at desc;				
 	`
 	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
-		return articles, errors.New("Không có dữ liệu từ hệ thống")
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
 		return articles, err
@@ -222,6 +218,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse 
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
 			return articles, err
@@ -245,6 +242,10 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse 
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return articles, nil
 }
@@ -281,10 +282,6 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 		articles.created_at desc;				
 	`
 	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
-		return articles, errors.New("Không có dữ liệu từ hệ thống")
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
 		return articles, err
@@ -295,6 +292,10 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+		if err == sql.ErrNoRows {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
+			return articles, errors.New("Không có dữ liệu từ hệ thống")
+		}
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
 			return articles, err
