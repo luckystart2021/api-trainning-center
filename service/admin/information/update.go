@@ -3,6 +3,7 @@ package information
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -32,7 +33,7 @@ func updateInformationByRequest(db *sql.DB, idInformationI int, address, phone, 
 	_, err := db.Exec(query, address, phone, email, maps, title, description, img, idInformationI)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateInformationByRequest] Update DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 
 type IChildCategoryService interface {
 	CreateChildCategory(userName, title, meta string, idCategory int) (response.MessageResponse, error)
+	UpdateChildCategory(id int, userName, title, meta string, idCategory int) (response.MessageResponse, error)
 }
 
 type StoreChildCategory struct {

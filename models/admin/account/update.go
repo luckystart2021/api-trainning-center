@@ -2,6 +2,7 @@ package account
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,7 +17,7 @@ func UpdateAccountByRequest(userName, newPassWord string, db *sql.DB) error {
 	_, err := db.Exec(query, newPassWord, userName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateAccountByRequest] Update DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }
@@ -37,7 +38,7 @@ func UpdateAccount(req AccountRequest, db *sql.DB) error {
 	_, err := db.Exec(query, &user.UserName, &user.Email, &user.Role, &user.Sex, &user.DateOfBirth, &user.Phone, &user.FullName, &user.Address)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateAccount] Update DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

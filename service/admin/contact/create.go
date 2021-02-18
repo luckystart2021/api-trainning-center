@@ -3,6 +3,7 @@ package contact
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
