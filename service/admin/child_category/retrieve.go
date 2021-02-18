@@ -2,6 +2,10 @@ package child_category
 
 import (
 	"api-trainning-center/service/admin/article"
+	"api-trainning-center/utils"
+	"database/sql"
+	"errors"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -13,4 +17,48 @@ func (st StoreChildCategory) ShowChildCategories(idCategoryParent int) ([]articl
 		return []article.Categories{}, err
 	}
 	return categories, nil
+}
+
+func (st StoreChildCategory) ShowChildCategory(idChildCategory int) (article.Categories, error) {
+	categories, err := retrieveCategory(st.db, idChildCategory)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowChildCategory] error : ", err)
+		return article.Categories{}, err
+	}
+	return categories, nil
+}
+
+func retrieveCategory(db *sql.DB, idChildCategory int) (article.Categories, error) {
+	category := article.Categories{}
+	query := `
+	SELECT 
+		id, title, id_category, meta, created_at, created_by, updated_at, updated_by
+	FROM 
+		child_category
+	WHERE id = $1;
+	`
+	rows := db.QueryRow(query, idChildCategory)
+	var id, idCategory int64
+	var title, meta, createdBy, updateBy string
+	var createdAt, updatedAt time.Time
+	err := rows.Scan(&id, &title, &idCategory, &meta, &createdAt, &createdBy, &updatedAt, &updateBy)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategory] No Data  %v", err)
+		return category, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategory] Scan error  %v", err)
+		return category, errors.New("Lỗi hệ thống")
+	}
+	categoryR := article.Categories{
+		Id:         id,
+		Title:      title,
+		IdCategory: idCategory,
+		Meta:       meta,
+		CreatedAt:  utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		CreatedBy:  createdBy,
+		UpdatedAt:  utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+		UpdatedBy:  updateBy,
+	}
+	return categoryR, nil
 }
