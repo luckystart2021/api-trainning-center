@@ -3,6 +3,7 @@ package information
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -26,7 +27,7 @@ func CreateInformationByRequest(db *sql.DB, address, phone, email, maps, title, 
 	_, err := db.Exec(query, address, phone, email, maps, title, description, img)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateInformationByRequest]Insert contact DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

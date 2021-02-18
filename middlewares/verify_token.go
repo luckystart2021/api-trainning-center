@@ -101,7 +101,7 @@ func ExtractToken(r *http.Request) (string, error) {
 	//normally Authorization the_token_xxx
 	strArr := strings.Split(bearToken, " ")
 	if len(strArr) != 2 {
-		return "", errors.New("Mã thông báo không được cung cấp hoặc không đúng định dạng")
+		return "", errors.New("Mã xác thực không được cung cấp hoặc không đúng định dạng")
 	}
 	return strArr[1], nil
 }

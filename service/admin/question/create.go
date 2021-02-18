@@ -3,6 +3,7 @@ package question
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -28,7 +29,7 @@ func CreateQuestionByRequest(db *sql.DB, codeDe int, name, answerA, answerB, ans
 	_, err := db.Exec(query, name, result, liet, codeDe, answerA, answerB, answerC, answerD, img)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateInformationByRequest]Insert Question DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

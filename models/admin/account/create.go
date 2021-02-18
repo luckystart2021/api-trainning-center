@@ -168,7 +168,7 @@ func CreateUserByRequest(req AccountRequest, db *sql.DB) error {
 	_, err := db.Exec(query, req.UserName, req.PassWord, req.Email, req.Role, req.Sex, req.DateOfBirth, req.Phone, req.FullName, req.Address)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateUserByRequest]Insert DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

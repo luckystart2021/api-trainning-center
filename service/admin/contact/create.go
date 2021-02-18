@@ -26,7 +26,7 @@ func CreateContactByRequest(db *sql.DB, fullName, phone, email, message, subject
 	_, err := db.Exec(query, fullName, phone, email, message, subject)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateContactByRequest]Insert contact DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

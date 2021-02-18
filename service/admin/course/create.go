@@ -62,7 +62,7 @@ func CreateCourseByRequest(db *sql.DB, userName, name, trainingSystem string, st
 	_, err := db.Exec(query, name, startDate, endDate, graduationDate, testDate, trainingSystem, userName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateCourseByRequest]Insert Course DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }

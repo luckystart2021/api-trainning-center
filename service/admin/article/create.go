@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/models/admin/account"
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -35,7 +36,7 @@ func CreateArticleByRequest(db *sql.DB, idUser int, idChildCategoryP int, userNa
 	_, err := db.Exec(query, idUser, idChildCategoryP, title, description, details, image, meta, keyWordSEO, userName, userName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateArticleByRequest]Insert Article DB err  %v", err)
-		return err
+		return errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 	return nil
 }
