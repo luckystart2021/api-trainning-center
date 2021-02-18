@@ -15,15 +15,10 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 	return func(router chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
-
 		router.Route("/child_category", func(router chi.Router) {
+			router.Get("/{id_category}/view", RetrieveChildCategories(st))
 			router.Post("/create", CreateChildCategory(st))
 			router.Put("/{id}/update", UpdateChildCategory(st))
 		})
-		// router.Put("/article/{id_article}/update", UpdateArticle(st))
-		// router.Get("/article/{id_child_category}/views", ShowArticles(st))
-		// router.Get("/article/{id_article}/detail", ShowDetailArticle(st))
-		// router.Put("/article/{id_article}/delete", DeleteArticle(st))
-		// router.Put("/article/{id_article}/approval", ApprovalArticle(st))
 	}
 }

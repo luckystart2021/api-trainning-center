@@ -28,7 +28,7 @@ type CategoriesResponse struct {
 
 func (tc StoreArticle) ShowCategories(idCategoryParent int) ([]CategoriesResponse, error) {
 	categoriesResponse := []CategoriesResponse{}
-	categories, err := retrieveCategories(tc.db, idCategoryParent)
+	categories, err := RetrieveCategories(tc.db, idCategoryParent)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCategories] error : ", err)
 		return categoriesResponse, err
@@ -45,7 +45,7 @@ func (tc StoreArticle) ShowCategories(idCategoryParent int) ([]CategoriesRespons
 	return categoriesResponse, nil
 }
 
-func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) {
+func RetrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) {
 	categories := []Categories{}
 	query := `
 	select

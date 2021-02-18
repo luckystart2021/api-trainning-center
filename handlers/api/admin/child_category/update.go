@@ -24,14 +24,14 @@ func UpdateChildCategory(service child_category.IChildCategoryService) http.Hand
 
 		id := chi.URLParam(r, "id")
 		if id == "" {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã câu hỏi không được rỗng"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không được rỗng"))
 			return
 		}
 
 		idP, err := strconv.Atoi(id)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã câu hỏi không hợp lệ"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
 			return
 		}
 
