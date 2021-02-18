@@ -1,5 +1,6 @@
 package constant
 
 const (
-	ADMIN = "ADMIN"
+	ADMIN        = "ADMIN"
+	ItemsPerPage = 2
 )

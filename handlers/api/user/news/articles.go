@@ -2,16 +2,13 @@ package news
 
 import (
 	"api-trainning-center/service/admin/article"
+	"api-trainning-center/service/constant"
 	"api-trainning-center/service/response"
 	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi"
-)
-
-const (
-	itemsPerPage = 2
 )
 
 type ArticleResponse struct {
@@ -123,8 +120,8 @@ func getDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
 	if page == 0 {
 		return nil, errors.New("Số trang không được bằng 0")
 	}
-	start := (page - 1) * itemsPerPage
-	stop := start + itemsPerPage
+	start := (page - 1) * constant.ItemsPerPage
+	stop := start + constant.ItemsPerPage
 
 	if start > len(data) {
 		return nil, errors.New("Không có dữ liệu từ hệ thống")

@@ -2,6 +2,7 @@ package news
 
 import (
 	"api-trainning-center/service/admin/article"
+	"api-trainning-center/service/constant"
 	"api-trainning-center/service/response"
 	"errors"
 	"net/http"
@@ -82,8 +83,8 @@ func getDataPageChildArticles(page int, data []article.ChildCategoryNewsList) ([
 	if page == 0 {
 		return nil, errors.New("Số trang không được bằng 0")
 	}
-	start := (page - 1) * itemsPerPage
-	stop := start + itemsPerPage
+	start := (page - 1) * constant.ItemsPerPage
+	stop := start + constant.ItemsPerPage
 
 	if start > len(data) {
 		return nil, errors.New("Không có dữ liệu từ hệ thống")
