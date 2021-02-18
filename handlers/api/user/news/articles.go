@@ -10,6 +10,21 @@ import (
 	"github.com/go-chi/chi"
 )
 
+const (
+	itemsPerPage = 2
+)
+
+type ArticleResponse struct {
+	Id          int64  `json:"id"`
+	IsOne       bool   `json:"is_one"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Img         string `json:"img"`
+	Meta        string `json:"meta"`
+	CreatedAt   string `json:"created_at"`
+	CreatedBy   string `json:"created_by"`
+}
+
 func GetArticles(service article.IArticleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := chi.URLParam(r, "id_category")
@@ -28,8 +43,21 @@ func GetArticles(service article.IArticleService) http.HandlerFunc {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
+		pageParam := r.URL.Query().Get("page")
+		pageNo, err := strconv.Atoi(pageParam)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Số trang không hợp lệ"))
+			return
+		}
+		resp, err := GetDataPage(pageNo, showArticles)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
 		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, showArticles)
+		response.RespondWithJSON(w, http.StatusOK, resp)
 	}
 }
 
@@ -82,4 +110,48 @@ func GetCategories(service article.IArticleService) http.HandlerFunc {
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, showCategories)
 	}
+}
+
+// pages start at 1, can't be 0 or less.
+func GetDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
+	if page == 0 {
+		return nil, errors.New("Số trang không được bằng 0")
+	}
+	start := (page - 1) * itemsPerPage
+	stop := start + itemsPerPage
+
+	if start > len(data) {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
+	}
+
+	if stop > len(data) {
+		stop = len(data)
+	}
+
+	if len(data[start:stop]) == 0 {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
+	}
+
+	articlesResponse := []ArticleResponse{}
+	var isValueOne bool
+	for i, data := range data[start:stop] {
+		if i == 0 {
+			isValueOne = true
+		} else {
+			isValueOne = false
+		}
+		articleResponse := ArticleResponse{
+			Id:          data.Id,
+			IsOne:       isValueOne,
+			Title:       data.Title,
+			Description: data.Description,
+			Img:         data.Img,
+			Meta:        data.Meta,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
+		}
+		articlesResponse = append(articlesResponse, articleResponse)
+	}
+
+	return articlesResponse, nil
 }
