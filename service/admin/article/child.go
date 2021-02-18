@@ -19,9 +19,9 @@ type ChildCategoryNewsList struct {
 	CreatedBy   string `json:"created_by"`
 }
 
-func (tc StoreArticle) ShowChildArticles(idChildCategoryP int, meta string) ([]ChildCategoryNewsList, error) {
+func (tc StoreArticle) ShowChildArticles(idChildCategoryP int, metaChild, metaParent string) ([]ChildCategoryNewsList, error) {
 	childCategoryNewsList := []ChildCategoryNewsList{}
-	childCategories, err := retrieveChildCategories(tc.db, idChildCategoryP, meta, statusActive, isDeleteIsFalse)
+	childCategories, err := retrieveChildCategories(tc.db, idChildCategoryP, metaChild, metaParent, statusActive, isDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowChildArticles] error : ", err)
 		return childCategoryNewsList, err
@@ -42,7 +42,7 @@ func (tc StoreArticle) ShowChildArticles(idChildCategoryP int, meta string) ([]C
 	return childCategoryNewsList, nil
 }
 
-func retrieveChildCategories(db *sql.DB, idChildCategoryP int, meta string, statusActive, isDeleteIsFalse bool) ([]Articles, error) {
+func retrieveChildCategories(db *sql.DB, idChildCategoryP int, metaChild, metaParent string, statusActive, isDeleteIsFalse bool) ([]Articles, error) {
 	articles := []Articles{}
 	query := `
 	select
@@ -66,15 +66,18 @@ func retrieveChildCategories(db *sql.DB, idChildCategoryP int, meta string, stat
 		articles
 	inner join child_category c on
 		c.id = articles.id_child_category
+	inner join category c1 on
+		c.id_category = c1.id
 	where
 		c.id = $1
 		and c.meta = $2
 		and articles.status = $3
 		and articles.is_deleted = $4
+		and c1.meta = $5
 	order by
 		articles.created_at desc;
 	`
-	rows, err := db.Query(query, idChildCategoryP, meta, statusActive, isDeleteIsFalse)
+	rows, err := db.Query(query, idChildCategoryP, metaChild, statusActive, isDeleteIsFalse, metaParent)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] query error  %v", err)
 		return articles, err

@@ -18,8 +18,8 @@ func GetChildArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		meta := chi.URLParam(r, "meta_child")
-		if meta == "" || len(meta) == 0 {
+		metaChild := chi.URLParam(r, "meta_child")
+		if metaChild == "" || len(metaChild) == 0 {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã liên kết dữ liệu không tồn tại"))
 			return
 		}
@@ -37,7 +37,7 @@ func GetChildArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		showChildArticles, err := service.ShowChildArticles(idChildCategoryP, meta)
+		showChildArticles, err := service.ShowChildArticles(idChildCategoryP, metaChild, metaParent)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
