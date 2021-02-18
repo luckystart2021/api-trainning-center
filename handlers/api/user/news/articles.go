@@ -38,19 +38,25 @@ func GetArticles(service article.IArticleService) http.HandlerFunc {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
 			return
 		}
-		showArticles, err := service.ShowArticles(idCategory)
-		if err != nil {
-			response.RespondWithError(w, http.StatusBadRequest, err)
+		pageParam := r.URL.Query().Get("page")
+		if pageParam == "" || len(pageParam) == 0 {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập số trang"))
 			return
 		}
-		pageParam := r.URL.Query().Get("page")
 		pageNo, err := strconv.Atoi(pageParam)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Số trang không hợp lệ"))
 			return
 		}
-		resp, err := GetDataPage(pageNo, showArticles)
+
+		showArticles, err := service.ShowArticles(idCategory)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		resp, err := getDataPage(pageNo, showArticles)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, err)
@@ -113,7 +119,7 @@ func GetCategories(service article.IArticleService) http.HandlerFunc {
 }
 
 // pages start at 1, can't be 0 or less.
-func GetDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
+func getDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
 	if page == 0 {
 		return nil, errors.New("Số trang không được bằng 0")
 	}
