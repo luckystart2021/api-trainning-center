@@ -3,6 +3,7 @@ package article
 import (
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -38,16 +39,16 @@ func deleteArticleById(db *sql.DB, idArticle int, userName string) (int64, error
 	where
 		id = $1
 	`
-	res, err := db.Exec(query, idArticle, isDeleteIsTrue, timeUpdate, userName, userName)
+	res, err := db.Exec(query, idArticle, isDeleteIsTrue, timeUpdate, userName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[deleteArticleById] Delete Article DB err  %v", err)
-		return 0, err
+		return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	// check how many rows affected
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RowsAffected] Delete Article DB err  %v", err)
-		return 0, err
+		return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	return rowsAffected, nil
