@@ -14,8 +14,9 @@ type IArticleService interface {
 	ShowChildArticles(idChildCategoryP int, metaChild, metaParent string) ([]ChildCategoryNewsList, error)
 	CreateArticle(idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (response.MessageResponse, error)
 	UpdateArticle(idArticle, idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (response.MessageResponse, error)
-	DeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	ApprovalArticleById(idArticle int, userName string) (response.MessageResponse, error)
+	DeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
+	UnDeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 }
 
 type StoreArticle struct {
