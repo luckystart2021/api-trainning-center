@@ -64,6 +64,7 @@ type ArticleDetail struct {
 
 var (
 	statusActive    = true
+	statusInActive  = false
 	isDeleteIsFalse = false
 	isDeleteIsTrue  = true
 )
