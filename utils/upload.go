@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -29,14 +30,21 @@ func FileUpload(r *http.Request, fileName string) (string, error) {
 	defer file.Close() //close the file when we finish
 	//this is path which  we want to store the file
 	saveFileName := "upload/img/" + fileName + "/"
+	if _, err := os.Stat(saveFileName); os.IsNotExist(err) {
+		os.Mkdir(saveFileName, 0755)
+	}
 	// info, err := os.Stat()
 	fileImg := FilenameWithoutExtension(handler.Filename) + "_" + buildFileName() + FilenameExtension(handler.Filename)
 	f, err := os.OpenFile(saveFileName+fileImg, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		return "", err
+		return "", errors.New("Lỗi open file")
 	}
 	defer f.Close()
-	io.Copy(f, file)
+
+	if _, err := io.Copy(f, file); err != nil {
+		return "", errors.New("Lỗi copy file")
+	}
+
 	//here we save our file to our path
 	return fileImg, nil
 }
