@@ -12,6 +12,7 @@ type IChildCategoryService interface {
 	ShowChildCategories(idCategoryParent int) ([]article.Categories, error)
 	ShowChildCategory(idChildCategory int) (article.Categories, error)
 	DeleteCategoryById(id int, userName string) (response.MessageResponse, error)
+	UnDeleteCategoryById(id int, userName string) (response.MessageResponse, error)
 }
 
 type StoreChildCategory struct {
