@@ -31,7 +31,7 @@ func retrieveShowQuestionsExam(db *sql.DB) ([]ResponseQuestionExam, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] query error  %v", err)
-		return questionsExam, err
+		return questionsExam, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -41,7 +41,7 @@ func retrieveShowQuestionsExam(db *sql.DB) ([]ResponseQuestionExam, error) {
 		err = rows.Scan(&id, &name)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] Scan error  %v", err)
-			return questionsExam, err
+			return questionsExam, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		questionExam := ResponseQuestionExam{
 			Id:   id,
@@ -165,7 +165,7 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] query error  %v", err)
-		return questions, err
+		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -177,7 +177,7 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 		err = rows.Scan(&id, &questionName, &result, &codeDe, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] Scan error  %v", err)
-			return questions, err
+			return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		questionSystem := QuestionSystem{
 			Id:      id,
@@ -228,7 +228,7 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestions] query error  %v", err)
-		return questions, err
+		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -238,7 +238,7 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 		err = rows.Scan(&id, &questionName, &answerA, &answerB, &answerC, &answerD, &img)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestions] Scan error  %v", err)
-			return questions, err
+			return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		answers := []Answers{}
 		answer1 := Answers{

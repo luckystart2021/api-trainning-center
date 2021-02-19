@@ -234,7 +234,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
-		return articles, err
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
@@ -245,7 +245,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
-			return articles, err
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		article := Articles{
 			Id:              idArticle,
@@ -308,7 +308,7 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
-		return articles, err
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
@@ -322,7 +322,7 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 		}
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
-			return articles, err
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		article := Articles{
 			Id:              idArticle,

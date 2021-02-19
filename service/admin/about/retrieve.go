@@ -32,7 +32,7 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 	rows, err := db.Query(query)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] query error  %v", err)
-		return abouts, err
+		return abouts, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var title, description, subtitle, img string
@@ -40,7 +40,7 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] Scan error  %v", err)
-			return abouts, err
+			return abouts, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		about := About{
 			Title:       title,

@@ -44,7 +44,7 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] query error  %v", err)
-		return contacts, err
+		return contacts, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -54,7 +54,7 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 		err = rows.Scan(&fullName, &phone, &email, &message, &subject, &createdAt)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] Scan error  %v", err)
-			return contacts, err
+			return contacts, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		contact := Contact{
 			FullName:  fullName,

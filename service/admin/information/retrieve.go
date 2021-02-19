@@ -2,6 +2,7 @@ package information
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -31,7 +32,7 @@ func retrieveInformation(db *sql.DB) (Information, error) {
 	information.Img = "/files/img/information/" + img
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveInformation] Scan error  %v", err)
-		return information, err
+		return information, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	return information, nil
 }

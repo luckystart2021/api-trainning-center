@@ -74,7 +74,7 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int, childCategoryIsDeleteI
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] query error  %v", err)
-		return categories, err
+		return categories, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var id, idCategory int64
@@ -84,7 +84,7 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int, childCategoryIsDeleteI
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] Scan error  %v", err)
-			return categories, err
+			return categories, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		category := Categories{
 			Id:         id,

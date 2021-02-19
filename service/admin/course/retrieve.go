@@ -101,7 +101,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
-		return courses, err
+		return courses, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -115,7 +115,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 		err = rows.Scan(&id, &code, &name, &startDate, &endDate, &graduationDate, &testDate, &trainingSystem, &status, &createdBy, &createdAt, &updatedBy, &updatedAt)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
-			return courses, err
+			return courses, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		course := Course{
 			Id:             id,

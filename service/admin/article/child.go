@@ -81,7 +81,7 @@ func retrieveChildCategories(db *sql.DB, idChildCategoryP int, metaChild, metaPa
 	rows, err := db.Query(query, idChildCategoryP, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] query error  %v", err)
-		return articles, err
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
@@ -91,7 +91,7 @@ func retrieveChildCategories(db *sql.DB, idChildCategoryP int, metaChild, metaPa
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] Scan error  %v", err)
-			return articles, err
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		article := Articles{
 			Id:              idArticle,

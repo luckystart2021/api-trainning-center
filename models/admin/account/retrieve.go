@@ -104,7 +104,7 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] query error  %v", err)
-		return users, err
+		return users, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	for rows.Next() {
@@ -116,7 +116,7 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete, &available, &address)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] Scan error  %v", err)
-			return users, err
+			return users, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		user := User{
 			UserName:    username,

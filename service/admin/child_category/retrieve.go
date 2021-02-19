@@ -19,7 +19,7 @@ func (st StoreChildCategory) ShowChildCategories(idCategoryParent int) ([]Catego
 	categories, err := retrieveCategories(st.db, idCategoryParent)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowChildCategories] error : ", err)
-		return []Categories{}, err
+		return []Categories{}, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	return categories, nil
 }
@@ -104,7 +104,7 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] query error  %v", err)
-		return categories, err
+		return categories, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
 		var id, idCategory int64
@@ -115,7 +115,7 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] Scan error  %v", err)
-			return categories, err
+			return categories, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		category := Categories{
 			Id:         id,

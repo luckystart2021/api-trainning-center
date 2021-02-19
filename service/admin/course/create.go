@@ -76,7 +76,7 @@ func CountCourse(db *sql.DB) (int64, error) {
 	err := row.Scan(&count)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CountCourse] count course query err  %v", err)
-		return count, err
+		return count, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	return count, nil
 }
