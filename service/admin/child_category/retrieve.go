@@ -10,8 +10,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	childCategoryIsDeleteIsFalse = false
+	childCategoryIsDeleteIsTrue  = true
+)
+
 func (st StoreChildCategory) ShowChildCategories(idCategoryParent int) ([]article.Categories, error) {
-	categories, err := article.RetrieveCategories(st.db, idCategoryParent)
+	categories, err := article.RetrieveCategories(st.db, idCategoryParent, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowChildCategories] error : ", err)
 		return []article.Categories{}, err

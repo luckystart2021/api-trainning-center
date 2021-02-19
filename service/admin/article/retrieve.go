@@ -176,7 +176,7 @@ func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bo
 
 func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	article := []Article{}
-	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse)
+	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowArticles] error : ", err)
 		return article, err
@@ -197,7 +197,7 @@ func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	return article, nil
 }
 
-func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse bool) ([]Articles, error) {
+func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
 	articles := []Articles{}
 	query := `
 	select
@@ -227,10 +227,11 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse 
 		c2.id = $1
 		and articles.status = $2
 		and articles.is_deleted = $3
+		and c.is_deleted = $4
 	order by
 		articles.created_at desc;				
 	`
-	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
+	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
 		return articles, err

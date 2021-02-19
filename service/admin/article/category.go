@@ -26,9 +26,14 @@ type CategoriesResponse struct {
 	Meta  string `json:"meta"`
 }
 
+var (
+	childCategoryIsDeleteIsFalse = false
+	childCategoryIsDeleteIsTrue  = true
+)
+
 func (tc StoreArticle) ShowCategories(idCategoryParent int) ([]CategoriesResponse, error) {
 	categoriesResponse := []CategoriesResponse{}
-	categories, err := RetrieveCategories(tc.db, idCategoryParent)
+	categories, err := RetrieveCategories(tc.db, idCategoryParent, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCategories] error : ", err)
 		return categoriesResponse, err
@@ -45,7 +50,7 @@ func (tc StoreArticle) ShowCategories(idCategoryParent int) ([]CategoriesRespons
 	return categoriesResponse, nil
 }
 
-func RetrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) {
+func RetrieveCategories(db *sql.DB, idCategoryParent int, childCategoryIsDeleteIsFalse bool) ([]Categories, error) {
 	categories := []Categories{}
 	query := `
 	select
@@ -61,14 +66,12 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 		child_category cc
 	where
 		id_category = $1
+		and is_deleted = $2
 	order by
 		id
 	`
-	rows, err := db.Query(query, idCategoryParent)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] No Data  %v", err)
-		return categories, errors.New("Không có dữ liệu từ hệ thống")
-	}
+	rows, err := db.Query(query, idCategoryParent, childCategoryIsDeleteIsFalse)
+
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] query error  %v", err)
 		return categories, err
@@ -78,6 +81,7 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 		var title, meta, createdBy, updateBy string
 		var createdAt, updatedAt time.Time
 		err = rows.Scan(&id, &title, &idCategory, &meta, &createdAt, &createdBy, &updatedAt, &updateBy)
+
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] Scan error  %v", err)
 			return categories, err
@@ -93,6 +97,10 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 			UpdatedBy:  updateBy,
 		}
 		categories = append(categories, category)
+	}
+	if len(categories) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] No Data  %v", err)
+		return categories, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return categories, nil
 }
