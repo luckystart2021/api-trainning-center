@@ -7,6 +7,7 @@ import (
 
 type IArticleService interface {
 	ShowArticles(idChildCategory int) ([]Article, error)
+	ShowNews() ([]Article, error)
 	ShowArticlesByChildCategory(idChildCategory int) ([]AdminArticlesList, error)
 	ShowArticleById(idArticle int) (Articles, error)
 	ShowArticle(idArticle int, meta string) (ArticleDetail, error)
