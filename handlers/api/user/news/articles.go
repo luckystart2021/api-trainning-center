@@ -5,7 +5,6 @@ import (
 	"api-trainning-center/service/constant"
 	"api-trainning-center/service/response"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -184,27 +183,4 @@ func getDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
 	}
 
 	return articlesResponse, nil
-}
-
-func SearchNews(service article.IArticleService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		searchKey := r.URL.Query().Get("key")
-		if searchKey == "" || len(searchKey) == 0 {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập từ khoá tìm kiếm"))
-			return
-		}
-		if len(searchKey) < 5 {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập từ khoá tìm kiếm lớn hơn 5 ký tự"))
-			return
-		}
-		fmt.Println("keys", searchKey)
-		showResultNewsByKey, err := service.ShowResultNewsByKey(searchKey)
-		if err != nil {
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
-
-		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, showResultNewsByKey)
-	}
 }
