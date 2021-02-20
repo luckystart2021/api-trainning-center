@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,7 @@ func ParseStringToTime(date string) (time.Time, error) {
 	myDate, err := time.Parse(layout, date)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStringToTime] parse error %v", err)
-		return time.Now(), err
+		return time.Now(), errors.New("Thời gian không hợp lệ")
 	}
 	return myDate, nil
 }

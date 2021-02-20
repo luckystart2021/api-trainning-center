@@ -19,6 +19,7 @@ func CourseRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Get("/view", RetrieveCourses(st))
 			router.Get("/view/{id_course}", RetrieveCourse(st))
 			router.Post("/create", CreateCourse(st))
+			router.Put("/{id_course}/update", UpdateCourse(st))
 		})
 	}
 }
