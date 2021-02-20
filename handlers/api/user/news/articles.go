@@ -35,6 +35,19 @@ func GetNews(service article.IArticleService) http.HandlerFunc {
 	}
 }
 
+func GetFavoriteNews(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showFavoriteNews, err := service.ShowFavoriteNews()
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showFavoriteNews)
+	}
+}
+
 func GetArticles(service article.IArticleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := chi.URLParam(r, "id_category")

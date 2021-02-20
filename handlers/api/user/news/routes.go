@@ -17,5 +17,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Get("/{meta_parent}/{meta_child}/list/child-news", GetChildArticles(st))
 		router.Get("/{meta_parent}/{meta_child}/list/child-news/pagination", GetChildArticlesPagination(st))
 		router.Get("/news", GetNews(st))
+		router.Get("/favorite/news", GetFavoriteNews(st))
 	}
 }

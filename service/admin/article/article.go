@@ -19,6 +19,7 @@ type IArticleService interface {
 	UnApprovalArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	DeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	UnDeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
+	ShowFavoriteNews() ([]Article, error)
 }
 
 type StoreArticle struct {
