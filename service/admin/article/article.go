@@ -20,6 +20,7 @@ type IArticleService interface {
 	DeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	UnDeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	ShowFavoriteNews() ([]Article, error)
+	ShowResultNewsByKey(searchKey string) ([]Article, error)
 }
 
 type StoreArticle struct {
