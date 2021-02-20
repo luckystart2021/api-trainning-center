@@ -19,9 +19,9 @@ type ChildCategoryNewsList struct {
 	CreatedBy   string `json:"created_by"`
 }
 
-func (tc StoreArticle) ShowChildArticles(idChildCategoryP int, metaChild, metaParent string) ([]ChildCategoryNewsList, error) {
+func (tc StoreArticle) ShowChildArticles(metaChild, metaParent string) ([]ChildCategoryNewsList, error) {
 	childCategoryNewsList := []ChildCategoryNewsList{}
-	childCategories, err := retrieveChildCategories(tc.db, idChildCategoryP, metaChild, metaParent, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+	childCategories, err := retrieveChildCategories(tc.db, metaChild, metaParent, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowChildArticles] error : ", err)
 		return childCategoryNewsList, err
@@ -42,7 +42,7 @@ func (tc StoreArticle) ShowChildArticles(idChildCategoryP int, metaChild, metaPa
 	return childCategoryNewsList, nil
 }
 
-func retrieveChildCategories(db *sql.DB, idChildCategoryP int, metaChild, metaParent string, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
+func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
 	articles := []Articles{}
 	query := `
 	select
@@ -69,16 +69,15 @@ func retrieveChildCategories(db *sql.DB, idChildCategoryP int, metaChild, metaPa
 	inner join category c1 on
 		c.id_category = c1.id
 	where
-		c.id = $1
-		and c.meta = $2
-		and articles.status = $3
-		and articles.is_deleted = $4
-		and c1.meta = $5
-		and c.is_deleted = $6
+		c.meta = $1
+		and articles.status = $2
+		and articles.is_deleted = $3
+		and c1.meta = $4
+		and c.is_deleted = $5
 	order by
 		articles.created_at desc;
 	`
-	rows, err := db.Query(query, idChildCategoryP, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse)
+	rows, err := db.Query(query, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")

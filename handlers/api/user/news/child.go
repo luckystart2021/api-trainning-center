@@ -36,19 +36,6 @@ func GetChildArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		idChildCategory := chi.URLParam(r, "id_child_category")
-		if idChildCategory == "" || len(idChildCategory) == 0 {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không tồn tại"))
-			return
-		}
-
-		idChildCategoryP, err := strconv.Atoi(idChildCategory)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
-			return
-		}
-
 		pageParam := r.URL.Query().Get("page")
 		if pageParam == "" || len(pageParam) == 0 {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập số trang"))
@@ -61,7 +48,7 @@ func GetChildArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		showChildArticles, err := service.ShowChildArticles(idChildCategoryP, metaChild, metaParent)
+		showChildArticles, err := service.ShowChildArticles(metaChild, metaParent)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
