@@ -16,9 +16,10 @@ func CourseRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Route("/course", func(router chi.Router) {
-			router.Get("/view", RetrieveCourses(st))
-			router.Get("/view/{id_course}", RetrieveCourse(st))
+			router.Get("/view/active", RetrieveCourses(st))
+			router.Get("/view/in-active", RetrieveInActiveCourses(st))
 			router.Post("/create", CreateCourse(st))
+			router.Get("/{id_course}/view", RetrieveCourse(st))
 			router.Put("/{id_course}/update", UpdateCourse(st))
 		})
 	}

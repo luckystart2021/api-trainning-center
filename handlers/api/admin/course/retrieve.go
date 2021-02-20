@@ -21,6 +21,18 @@ func RetrieveCourses(service course.ICourseService) http.HandlerFunc {
 	}
 }
 
+func RetrieveInActiveCourses(service course.ICourseService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showInActiveCourses, err := service.ShowCoursesInActive()
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showInActiveCourses)
+	}
+}
+
 func RetrieveCourse(service course.ICourseService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := chi.URLParam(r, "id_course")

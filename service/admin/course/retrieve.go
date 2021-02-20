@@ -40,6 +40,16 @@ func (tc StoreCourse) ShowCoursesActive() ([]Course, error) {
 	return course, nil
 }
 
+func (tc StoreCourse) ShowCoursesInActive() ([]Course, error) {
+	course, err := RetrieveCourses(statusInActive, tc.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCoursesInActive] error : ", err)
+		return []Course{}, err
+	}
+
+	return course, nil
+}
+
 func (tc StoreCourse) ShowCourses(idCourse string) (Course, error) {
 	course, err := RetrieveCourse(idCourse, tc.db)
 	if err != nil {
@@ -59,13 +69,17 @@ func RetrieveCourse(idCourse string, db *sql.DB) (Course, error) {
 	FROM 
 		course
 	WHERE
-		code = $1;`
+		id = $1;`
 	rows := db.QueryRow(query, idCourse)
 	var graduationDate sql.NullTime
 	var startDate, endDate, testDate, createdAt, updatedAt time.Time
 
 	err := rows.Scan(&courses.Id, &courses.Code, &courses.Name, &startDate, &endDate, &graduationDate,
 		&testDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &createdAt, &courses.UpdatedBy, &updatedAt)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveCourse] No Data  %v", err)
+		return courses, errors.New("Không có dữ liệu từ hệ thống")
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
 		return courses, err
@@ -95,10 +109,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	ORDER BY start_date DESC;
 	`
 	rows, err := db.Query(query, status)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] No Data  %v", err)
-		return courses, errors.New("Không có dữ liệu từ hệ thống")
-	}
+
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
 		return courses, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -135,6 +146,10 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 			course.GraduationDate = utils.TimeIn(graduationDate.Time, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
 		}
 		courses = append(courses, course)
+	}
+	if len(courses) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] No Data  %v", err)
+		return courses, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return courses, nil
 }
