@@ -19,6 +19,14 @@ type Article struct {
 	CreatedBy   string `json:"created_by"`
 }
 
+type NotificationNews struct {
+	Id        int64  `json:"id"`
+	Title     string `json:"title"`
+	Meta      string `json:"meta"`
+	CreatedAt string `json:"created_at"`
+	CreatedBy string `json:"created_by"`
+}
+
 type Articles struct {
 	Id              int64  `json:"id"`
 	IdUser          int64  `json:"id_user"`
@@ -608,10 +616,7 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
-		if err == sql.ErrNoRows {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] No Data  %v", err)
-			return articles, errors.New("Không có dữ liệu từ hệ thống")
-		}
+
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] Scan error  %v", err)
 			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -635,6 +640,109 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return articles, nil
+}
+
+func (tc StoreArticle) GetNotificationNews() ([]NotificationNews, error) {
+	article := []NotificationNews{}
+	articels, err := retrieveNotificationNew(tc.db, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[GetNotificationNews] error : ", err)
+		return article, err
+	}
+	for _, data := range articels {
+		articleR := NotificationNews{
+			Id:        data.Id,
+			Title:     data.Title,
+			Meta:      data.Meta,
+			CreatedAt: data.CreatedAt,
+			CreatedBy: data.CreatedBy,
+		}
+		article = append(article, articleR)
+	}
+	logrus.WithFields(logrus.Fields{}).Info("[GetNotificationNews] retrieve success")
+	return article, nil
+}
+
+func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
+	articles := []Articles{}
+	query := `
+	select 
+		articles.id ,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	from
+		articles
+	inner join child_category c on
+		c.id = articles.id_child_category
+	inner join category c2 on
+		c.id_category = c2.id
+	where
+		articles.status = $1
+		and articles.is_deleted = $2
+		and c.is_deleted = $3
+		and c.id = 2
+	order by
+		articles.created_at desc
+	limit 3;				
+	`
+	rows, err := db.Query(query, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] query error  %v", err)
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	for rows.Next() {
+		var idArticle, view, idUser, idChildCategory int64
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var createdAt, updatedAt time.Time
+		var status, isDeleted bool
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] Scan error  %v", err)
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		article := Articles{
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
+		}
+		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return articles, nil
 }
