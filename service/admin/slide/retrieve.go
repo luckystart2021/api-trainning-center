@@ -53,6 +53,45 @@ func (tc StoreSlide) ShowSlidesAdmin() ([]slide.Slide, error) {
 	return slides, nil
 }
 
+func (tc StoreSlide) ShowDetailSlide(idSlide int) (slide.Slide, error) {
+	detailSlide, err := retrieveDetailSlide(tc.db, idSlide)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowSlidesAdmin] error : ", err)
+		return slide.Slide{}, err
+	}
+	return detailSlide, nil
+}
+
+func retrieveDetailSlide(db *sql.DB, idSlide int) (slide.Slide, error) {
+	slide := slide.Slide{}
+	query := `
+	SELECT
+		id,
+		title,
+		img,
+		hide,
+		created_at,
+		created_by
+	FROM
+		slide
+	WHERE 
+		id = $1;
+	`
+	rows := db.QueryRow(query, idSlide)
+	var createdAt time.Time
+	err := rows.Scan(&slide.Id, &slide.Title, &slide.Img, &slide.Hide, &createdAt, &slide.CreatedBy)
+	slide.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveDetailSlide] No Data  %v", err)
+		return slide, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveDetailSlide] Scan error  %v", err)
+		return slide, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	return slide, nil
+}
+
 func retrieveSlide(db *sql.DB) ([]slide.Slide, error) {
 	slides := []slide.Slide{}
 	query := `
