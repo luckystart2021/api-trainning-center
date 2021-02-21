@@ -19,7 +19,7 @@ func FileUpload(r *http.Request, fileName string) (string, error) {
 	}
 	//replace file with the key your sent your image with
 	if err != nil {
-		return "", err
+		return "", errors.New("Xảy ra lỗi khi nhận file")
 	}
 
 	// checkFilenameExtension := FilenameExtension(handler.Filename)

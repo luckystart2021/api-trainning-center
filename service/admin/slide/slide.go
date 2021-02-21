@@ -1,9 +1,13 @@
 package slide
 
-import "database/sql"
+import (
+	"api-trainning-center/service/response"
+	"database/sql"
+)
 
 type ISlideService interface {
 	ShowSlides() ([]ShowSlides, error)
+	CreateSlide(userName, title, img string) (response.MessageResponse, error)
 }
 
 type StoreSlide struct {
