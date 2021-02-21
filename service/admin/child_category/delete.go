@@ -53,13 +53,13 @@ func (tc StoreChildCategory) UnDeleteCategoryById(id int, userName string) (resp
 func unDeleteCategoryById(db *sql.DB, id int, userName string) (int64, error) {
 	timeUpdate := time.Now()
 	query := `
-	update
+	UPDATE
 		child_category
-	set
+	SET
 		is_deleted = $2,
 		updated_at = $3,
 		updated_by = $4
-	where
+	WHERE
 		id = $1
 	`
 	res, err := db.Exec(query, id, isDeleteIsFalse, timeUpdate, userName)
@@ -80,13 +80,13 @@ func unDeleteCategoryById(db *sql.DB, id int, userName string) (int64, error) {
 func deleteCategoryById(db *sql.DB, id int, userName string) (int64, error) {
 	timeUpdate := time.Now()
 	query := `
-	update
+	UPDATE
 		child_category
-	set
+	SET
 		is_deleted = $2,
 		updated_at = $3,
 		updated_by = $4
-	where
+	WHERE
 		id = $1
 	`
 	res, err := db.Exec(query, id, isDeleteIsTrue, timeUpdate, userName)
