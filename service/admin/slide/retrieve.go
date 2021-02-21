@@ -40,6 +40,19 @@ func (tc StoreSlide) ShowSlides() ([]ShowSlides, error) {
 	return responseSlides, nil
 }
 
+func (tc StoreSlide) ShowSlidesAdmin() ([]slide.Slide, error) {
+	slides, err := retrieveSlide(tc.db)
+	if len(slides) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[ShowSlidesAdmin] No Data  %v", err)
+		return []slide.Slide{}, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowSlidesAdmin] error : ", err)
+		return []slide.Slide{}, err
+	}
+	return slides, nil
+}
+
 func retrieveSlide(db *sql.DB) ([]slide.Slide, error) {
 	slides := []slide.Slide{}
 	query := `
