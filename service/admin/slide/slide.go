@@ -13,6 +13,7 @@ type ISlideService interface {
 	CreateSlide(userName, title, img string) (response.MessageResponse, error)
 	UpdateSlide(id int, title, img string) (response.MessageResponse, error)
 	HideSlideById(idSlide int) (response.MessageResponse, error)
+	UnHideSlideById(idSlide int) (response.MessageResponse, error)
 }
 
 type StoreSlide struct {

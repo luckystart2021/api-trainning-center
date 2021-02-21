@@ -21,6 +21,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Post("/create", CreateSlide(st))
 			router.Put("/{id}/update", UpdateSlide(st))
 			router.Put("/{id}/hide", HideSlide(st))
+			router.Put("/{id}/un-hide", UnHideSlide(st))
 		})
 	}
 }

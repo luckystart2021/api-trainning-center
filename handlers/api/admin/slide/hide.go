@@ -32,3 +32,26 @@ func HideSlide(service slide.ISlideService) http.HandlerFunc {
 		response.RespondWithJSON(w, http.StatusOK, hideSlide)
 	}
 }
+
+func UnHideSlide(service slide.ISlideService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "id")
+		if id == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã slide không được rỗng"))
+			return
+		}
+		idSlide, err := strconv.Atoi(id)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã slide không hợp lệ"))
+			return
+		}
+		hideSlide, err := service.UnHideSlideById(idSlide)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, hideSlide)
+	}
+}

@@ -9,12 +9,13 @@ import (
 )
 
 const (
-	isHide = true
+	isHide   = true
+	isUnHide = false
 )
 
 func (tc StoreSlide) HideSlideById(idSlide int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
-	count, err := hideSlideById(tc.db, idSlide)
+	count, err := hideSlideById(tc.db, idSlide, isHide)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[HideSlideById]Hide slide DB err  %v", err)
 		return resp, err
@@ -30,7 +31,25 @@ func (tc StoreSlide) HideSlideById(idSlide int) (response.MessageResponse, error
 	return resp, nil
 }
 
-func hideSlideById(db *sql.DB, id int) (int64, error) {
+func (tc StoreSlide) UnHideSlideById(idSlide int) (response.MessageResponse, error) {
+	resp := response.MessageResponse{}
+	count, err := hideSlideById(tc.db, idSlide, isUnHide)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[UnHideSlideById]UnHide slide DB err  %v", err)
+		return resp, err
+	}
+
+	if count > 0 {
+		resp.Status = true
+		resp.Message = "Hiện thị slide thành công"
+	} else {
+		resp.Status = false
+		resp.Message = "Không tìm thấy slide"
+	}
+	return resp, nil
+}
+
+func hideSlideById(db *sql.DB, id int, isHide bool) (int64, error) {
 	query := `
 	UPDATE
 		slide
