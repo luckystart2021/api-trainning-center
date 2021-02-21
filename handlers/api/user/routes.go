@@ -6,6 +6,7 @@ import (
 	"api-trainning-center/handlers/api/user/information"
 	"api-trainning-center/handlers/api/user/news"
 	"api-trainning-center/handlers/api/user/question"
+	"api-trainning-center/handlers/api/user/slide"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -18,5 +19,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Group(question.Router(db))
 		router.Group(about.Router(db))
 		router.Group(news.Router(db))
+		router.Group(slide.Router(db))
 	}
 }

@@ -38,10 +38,6 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 	ORDER BY created_at DESC
 	`
 	rows, err := db.Query(query)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] No Data  %v", err)
-		return contacts, errors.New("Không có dữ liệu từ hệ thống")
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] query error  %v", err)
 		return contacts, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -69,6 +65,10 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 			contact.Subject = subject.String
 		}
 		contacts = append(contacts, contact)
+	}
+	if len(contacts) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] No Data  %v", err)
+		return contacts, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return contacts, nil
 }
