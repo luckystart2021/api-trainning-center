@@ -9,20 +9,20 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func GetQuestionAnswer(service question.IQuestionService) http.HandlerFunc {
+func ShowSuiteTest(service question.IQuestionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		code := chi.URLParam(r, "id")
+		code := chi.URLParam(r, "rank")
 		if code == "" {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã đề không tồn tại"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Hạng xe không tồn tại"))
 			return
 		}
-		showQuestions, err := service.ShowQuestions(code)
+		showTestSuite, err := service.GetAllTestSuiteByRank(code)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
 		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, showQuestions)
+		response.RespondWithJSON(w, http.StatusOK, showTestSuite)
 	}
 }
 
