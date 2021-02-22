@@ -58,6 +58,23 @@ type TestSuite struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
+
+type QuestionResponse struct {
+	Id           int       `json:"id"`
+	QuestionName string    `json:"question_name"`
+	Img          string    `json:"img"`
+	Answers      []Answers `json:"answers"`
+}
+
+type Questions struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	AnswerA string `json:"answer_a"`
+	AnswerB string `json:"answer_b"`
+	AnswerC string `json:"answer_c"`
+	AnswerD string `json:"answer_d"`
+	Img     string `json:"img"`
+}
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
 	ShowResult(result []result.Result) (ResponseResult, error)
@@ -69,6 +86,7 @@ type IQuestionService interface {
 	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
 	GetAllTestSuiteByRank(rank string) (TestSuiteResponse, error)
+	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 }
 
 type StoreQuestion struct {

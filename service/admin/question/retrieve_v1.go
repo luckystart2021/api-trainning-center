@@ -34,6 +34,101 @@ func (tc StoreQuestion) GetAllTestSuiteByRank(rank string) (TestSuiteResponse, e
 	return testSuiteResponse, nil
 }
 
+func (tc StoreQuestion) GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error) {
+	questionResponse := []QuestionResponse{}
+	questions, err := retrieveQuestion(tc.db, idSuite)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveQuestion] error : ", err)
+		return []QuestionResponse{}, err
+	}
+	for _, data := range questions {
+		answers := []Answers{}
+		answer1 := Answers{
+			Answer: data.AnswerA,
+		}
+		answers = append(answers, answer1)
+		answer2 := Answers{
+			Answer: data.AnswerB,
+		}
+		answers = append(answers, answer2)
+		if data.AnswerC != "" || len(data.AnswerC) != 0 {
+			answer3 := Answers{
+				Answer: data.AnswerC,
+			}
+			answers = append(answers, answer3)
+		}
+		if data.AnswerD != "" || len(data.AnswerD) != 0 {
+			answer4 := Answers{
+				Answer: data.AnswerD,
+			}
+			answers = append(answers, answer4)
+		}
+
+		question := QuestionResponse{
+			Id:           data.Id,
+			QuestionName: data.Name,
+			Img:          data.Img,
+			Answers:      answers,
+		}
+		questionResponse = append(questionResponse, question)
+	}
+
+	return questionResponse, nil
+}
+
+func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
+	questions := []Questions{}
+	query := `
+	select
+		q2.id ,
+		q2.name ,
+		q2.img ,
+		q2.answera ,
+		q2.answerb ,
+		q2.answerc ,
+		q2.answerd
+	from
+		testsuite_question tq
+	join question q2 on
+		tq.id_question = q2.id
+	where
+		tq.id_testsuite = $1
+	`
+	rows, err := db.Query(query, idSuite)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] query error  %v", err)
+		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	for rows.Next() {
+		var err error
+		var id int
+		var questionName string
+		var answerA, answerB, answerC, answerD, img sql.NullString
+		err = rows.Scan(&id, &questionName, &img, &answerA, &answerB, &answerC, &answerD)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] Scan error  %v", err)
+			return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		question := Questions{
+			Id:      id,
+			Name:    questionName,
+			AnswerA: answerA.String,
+			AnswerB: answerB.String,
+			AnswerC: answerC.String,
+			AnswerD: answerD.String,
+		}
+		if img.Valid && img.String != "" {
+			question.Img = "/files/img/question/" + img.String
+		}
+		questions = append(questions, question)
+	}
+	if len(questions) == 0 {
+		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestion] No Data  %v", err)
+		return questions, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return questions, nil
+}
+
 func retrieveRank(db *sql.DB, rank string) (Rank, error) {
 	rankR := Rank{}
 	query := `
@@ -75,10 +170,6 @@ func retrieveTestSuite(db *sql.DB, rank string) ([]TestSuite, error) {
 		rv.name = $1
 	`
 	rows, err := db.Query(query, rank)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] No Data  %v", err)
-		return testSuites, errors.New("Không có dữ liệu từ hệ thống")
-	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] query error  %v", err)
 		return testSuites, errors.New("Lỗi hệ thống vui lòng thử lại")
