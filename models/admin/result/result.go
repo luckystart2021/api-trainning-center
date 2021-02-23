@@ -1,6 +1,10 @@
 package result
 
 type Result struct {
-	IdQuestion string `json:"id_question"`
-	IdAnswer   string `json:"id_answer"`
+	IdSuite int      `json:"id_suite"`
+	Answers []Answer `json:"answers"`
+}
+type Answer struct {
+	IdQuestion int    `json:"id_question"`
+	IdAnswer   string `json:"answer"`
 }

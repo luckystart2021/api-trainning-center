@@ -25,8 +25,8 @@ type ResponseResult struct {
 }
 
 type ResultTest struct {
-	IdQuestion    string `json:"id_question"`
-	IdAnswer      string `json:"id_answer"`
+	IdQuestion    int    `json:"id_question"`
+	IdAnswer      string `json:"answer"`
 	CorrectAnswer string `json:"correct_answer"`
 }
 
@@ -77,7 +77,7 @@ type Questions struct {
 }
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
-	ShowResult(result []result.Result) (ResponseResult, error)
+
 	CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	ShowQuestionsSystem(code string) ([]QuestionSystem, error)
 	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
@@ -88,6 +88,7 @@ type IQuestionService interface {
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 	GetAllRankVehicle() ([]RankResponse, error)
+	ShowResult(result result.Result) (ResponseResult, error)
 }
 
 type StoreQuestion struct {
