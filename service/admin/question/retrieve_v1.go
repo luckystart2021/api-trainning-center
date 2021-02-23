@@ -15,6 +15,30 @@ type Rank struct {
 	PointPass      int    `json:"point_pass"`
 }
 
+type RankResponse struct {
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	NumberQuestion int    `json:"number_question"`
+}
+
+func (tc StoreQuestion) GetAllRankVehicle() ([]RankResponse, error) {
+	rankResponse := []RankResponse{}
+	ranks, err := retrieveRanks(tc.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveRanks] error : ", err)
+		return rankResponse, err
+	}
+	for _, data := range ranks {
+		rank := RankResponse{
+			Id:             data.Id,
+			Name:           data.Name,
+			NumberQuestion: data.NumberQuestion,
+		}
+		rankResponse = append(rankResponse, rank)
+	}
+	return rankResponse, nil
+}
+
 func (tc StoreQuestion) GetAllTestSuiteByRank(idRank int) (TestSuiteResponse, error) {
 	testSuite, err := retrieveTestSuite(tc.db, idRank)
 	if err != nil {
@@ -154,6 +178,39 @@ func retrieveRank(db *sql.DB, idRank int) (Rank, error) {
 		return rankR, err
 	}
 	return rankR, nil
+}
+
+func retrieveRanks(db *sql.DB) ([]Rank, error) {
+	ranks := []Rank{}
+	query := `
+	SELECT
+		id,
+		name,
+		time,
+		number_question,
+		point_pass
+	FROM
+		rank_vehicle
+	`
+	rows, err := db.Query(query)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveRanks] query error  %v", err)
+		return ranks, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	var rank Rank
+	for rows.Next() {
+		err = rows.Scan(&rank.Id, &rank.Name, &rank.Time, &rank.NumberQuestion, &rank.PointPass)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] Scan error  %v", err)
+			return ranks, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		ranks = append(ranks, rank)
+	}
+	if len(ranks) == 0 {
+		logrus.WithFields(logrus.Fields{}).Infof("[retrieveRanks] No Data  %v", err)
+		return ranks, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return ranks, nil
 }
 
 func retrieveTestSuite(db *sql.DB, idRank int) ([]TestSuite, error) {

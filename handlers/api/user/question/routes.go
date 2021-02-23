@@ -14,6 +14,7 @@ func Router(db *sql.DB) func(chi.Router) {
 		// router.Post("/question/result", GetResult(st))
 		// router.Get("/question/exam", GetExam(st))
 
+		router.Get("/question/rank", ShowRankVehicle(st))
 		router.Get("/question/{id_rank}/view-suite", ShowSuiteTest(st))
 		router.Get("/question/{id_suite}/view-questions", ShowQuestionsByIdSuite(st))
 	}

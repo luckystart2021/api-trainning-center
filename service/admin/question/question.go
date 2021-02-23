@@ -87,6 +87,7 @@ type IQuestionService interface {
 	// V1
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
+	GetAllRankVehicle() ([]RankResponse, error)
 }
 
 type StoreQuestion struct {

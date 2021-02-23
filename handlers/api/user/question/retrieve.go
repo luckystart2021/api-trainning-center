@@ -10,6 +10,17 @@ import (
 	"github.com/go-chi/chi"
 )
 
+func ShowRankVehicle(service question.IQuestionService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showRank, err := service.GetAllRankVehicle()
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showRank)
+	}
+}
 func ShowSuiteTest(service question.IQuestionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := chi.URLParam(r, "id_rank")
