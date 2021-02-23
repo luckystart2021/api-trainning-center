@@ -12,12 +12,18 @@ import (
 
 func ShowSuiteTest(service question.IQuestionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		code := chi.URLParam(r, "rank")
+		code := chi.URLParam(r, "id_rank")
 		if code == "" {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Hạng xe không tồn tại"))
 			return
 		}
-		showTestSuite, err := service.GetAllTestSuiteByRank(code)
+		idRank, err := strconv.Atoi(code)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã hạng xe không hợp lệ"))
+			return
+		}
+		showTestSuite, err := service.GetAllTestSuiteByRank(idRank)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

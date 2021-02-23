@@ -15,14 +15,14 @@ type Rank struct {
 	PointPass      int    `json:"point_pass"`
 }
 
-func (tc StoreQuestion) GetAllTestSuiteByRank(rank string) (TestSuiteResponse, error) {
-	testSuite, err := retrieveTestSuite(tc.db, rank)
+func (tc StoreQuestion) GetAllTestSuiteByRank(idRank int) (TestSuiteResponse, error) {
+	testSuite, err := retrieveTestSuite(tc.db, idRank)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveTestSuite] error : ", err)
 		return TestSuiteResponse{}, err
 	}
 
-	rankR, err := retrieveRank(tc.db, rank)
+	rankR, err := retrieveRank(tc.db, idRank)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveTimeTest] error : ", err)
 		return TestSuiteResponse{}, err
@@ -129,7 +129,7 @@ func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 	return questions, nil
 }
 
-func retrieveRank(db *sql.DB, rank string) (Rank, error) {
+func retrieveRank(db *sql.DB, idRank int) (Rank, error) {
 	rankR := Rank{}
 	query := `
 	SELECT
@@ -141,9 +141,9 @@ func retrieveRank(db *sql.DB, rank string) (Rank, error) {
 	FROM
 		rank_vehicle
 	WHERE
-		name = $1;
+		id = $1;
 	`
-	rows := db.QueryRow(query, rank)
+	rows := db.QueryRow(query, idRank)
 	err := rows.Scan(&rankR.Id, &rankR.Name, &rankR.Time, &rankR.NumberQuestion, &rankR.PointPass)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveRank] No Data  %v", err)
@@ -156,7 +156,7 @@ func retrieveRank(db *sql.DB, rank string) (Rank, error) {
 	return rankR, nil
 }
 
-func retrieveTestSuite(db *sql.DB, rank string) ([]TestSuite, error) {
+func retrieveTestSuite(db *sql.DB, idRank int) ([]TestSuite, error) {
 	testSuites := []TestSuite{}
 	query := `
 	SELECT
@@ -167,9 +167,9 @@ func retrieveTestSuite(db *sql.DB, rank string) ([]TestSuite, error) {
 	JOIN rank_vehicle rv ON
 		t.id_rank = rv.id
 	WHERE
-		rv.name = $1
+		rv.id = $1
 	`
-	rows, err := db.Query(query, rank)
+	rows, err := db.Query(query, idRank)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] query error  %v", err)
 		return testSuites, errors.New("Lỗi hệ thống vui lòng thử lại")

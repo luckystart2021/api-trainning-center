@@ -85,7 +85,7 @@ type IQuestionService interface {
 	ShowQuestionsExam() ([]ResponseQuestionExam, error)
 	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
-	GetAllTestSuiteByRank(rank string) (TestSuiteResponse, error)
+	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 }
 
