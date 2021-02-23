@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/models/admin/result"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -23,7 +24,7 @@ func (tc StoreQuestion) ShowResult(results result.Result) (ResponseResult, error
 	var countInCorrect int
 	resultTests := []ResultTest{}
 	for _, result := range results.Answers {
-		checkR, err := checkR(tc.db, result.IdQuestion, result.IdAnswer)
+		checkR, err := checkR(tc.db, result.IdQuestion, strings.ToUpper(result.IdAnswer))
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Error("[checkR] error : ", err)
 			return ResponseResult{}, err
@@ -31,7 +32,7 @@ func (tc StoreQuestion) ShowResult(results result.Result) (ResponseResult, error
 		if checkR {
 			countCorrect++
 		} else {
-			resultLiet, err := checkLiet(tc.db, result.IdQuestion, result.IdAnswer)
+			resultLiet, err := checkLiet(tc.db, result.IdQuestion, strings.ToUpper(result.IdAnswer))
 			if err != nil {
 				logrus.WithFields(logrus.Fields{}).Error("[checkLiet] error : ", err)
 				return ResponseResult{}, err
@@ -47,7 +48,7 @@ func (tc StoreQuestion) ShowResult(results result.Result) (ResponseResult, error
 		}
 		resultTest := ResultTest{
 			IdQuestion:    result.IdQuestion,
-			IdAnswer:      result.IdAnswer,
+			IdAnswer:      strings.ToUpper(result.IdAnswer),
 			CorrectAnswer: resultFromDB,
 		}
 		resultTests = append(resultTests, resultTest)
