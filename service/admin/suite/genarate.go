@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 )
@@ -131,95 +132,98 @@ func checkOverlap(as []int) bool {
 var khongliet = false
 
 func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.MessageResponse, error) {
-
 	resp := response.MessageResponse{}
-	questionsKhaiNiem, err := retrieveQuestion(tc.db, khainiem, false)
-	questionsQuytacgiathong, err := retrieveQuestion(tc.db, quytacgiaothong, false)
-	questionsTocdokhoangcach, err := retrieveQuestion(tc.db, tocdokhoangcach, false)
-	questionsNghiepvuvantai, err := retrieveQuestion(tc.db, nghiepvuvantai, false)
-	questionsVanhoavadaoduc, err := retrieveQuestion(tc.db, vanhoagiaothongvadaoducnguoilaixe, false)
-	questionsKythuatlaixe, err := retrieveQuestion(tc.db, kythuatlaixe, false)
-	questionsCautaovasuachua, err := retrieveQuestion(tc.db, cautaovasuachua, false)
-	questionsHethongbienbaohieuduongbo, err := retrieveQuestion(tc.db, hethongbienbaohieuduongbo, false)
-	questionsCacthexahinhvakynangxulytinhhuonggiaothong, err := retrieveQuestion(tc.db, cacthexahinhvakynangxulytinhhuonggiaothong, false)
-	questionsLiet, err := retrieveQuestionLiet(tc.db)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[retrieveQuestion] error : ", err)
-		return resp, err
-	}
-	total := []int{}
-	totalKhaiNiem := randomQuestion(questionsKhaiNiem, khainiem, rank)
-	for _, data := range totalKhaiNiem {
-		total = append(total, data)
-	}
-	totalQuytacgiathong := randomQuestion(questionsQuytacgiathong, quytacgiaothong, rank)
-	for _, data := range totalQuytacgiathong {
-		total = append(total, data)
-	}
-	totalTocdokhoangcach := randomQuestion(questionsTocdokhoangcach, tocdokhoangcach, rank)
-	for _, data := range totalTocdokhoangcach {
-		total = append(total, data)
-	}
+	idR, _ := strconv.Atoi(number)
 
-	totalNghiepvuvantai := randomQuestion(questionsNghiepvuvantai, nghiepvuvantai, rank)
-	for _, data := range totalNghiepvuvantai {
-		total = append(total, data)
-	}
-
-	totalVanhoavadaoduc := randomQuestion(questionsVanhoavadaoduc, vanhoagiaothongvadaoducnguoilaixe, rank)
-	for _, data := range totalVanhoavadaoduc {
-		total = append(total, data)
-	}
-
-	totalKythuatlaixe := randomQuestion(questionsKythuatlaixe, kythuatlaixe, rank)
-	for _, data := range totalKythuatlaixe {
-		total = append(total, data)
-	}
-
-	totalCautaovasuachua := randomQuestion(questionsCautaovasuachua, cautaovasuachua, rank)
-	for _, data := range totalCautaovasuachua {
-		total = append(total, data)
-	}
-
-	totalHethongbienbaohieuduongbo := randomQuestion(questionsHethongbienbaohieuduongbo, hethongbienbaohieuduongbo, rank)
-	for _, data := range totalHethongbienbaohieuduongbo {
-		total = append(total, data)
-	}
-
-	totalCacthexahinhvakynangxulytinhhuonggiaothong := randomQuestion(questionsCacthexahinhvakynangxulytinhhuonggiaothong, cacthexahinhvakynangxulytinhhuonggiaothong, rank)
-	for _, data := range totalCacthexahinhvakynangxulytinhhuonggiaothong {
-		total = append(total, data)
-	}
-
-	totalLiet := randomQuestion(questionsLiet, liet, rank)
-	for _, data := range totalLiet {
-		total = append(total, data)
-	}
-
-	if rank == "B2" && len(total) < 35 {
-		fmt.Println("B2 cần 35 câu hỏi")
-	}
-	if rank == "C" && len(total) < 40 {
-		fmt.Println("C cần 40 câu hỏi")
-	}
-	if rank == "DEF" && len(total) < 45 {
-		fmt.Println("DEFcần 45 câu hỏi")
-	}
-	fmt.Println("ket qua ran", total, "tong so cau", len(total))
-	after := []int{}
-
-	for j := 0; j < len(total); j++ {
-		randomIndex := rand.Intn(len(total))
-		dataR := total[randomIndex]
-		after = append(after, dataR)
-
-		if checkOverlap(after) {
-			after = after[:len(after)-1]
-			j--
-			continue
+	for index := 0; index < idR; index++ {
+		questionsKhaiNiem, err := retrieveQuestion(tc.db, khainiem, false)
+		questionsQuytacgiathong, err := retrieveQuestion(tc.db, quytacgiaothong, false)
+		questionsTocdokhoangcach, err := retrieveQuestion(tc.db, tocdokhoangcach, false)
+		questionsNghiepvuvantai, err := retrieveQuestion(tc.db, nghiepvuvantai, false)
+		questionsVanhoavadaoduc, err := retrieveQuestion(tc.db, vanhoagiaothongvadaoducnguoilaixe, false)
+		questionsKythuatlaixe, err := retrieveQuestion(tc.db, kythuatlaixe, false)
+		questionsCautaovasuachua, err := retrieveQuestion(tc.db, cautaovasuachua, false)
+		questionsHethongbienbaohieuduongbo, err := retrieveQuestion(tc.db, hethongbienbaohieuduongbo, false)
+		questionsCacthexahinhvakynangxulytinhhuonggiaothong, err := retrieveQuestion(tc.db, cacthexahinhvakynangxulytinhhuonggiaothong, false)
+		questionsLiet, err := retrieveQuestionLiet(tc.db)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[retrieveQuestion] error : ", err)
+			return resp, err
 		}
+		total := []int{}
+		totalKhaiNiem := randomQuestion(questionsKhaiNiem, khainiem, rank)
+		for _, data := range totalKhaiNiem {
+			total = append(total, data)
+		}
+		totalQuytacgiathong := randomQuestion(questionsQuytacgiathong, quytacgiaothong, rank)
+		for _, data := range totalQuytacgiathong {
+			total = append(total, data)
+		}
+		totalTocdokhoangcach := randomQuestion(questionsTocdokhoangcach, tocdokhoangcach, rank)
+		for _, data := range totalTocdokhoangcach {
+			total = append(total, data)
+		}
+
+		totalNghiepvuvantai := randomQuestion(questionsNghiepvuvantai, nghiepvuvantai, rank)
+		for _, data := range totalNghiepvuvantai {
+			total = append(total, data)
+		}
+
+		totalVanhoavadaoduc := randomQuestion(questionsVanhoavadaoduc, vanhoagiaothongvadaoducnguoilaixe, rank)
+		for _, data := range totalVanhoavadaoduc {
+			total = append(total, data)
+		}
+
+		totalKythuatlaixe := randomQuestion(questionsKythuatlaixe, kythuatlaixe, rank)
+		for _, data := range totalKythuatlaixe {
+			total = append(total, data)
+		}
+
+		totalCautaovasuachua := randomQuestion(questionsCautaovasuachua, cautaovasuachua, rank)
+		for _, data := range totalCautaovasuachua {
+			total = append(total, data)
+		}
+
+		totalHethongbienbaohieuduongbo := randomQuestion(questionsHethongbienbaohieuduongbo, hethongbienbaohieuduongbo, rank)
+		for _, data := range totalHethongbienbaohieuduongbo {
+			total = append(total, data)
+		}
+
+		totalCacthexahinhvakynangxulytinhhuonggiaothong := randomQuestion(questionsCacthexahinhvakynangxulytinhhuonggiaothong, cacthexahinhvakynangxulytinhhuonggiaothong, rank)
+		for _, data := range totalCacthexahinhvakynangxulytinhhuonggiaothong {
+			total = append(total, data)
+		}
+
+		totalLiet := randomQuestion(questionsLiet, liet, rank)
+		for _, data := range totalLiet {
+			total = append(total, data)
+		}
+
+		if rank == "B2" && len(total) < 35 {
+			fmt.Println("B2 cần 35 câu hỏi")
+		}
+		if rank == "C" && len(total) < 40 {
+			fmt.Println("C cần 40 câu hỏi")
+		}
+		if rank == "DEF" && len(total) < 45 {
+			fmt.Println("DEFcần 45 câu hỏi")
+		}
+		fmt.Println("ket qua ran", total, "tong so cau", len(total))
+		after := []int{}
+
+		for j := 0; j < len(total); j++ {
+			randomIndex := rand.Intn(len(total))
+			dataR := total[randomIndex]
+			after = append(after, dataR)
+
+			if checkOverlap(after) {
+				after = after[:len(after)-1]
+				j--
+				continue
+			}
+		}
+		fmt.Println("Đề", index, "data sau khi random", after, "tong so cau sau khi ran", len(after))
 	}
-	fmt.Println("data sau khi random", after, "tong so cau sau khi ran", len(after))
 	return resp, nil
 }
 
