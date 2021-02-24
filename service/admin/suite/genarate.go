@@ -29,6 +29,8 @@ var (
 	hethongbienbaohieuduongbo = 8
 	// Chương 7 (từ số 487 đến câu số 600). Các thế sa hình và kỹ năng xử lý tình huống giao thông
 	cacthexahinhvakynangxulytinhhuonggiaothong = 9
+	// các câu liệt
+	liet = 10
 )
 
 // range specification, note that min <= max
@@ -41,12 +43,55 @@ func (ir *IntRange) NextRandom(r *rand.Rand) int {
 	return r.Intn(ir.max-ir.min+1) + ir.min
 }
 
-func randomQuestion(input []QuestionResp) []int {
-	fmt.Println("len", len(input))
+func randomQuestion(input []QuestionResp, loaicauhoi int, rank string) []int {
 	ir := IntRange{1, len(input)}
 	var idQuestRans []int
 	var id int
-	var n = 100
+	var n int
+	if loaicauhoi == khainiem {
+		n = 1
+	}
+	if loaicauhoi == quytacgiaothong {
+		n = 7
+	}
+	if loaicauhoi == tocdokhoangcach {
+		n = 1
+	}
+	if loaicauhoi == nghiepvuvantai {
+		n = 1
+	}
+	if loaicauhoi == vanhoagiaothongvadaoducnguoilaixe {
+		n = 1
+	}
+	if loaicauhoi == kythuatlaixe {
+		n = 2
+	}
+	if loaicauhoi == cautaovasuachua {
+		n = 1
+	}
+	if loaicauhoi == hethongbienbaohieuduongbo && rank == "B2" {
+		n = 10
+	}
+	if loaicauhoi == hethongbienbaohieuduongbo && rank == "C" {
+		n = 14
+	}
+	if loaicauhoi == hethongbienbaohieuduongbo && rank == "DEF" {
+		n = 16
+	}
+
+	if loaicauhoi == cacthexahinhvakynangxulytinhhuonggiaothong && rank == "B2" {
+		n = 10
+	}
+	if loaicauhoi == cacthexahinhvakynangxulytinhhuonggiaothong && rank == "C" {
+		n = 11
+	}
+	if loaicauhoi == cacthexahinhvakynangxulytinhhuonggiaothong && rank == "DEF" {
+		n = 14
+	}
+	if loaicauhoi == liet {
+		n = 1
+	}
+
 	for j := 0; j < n; j++ {
 		idRan := rand.Intn(1000)
 		r := rand.New(rand.NewSource(int64(idRan)))
@@ -56,15 +101,19 @@ func randomQuestion(input []QuestionResp) []int {
 				idQuestRans = append(idQuestRans, data1.IdQuestion)
 			}
 		}
+
 		if checkOverlap(idQuestRans) {
 			idQuestRans = idQuestRans[:len(idQuestRans)-1]
+			j--
 			continue
 		}
-		if len(idQuestRans) == 10 {
-			break
-		}
 	}
-	fmt.Println("ket qua ran", idQuestRans)
+
+	if len(idQuestRans) != n {
+		logrus.WithFields(logrus.Fields{}).Error("Chưa đủ bộ đề")
+		panic("Chưa đủ câu bộ đề")
+	}
+
 	return idQuestRans
 }
 
@@ -79,15 +128,98 @@ func checkOverlap(as []int) bool {
 	return false
 }
 
+var khongliet = false
+
 func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.MessageResponse, error) {
+
 	resp := response.MessageResponse{}
-	questions, err := retrieveQuestion(tc.db, khainiem)
+	questionsKhaiNiem, err := retrieveQuestion(tc.db, khainiem, false)
+	questionsQuytacgiathong, err := retrieveQuestion(tc.db, quytacgiaothong, false)
+	questionsTocdokhoangcach, err := retrieveQuestion(tc.db, tocdokhoangcach, false)
+	questionsNghiepvuvantai, err := retrieveQuestion(tc.db, nghiepvuvantai, false)
+	questionsVanhoavadaoduc, err := retrieveQuestion(tc.db, vanhoagiaothongvadaoducnguoilaixe, false)
+	questionsKythuatlaixe, err := retrieveQuestion(tc.db, kythuatlaixe, false)
+	questionsCautaovasuachua, err := retrieveQuestion(tc.db, cautaovasuachua, false)
+	questionsHethongbienbaohieuduongbo, err := retrieveQuestion(tc.db, hethongbienbaohieuduongbo, false)
+	questionsCacthexahinhvakynangxulytinhhuonggiaothong, err := retrieveQuestion(tc.db, cacthexahinhvakynangxulytinhhuonggiaothong, false)
+	questionsLiet, err := retrieveQuestionLiet(tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[retrieveQuestion] error : ", err)
 		return resp, err
 	}
-	fmt.Println("questions", questions)
-	randomQuestion(questions)
+	total := []int{}
+	totalKhaiNiem := randomQuestion(questionsKhaiNiem, khainiem, rank)
+	for _, data := range totalKhaiNiem {
+		total = append(total, data)
+	}
+	totalQuytacgiathong := randomQuestion(questionsQuytacgiathong, quytacgiaothong, rank)
+	for _, data := range totalQuytacgiathong {
+		total = append(total, data)
+	}
+	totalTocdokhoangcach := randomQuestion(questionsTocdokhoangcach, tocdokhoangcach, rank)
+	for _, data := range totalTocdokhoangcach {
+		total = append(total, data)
+	}
+
+	totalNghiepvuvantai := randomQuestion(questionsNghiepvuvantai, nghiepvuvantai, rank)
+	for _, data := range totalNghiepvuvantai {
+		total = append(total, data)
+	}
+
+	totalVanhoavadaoduc := randomQuestion(questionsVanhoavadaoduc, vanhoagiaothongvadaoducnguoilaixe, rank)
+	for _, data := range totalVanhoavadaoduc {
+		total = append(total, data)
+	}
+
+	totalKythuatlaixe := randomQuestion(questionsKythuatlaixe, kythuatlaixe, rank)
+	for _, data := range totalKythuatlaixe {
+		total = append(total, data)
+	}
+
+	totalCautaovasuachua := randomQuestion(questionsCautaovasuachua, cautaovasuachua, rank)
+	for _, data := range totalCautaovasuachua {
+		total = append(total, data)
+	}
+
+	totalHethongbienbaohieuduongbo := randomQuestion(questionsHethongbienbaohieuduongbo, hethongbienbaohieuduongbo, rank)
+	for _, data := range totalHethongbienbaohieuduongbo {
+		total = append(total, data)
+	}
+
+	totalCacthexahinhvakynangxulytinhhuonggiaothong := randomQuestion(questionsCacthexahinhvakynangxulytinhhuonggiaothong, cacthexahinhvakynangxulytinhhuonggiaothong, rank)
+	for _, data := range totalCacthexahinhvakynangxulytinhhuonggiaothong {
+		total = append(total, data)
+	}
+
+	totalLiet := randomQuestion(questionsLiet, liet, rank)
+	for _, data := range totalLiet {
+		total = append(total, data)
+	}
+
+	if rank == "B2" && len(total) < 35 {
+		fmt.Println("B2 cần 35 câu hỏi")
+	}
+	if rank == "C" && len(total) < 40 {
+		fmt.Println("C cần 40 câu hỏi")
+	}
+	if rank == "DEF" && len(total) < 45 {
+		fmt.Println("DEFcần 45 câu hỏi")
+	}
+	fmt.Println("ket qua ran", total, "tong so cau", len(total))
+	after := []int{}
+
+	for j := 0; j < len(total); j++ {
+		randomIndex := rand.Intn(len(total))
+		dataR := total[randomIndex]
+		after = append(after, dataR)
+
+		if checkOverlap(after) {
+			after = after[:len(after)-1]
+			j--
+			continue
+		}
+	}
+	fmt.Println("data sau khi random", after, "tong so cau sau khi ran", len(after))
 	return resp, nil
 }
 
@@ -96,7 +228,7 @@ type QuestionResp struct {
 	IdQuestion int
 }
 
-func retrieveQuestion(db *sql.DB, questionType int) ([]QuestionResp, error) {
+func retrieveQuestion(db *sql.DB, questionType int, liet bool) ([]QuestionResp, error) {
 	res := []QuestionResp{}
 	query := `
 	select 
@@ -105,8 +237,9 @@ func retrieveQuestion(db *sql.DB, questionType int) ([]QuestionResp, error) {
 		question q 
 	where 
 		question_type = $1
+		and paralysis = $2
 	`
-	rows, err := db.Query(query, questionType)
+	rows, err := db.Query(query, questionType, liet)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] query error  %v", err)
 		return res, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -120,6 +253,39 @@ func retrieveQuestion(db *sql.DB, questionType int) ([]QuestionResp, error) {
 		r.Id = index
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] Scan error  %v", err)
+			return res, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+
+		rs = append(rs, r)
+	}
+
+	return rs, nil
+}
+
+func retrieveQuestionLiet(db *sql.DB) ([]QuestionResp, error) {
+	res := []QuestionResp{}
+	query := `
+	select 
+		q.id
+	from 
+		question q 
+	where 
+		 paralysis = $1
+	`
+	rows, err := db.Query(query, true)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionLiet] query error  %v", err)
+		return res, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	rs := res
+	index := 0
+	for rows.Next() {
+		index++
+		var r QuestionResp
+		err = rows.Scan(&r.IdQuestion)
+		r.Id = index
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionLiet] Scan error  %v", err)
 			return res, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 
