@@ -35,14 +35,13 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			//checking whether any error occurred retrieving image
 		}
 		req := QuestionRequest{
-			CodeDe:  r.FormValue("code_de"),
 			Name:    r.FormValue("name"),
+			Result:  r.FormValue("anwser_correct"),
+			Liet:    r.FormValue("liet"),
 			AnswerA: r.FormValue("answer_a"),
 			AnswerB: r.FormValue("answer_b"),
 			AnswerC: r.FormValue("answer_c"),
 			AnswerD: r.FormValue("answer_d"),
-			Result:  r.FormValue("result"),
-			Liet:    r.FormValue("liet"),
 		}
 		if imageName != "" || len(imageName) > 0 {
 			req.Img = imageName
@@ -60,14 +59,7 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			return
 		}
 
-		CodeDe, err := strconv.Atoi(req.CodeDe)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
-			return
-		}
-
-		updateQuestion, err := service.UpdateQuestion(idQuestionI, CodeDe, req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
+		updateQuestion, err := service.UpdateQuestion(idQuestionI, req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

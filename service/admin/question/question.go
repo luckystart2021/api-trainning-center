@@ -32,7 +32,6 @@ type ResultTest struct {
 
 type QuestionSystem struct {
 	Id      int64  `json:"id"`
-	CodeDe  int64  `json:"code_de"`
 	Name    string `json:"name"`
 	AnswerA string `json:"answer_a"`
 	AnswerB string `json:"answer_b"`
@@ -77,14 +76,13 @@ type Questions struct {
 }
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
-
-	CreateQuestion(codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
-	ShowQuestionsSystem(code string) ([]QuestionSystem, error)
 	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
-	UpdateQuestion(idQuestion, codeDe int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	UpdateQuestion(idQuestion int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	ShowQuestionsExam() ([]ResponseQuestionExam, error)
 	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
+	CreateQuestion(name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	ShowQuestionsSystem() ([]QuestionSystem, error)
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 	GetAllRankVehicle() ([]RankResponse, error)

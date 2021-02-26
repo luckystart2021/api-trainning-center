@@ -199,14 +199,20 @@ func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.Messag
 			total = append(total, data)
 		}
 
-		if rank == "B2" && len(total) < 35 {
+		if rank == "B2" && len(total) != 35 {
 			fmt.Println("B2 cần 35 câu hỏi")
+			resp.Message = "thất bại"
+			return resp, nil
 		}
-		if rank == "C" && len(total) < 40 {
+		if rank == "C" && len(total) != 40 {
 			fmt.Println("C cần 40 câu hỏi")
+			resp.Message = "thất bại"
+			return resp, nil
 		}
-		if rank == "DEF" && len(total) < 45 {
+		if rank == "DEF" && len(total) != 45 {
 			fmt.Println("DEFcần 45 câu hỏi")
+			resp.Message = "thất bại"
+			return resp, nil
 		}
 		fmt.Println("ket qua ran", total, "tong so cau", len(total))
 		after := []int{}
@@ -222,6 +228,11 @@ func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.Messag
 				continue
 			}
 		}
+		for _, data := range after {
+			insertSuiteTestAndQuestion(tc.db, index+1, data)
+		}
+		resp.Status = true
+		resp.Message = "thành công"
 		fmt.Println("Đề", index, "data sau khi random", after, "tong so cau sau khi ran", len(after))
 	}
 	return resp, nil

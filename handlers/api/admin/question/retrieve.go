@@ -11,12 +11,7 @@ import (
 
 func ShowQuestions(service questionServeice.IQuestionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		code := chi.URLParam(r, "code_de")
-		if code == "" {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã đề không không được rỗng"))
-			return
-		}
-		showQuestions, err := service.ShowQuestionsSystem(code)
+		showQuestions, err := service.ShowQuestionsSystem()
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

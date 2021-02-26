@@ -10,15 +10,15 @@ import (
 )
 
 type QuestionRequest struct {
-	CodeDe  string `json:"code_de"`
-	Name    string `json:"name"`
-	AnswerA string `json:"answer_a"`
-	AnswerB string `json:"answer_b"`
-	AnswerC string `json:"answer_c"`
-	AnswerD string `json:"answer_d"`
-	Img     string `json:"img"`
-	Result  string `json:"result"`
-	Liet    string `json:"liet"`
+	Name         string `json:"name"`
+	AnswerA      string `json:"answer_a"`
+	AnswerB      string `json:"answer_b"`
+	AnswerC      string `json:"answer_c"`
+	AnswerD      string `json:"answer_d"`
+	Img          string `json:"img"`
+	Result       string `json:"result"`
+	Liet         string `json:"liet"`
+	QuestionType string `json:"question_type"`
 }
 
 // CreateQuestion controller for creating new question
@@ -34,14 +34,14 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 		}
 
 		req := QuestionRequest{
-			CodeDe:  r.FormValue("code_de"),
-			Name:    r.FormValue("name"),
-			AnswerA: r.FormValue("answer_a"),
-			AnswerB: r.FormValue("answer_b"),
-			AnswerC: r.FormValue("answer_c"),
-			AnswerD: r.FormValue("answer_d"),
-			Result:  r.FormValue("result"),
-			Liet:    r.FormValue("liet"),
+			Name:         r.FormValue("name"),
+			Result:       r.FormValue("anwser_correct"),
+			Liet:         r.FormValue("liet"),
+			QuestionType: r.FormValue("question_type"),
+			AnswerA:      r.FormValue("answer_a"),
+			AnswerB:      r.FormValue("answer_b"),
+			AnswerC:      r.FormValue("answer_c"),
+			AnswerD:      r.FormValue("answer_d"),
 		}
 		if imageName != "" || len(imageName) > 0 {
 			req.Img = imageName
@@ -59,14 +59,7 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			return
 		}
 
-		CodeDe, err := strconv.Atoi(req.CodeDe)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
-			return
-		}
-
-		resp, err := service.CreateQuestion(CodeDe, req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
+		resp, err := service.CreateQuestion(req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -77,13 +70,6 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 }
 
 func validate(q *QuestionRequest) error {
-	if q.CodeDe == "" || len(q.CodeDe) == 0 {
-		return errors.New("Vui lòng nhập mã đề")
-	}
-	if len(q.CodeDe) > 10 {
-		return errors.New("Mã đề không hợp lệ")
-	}
-
 	if q.Name == "" || len(q.Name) == 0 {
 		return errors.New("Vui lòng nhập câu hỏi")
 	}
@@ -117,6 +103,10 @@ func validate(q *QuestionRequest) error {
 	}
 	if len(q.Result) > 2 {
 		return errors.New("Đáp án không hợp lệ")
+	}
+
+	if q.QuestionType == "" || len(q.QuestionType) == 0 {
+		return errors.New("Vui lòng nhập loại câu hỏi")
 	}
 
 	if len(q.Img) > 2000 {

@@ -10,6 +10,10 @@ type MessageResponse struct {
 	Message string `json:"message"`
 }
 
+type UploadResponse struct {
+	FileName string `json:"file_name"`
+}
+
 type ErrorResponse struct {
 	Status bool   `json:"status"`
 	Error  string `json:"error"`

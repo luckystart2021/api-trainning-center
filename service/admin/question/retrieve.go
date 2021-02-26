@@ -66,8 +66,8 @@ func (tc StoreQuestion) ShowQuestions(code string) ([]Question, error) {
 	return question, nil
 }
 
-func (tc StoreQuestion) ShowQuestionsSystem(code string) ([]QuestionSystem, error) {
-	question, err := retrieveQuestionsSystem(tc.db, code)
+func (tc StoreQuestion) ShowQuestionsSystem() ([]QuestionSystem, error) {
+	question, err := retrieveQuestionsSystem(tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowQuestionsSystem] error : ", err)
 		return []QuestionSystem{}, err
@@ -106,11 +106,11 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 		q.id = $1
 	`
 	rows := db.QueryRow(query, idQuestion)
-	var id, codeDe int64
+	var id int64
 	var paralysis bool
 	var questionName, result string
 	var answerA, answerB, answerC, answerD, img sql.NullString
-	err := rows.Scan(&id, &questionName, &result, &codeDe, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
+	err := rows.Scan(&id, &questionName, &result, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionSystem] No Data  %v", err)
 		return question, errors.New("Không có dữ liệu từ hệ thống")
@@ -121,7 +121,6 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 	}
 	questionSystem := QuestionSystem{
 		Id:      id,
-		CodeDe:  codeDe,
 		Name:    questionName,
 		AnswerA: answerA.String,
 		AnswerB: answerB.String,
@@ -136,14 +135,13 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 	return questionSystem, nil
 }
 
-func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) {
+func retrieveQuestionsSystem(db *sql.DB) ([]QuestionSystem, error) {
 	questions := []QuestionSystem{}
 	query := `
 	select
 		q.id,
 		q.name,
-		q.result,
-		q.id_code_test,
+		q.anwser_correct,
 		q.paralysis,
 		q.answera ,
 		q.answerb ,
@@ -152,13 +150,9 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 		q.img
 	from
 		question q
-	inner join testsuite t on
-		t.id = q.id_code_test
-	where
-		q.id_code_test = $1
 	order by id;
 	`
-	rows, err := db.Query(query, code)
+	rows, err := db.Query(query)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] No Data  %v", err)
 		return questions, errors.New("Không có dữ liệu từ hệ thống")
@@ -170,18 +164,17 @@ func retrieveQuestionsSystem(db *sql.DB, code string) ([]QuestionSystem, error) 
 
 	for rows.Next() {
 		var err error
-		var id, codeDe int64
+		var id int64
 		var paralysis bool
 		var questionName, result string
 		var answerA, answerB, answerC, answerD, img sql.NullString
-		err = rows.Scan(&id, &questionName, &result, &codeDe, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
+		err = rows.Scan(&id, &questionName, &result, &paralysis, &answerA, &answerB, &answerC, &answerD, &img)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] Scan error  %v", err)
 			return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		questionSystem := QuestionSystem{
 			Id:      id,
-			CodeDe:  codeDe,
 			Name:    questionName,
 			AnswerA: answerA.String,
 			AnswerB: answerB.String,
