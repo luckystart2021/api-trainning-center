@@ -46,7 +46,7 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 		if imageName != "" || len(imageName) > 0 {
 			req.Img = imageName
 		}
-		if err := validate(&req); err != nil {
+		if err := validateUpdate(&req); err != nil {
 			// If input is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -67,4 +67,47 @@ func UpdateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, updateQuestion)
 	}
+}
+
+func validateUpdate(q *QuestionRequest) error {
+	if q.Name == "" || len(q.Name) == 0 {
+		return errors.New("Vui lòng nhập câu hỏi")
+	}
+	if len(q.Name) > 2000 {
+		return errors.New("Câu hỏi không hợp lệ")
+	}
+
+	if q.AnswerA == "" || len(q.AnswerA) == 0 {
+		return errors.New("Vui lòng nhập câu trả lời A")
+	}
+	if len(q.AnswerA) > 2000 {
+		return errors.New("Câu trả lời A không hợp lệ")
+	}
+
+	if q.AnswerB == "" || len(q.AnswerB) == 0 {
+		return errors.New("Vui lòng nhập câu trả lời B")
+	}
+	if len(q.AnswerB) > 2000 {
+		return errors.New("Câu trả lời B không hợp lệ")
+	}
+
+	if len(q.AnswerC) > 2000 {
+		return errors.New("Câu trả lời C không hợp lệ")
+	}
+	if len(q.AnswerD) > 2000 {
+		return errors.New("Câu trả lời D không hợp lệ")
+	}
+
+	if q.Result == "" || len(q.Result) == 0 {
+		return errors.New("Vui lòng nhập đáp án")
+	}
+	if len(q.Result) > 2 {
+		return errors.New("Đáp án không hợp lệ")
+	}
+
+	if len(q.Img) > 2000 {
+		return errors.New("Hình ảnh không hợp lệ")
+	}
+
+	return nil
 }

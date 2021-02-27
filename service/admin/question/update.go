@@ -25,13 +25,13 @@ func updateQuestionByRequest(db *sql.DB, idQuestion int, name, answerA, answerB,
 			`
 	UPDATE question SET 
 		name=$1, 
-		result=$2, 
+		anwser_correct=$2, 
 		paralysis=$3,
 		answera=$4,
 		answerb=$5,
 		answerc=$6,
 		answerd=$7,
-		img=$9
+		img=$8
 	WHERE id= $9;
 	`
 		_, err := db.Exec(query, name, result, liet, answerA, answerB, answerC, answerD, img, idQuestion)
@@ -44,7 +44,7 @@ func updateQuestionByRequest(db *sql.DB, idQuestion int, name, answerA, answerB,
 			`
 			UPDATE question SET 
 				name=$1, 
-				result=$2, 
+				anwser_correct=$2, 
 				paralysis=$3,
 				answera=$4,
 				answerb=$5,

@@ -31,15 +31,15 @@ type ResultTest struct {
 }
 
 type QuestionSystem struct {
-	Id      int64  `json:"id"`
-	Name    string `json:"name"`
-	AnswerA string `json:"answer_a"`
-	AnswerB string `json:"answer_b"`
-	AnswerC string `json:"answer_c"`
-	AnswerD string `json:"answer_d"`
-	Img     string `json:"img"`
-	Result  string `json:"result"`
-	Liet    bool   `json:"liet"`
+	Id            int64  `json:"id"`
+	Name          string `json:"name"`
+	AnswerA       string `json:"answer_a"`
+	AnswerB       string `json:"answer_b"`
+	AnswerC       string `json:"answer_c"`
+	AnswerD       string `json:"answer_d"`
+	Img           string `json:"img"`
+	AnwserCorrect string `json:"anwser_correct"`
+	Liet          bool   `json:"liet"`
 }
 
 type ResponseQuestionExam struct {
@@ -76,17 +76,17 @@ type Questions struct {
 }
 type IQuestionService interface {
 	ShowQuestions(code string) ([]Question, error)
-	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
-	UpdateQuestion(idQuestion int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	ShowQuestionsExam() ([]ResponseQuestionExam, error)
 	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
 	CreateQuestion(name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
-	ShowQuestionsSystem() ([]QuestionSystem, error)
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 	GetAllRankVehicle() ([]RankResponse, error)
 	ShowResult(result result.Result) (ResponseResult, error)
+	ShowQuestionsSystem() ([]QuestionSystem, error)
+	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
+	UpdateQuestion(idQuestion int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 }
 
 type StoreQuestion struct {

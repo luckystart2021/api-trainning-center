@@ -92,8 +92,7 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 	select
 		q.id,
 		q.name,
-		q.result,
-		q.id_code_test,
+		q.anwser_correct,
 		q.paralysis,
 		q.answera ,
 		q.answerb ,
@@ -120,14 +119,14 @@ func retrieveQuestionSystem(db *sql.DB, idQuestion string) (QuestionSystem, erro
 		return question, err
 	}
 	questionSystem := QuestionSystem{
-		Id:      id,
-		Name:    questionName,
-		AnswerA: answerA.String,
-		AnswerB: answerB.String,
-		AnswerC: answerC.String,
-		AnswerD: answerD.String,
-		Result:  result,
-		Liet:    paralysis,
+		Id:            id,
+		Name:          questionName,
+		AnswerA:       answerA.String,
+		AnswerB:       answerB.String,
+		AnswerC:       answerC.String,
+		AnswerD:       answerD.String,
+		AnwserCorrect: result,
+		Liet:          paralysis,
 	}
 	if img.Valid && img.String != "" {
 		questionSystem.Img = "/files/img/question/" + img.String
@@ -174,14 +173,14 @@ func retrieveQuestionsSystem(db *sql.DB) ([]QuestionSystem, error) {
 			return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		questionSystem := QuestionSystem{
-			Id:      id,
-			Name:    questionName,
-			AnswerA: answerA.String,
-			AnswerB: answerB.String,
-			AnswerC: answerC.String,
-			AnswerD: answerD.String,
-			Result:  result,
-			Liet:    paralysis,
+			Id:            id,
+			Name:          questionName,
+			AnswerA:       answerA.String,
+			AnswerB:       answerB.String,
+			AnswerC:       answerC.String,
+			AnswerD:       answerD.String,
+			AnwserCorrect: result,
+			Liet:          paralysis,
 		}
 		if img.Valid && img.String != "" {
 			questionSystem.Img = "/files/img/question/" + img.String
