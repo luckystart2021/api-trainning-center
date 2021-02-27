@@ -134,8 +134,10 @@ var khongliet = false
 func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	idR, _ := strconv.Atoi(number)
-
-	for index := 0; index < idR; index++ {
+	insertSuiteTest(tc.db, idR, rank)
+	boDe := retrieveBoDe(tc.db, rank)
+	for _, bd := range boDe {
+		// for index := 0; index < idR; index++ {
 		questionsKhaiNiem, err := retrieveQuestion(tc.db, khainiem, false)
 		questionsQuytacgiathong, err := retrieveQuestion(tc.db, quytacgiaothong, false)
 		questionsTocdokhoangcach, err := retrieveQuestion(tc.db, tocdokhoangcach, false)
@@ -214,7 +216,6 @@ func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.Messag
 			resp.Message = "thất bại"
 			return resp, nil
 		}
-		fmt.Println("ket qua ran", total, "tong so cau", len(total))
 		after := []int{}
 
 		for j := 0; j < len(total); j++ {
@@ -228,12 +229,16 @@ func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.Messag
 				continue
 			}
 		}
+
 		for _, data := range after {
-			insertSuiteTestAndQuestion(tc.db, index+1, data)
+			insertSuiteTestAndQuestion(tc.db, bd, data)
 		}
+
 		resp.Status = true
 		resp.Message = "thành công"
-		fmt.Println("Đề", index, "data sau khi random", after, "tong so cau sau khi ran", len(after))
+		logrus.WithFields(logrus.Fields{}).Info("[GenarateSuiteTest] tổng số câu sau khi random", len(after))
+		logrus.WithFields(logrus.Fields{}).Info("[GenarateSuiteTest] ID", after)
+		// }
 	}
 	return resp, nil
 }
@@ -323,4 +328,68 @@ func insertSuiteTestAndQuestion(db *sql.DB, idSuiteTest, idQuestion int) int64 {
 		return 0
 	}
 	return rowsAffected
+}
+
+func insertSuiteTest(db *sql.DB, number int, rank string) int64 {
+	var rowsAffected int64
+	var idRank int
+	if rank == "B2" {
+		idRank = 1
+	} else if rank == "C" {
+		idRank = 2
+	} else {
+		idRank = 3
+	}
+	for j := 0; j < number; j++ {
+
+		idDe := strconv.Itoa(j + 1)
+		maDe := "Đề " + idDe
+		query := `
+		INSERT INTO testsuite(name, id_rank)
+		VALUES($1, $2);
+		`
+		res, err := db.Exec(query, maDe, idRank)
+		rowsAffected, _ = res.RowsAffected()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[insertSuiteTest]Insert TestSuite DB err  %v", err)
+			return 0
+		}
+	}
+	return rowsAffected
+}
+
+func retrieveBoDe(db *sql.DB, rank string) []int {
+	var resp []int
+	var idRank int
+	if rank == "B2" {
+		idRank = 1
+	} else if rank == "C" {
+		idRank = 2
+	} else {
+		idRank = 3
+	}
+	query := `
+	select 
+		id
+	from 
+		testsuite 
+	where 
+		id_rank = $1
+	`
+	rows, err := db.Query(query, idRank)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveBoDe] query error  %v", err)
+		return resp
+	}
+	for rows.Next() {
+		var r int
+		err = rows.Scan(&r)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveBoDe] Scan error  %v", err)
+			return resp
+		}
+
+		resp = append(resp, r)
+	}
+	return resp
 }

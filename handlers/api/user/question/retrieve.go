@@ -67,14 +67,14 @@ func ShowQuestionsByIdSuite(service question.IQuestionService) http.HandlerFunc 
 	}
 }
 
-func GetExam(service question.IQuestionService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		showQuestionsExam, err := service.ShowQuestionsExam()
-		if err != nil {
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
-		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, showQuestionsExam)
-	}
-}
+// func GetExam(service question.IQuestionService) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		showQuestionsExam, err := service.ShowQuestionsExam()
+// 		if err != nil {
+// 			response.RespondWithError(w, http.StatusBadRequest, err)
+// 			return
+// 		}
+// 		// send Result response
+// 		response.RespondWithJSON(w, http.StatusOK, showQuestionsExam)
+// 	}
+// }

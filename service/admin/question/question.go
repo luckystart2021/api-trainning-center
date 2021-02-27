@@ -75,9 +75,9 @@ type Questions struct {
 	Img     string `json:"img"`
 }
 type IQuestionService interface {
-	ShowQuestions(code string) ([]Question, error)
-	ShowQuestionsExam() ([]ResponseQuestionExam, error)
-	DeleteQuestion(idQuestion string) (response.MessageResponse, error)
+	// ShowQuestions(code string) ([]Question, error)
+	// ShowQuestionsExam() ([]ResponseQuestionExam, error)
+	// DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
 	CreateQuestion(name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)

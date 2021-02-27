@@ -103,7 +103,7 @@ func (tc StoreQuestion) GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, 
 func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 	questions := []Questions{}
 	query := `
-	select
+	SELECT
 		q2.id ,
 		q2.name ,
 		q2.img ,
@@ -111,12 +111,13 @@ func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 		q2.answerb ,
 		q2.answerc ,
 		q2.answerd
-	from
+	FROM
 		testsuite_question tq
-	join question q2 on
+	JOIN question q2 ON
 		tq.id_question = q2.id
-	where
+	WHERE
 		tq.id_testsuite = $1
+	ORDER by tq.id 
 	`
 	rows, err := db.Query(query, idSuite)
 	if err != nil {
