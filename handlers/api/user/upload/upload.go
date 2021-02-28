@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"api-trainning-center/service/constant"
 	"api-trainning-center/service/response"
 	"api-trainning-center/utils"
 	"errors"
@@ -73,7 +74,7 @@ func CkUpload() http.HandlerFunc {
 
 			// CKEdFunc := r.FormValue("CKEditorFuncNum")
 			// fmt.Fprintln(w, "<script>window.parent.CKEDITOR.tools.callFunction("+CKEdFunc+", \""+uri+"\");</script>")
-			reps.Url = "/files/img/ck/" + uri
+			reps.Url = constant.Domain + "/files/img/ck/" + uri
 			response.RespondWithJSON(w, http.StatusOK, reps)
 		} else {
 			err := fmt.Errorf("Method %q not allowed", r.Method)
