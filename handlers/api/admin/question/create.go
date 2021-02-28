@@ -59,7 +59,7 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			return
 		}
 
-		resp, err := service.CreateQuestion(req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
+		resp, err := service.CreateQuestion(req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet, req.QuestionType)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

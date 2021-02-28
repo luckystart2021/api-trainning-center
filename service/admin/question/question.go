@@ -79,7 +79,7 @@ type IQuestionService interface {
 	// ShowQuestionsExam() ([]ResponseQuestionExam, error)
 	// DeleteQuestion(idQuestion string) (response.MessageResponse, error)
 	// V1
-	CreateQuestion(name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	CreateQuestion(name, answerA, answerB, answerC, answerD, img, result string, liet bool, typeQ string) (response.MessageResponse, error)
 	GetAllTestSuiteByRank(rank int) (TestSuiteResponse, error)
 	GetQuestionsByIdSuite(idSuite int) ([]QuestionResponse, error)
 	GetAllRankVehicle() ([]RankResponse, error)

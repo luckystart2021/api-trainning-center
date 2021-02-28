@@ -112,8 +112,8 @@ func randomQuestion(input []QuestionResp, loaicauhoi int, rank string) []int {
 
 	if len(idQuestRans) != n {
 		logrus.WithFields(logrus.Fields{}).Error("Chưa đủ bộ đề")
-		panic("Chưa đủ câu bộ đề")
 	}
+	fmt.Println("toi day r bne 2", idQuestRans)
 
 	return idQuestRans
 }
@@ -216,6 +216,7 @@ func (tc StoreSuiteTest) GenarateSuiteTest(number, rank string) (response.Messag
 			resp.Message = "thất bại"
 			return resp, nil
 		}
+
 		after := []int{}
 
 		for j := 0; j < len(total); j++ {
