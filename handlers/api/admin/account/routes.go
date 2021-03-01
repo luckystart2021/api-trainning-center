@@ -35,6 +35,6 @@ func adminRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Put("/disable/account", DisableAccount(st))
 			router.Put("/enable/account", EnableAccount(st))
 		})
-		router.Put("/update/account", UpdateAccount(st))
+		router.Put("/account/update", UpdateAccount(st))
 	}
 }
