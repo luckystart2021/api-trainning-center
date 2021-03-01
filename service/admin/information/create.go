@@ -1,6 +1,7 @@
 package information
 
 import (
+	"api-trainning-center/models/admin/information"
 	"api-trainning-center/service/response"
 	"database/sql"
 	"errors"
@@ -10,6 +11,13 @@ import (
 
 func (st StoreInformation) CreateInformation(address, phone, email, maps, title, description, img string) (response.MessageResponse, error) {
 	response := response.MessageResponse{}
+	count, err := information.CountInformation(st.db)
+	if err != nil {
+		return response, err
+	}
+	if count >= 1 {
+		return response, errors.New("Thông tin website đã tồn tại")
+	}
 	if err := CreateInformationByRequest(st.db, address, phone, email, maps, title, description, img); err != nil {
 		return response, err
 	}
