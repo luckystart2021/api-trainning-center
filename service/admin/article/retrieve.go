@@ -316,7 +316,7 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 	`
 	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	for rows.Next() {
@@ -325,12 +325,9 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
-		if err == sql.ErrNoRows {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
-			return articles, errors.New("Không có dữ liệu từ hệ thống")
-		}
+
 		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] Scan error  %v", err)
 			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		article := Articles{
@@ -352,6 +349,10 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return articles, nil
 }
@@ -379,6 +380,101 @@ func (tc StoreArticle) ShowArticlesByChildCategory(idChildCategory int) ([]Admin
 	}
 
 	return articleLst, nil
+}
+
+func (tc StoreArticle) ShowArticlesDeleteByChildCategory() ([]AdminArticlesList, error) {
+	articleLst := []AdminArticlesList{}
+	articels, err := retrieveArticlesDeteledByChildCategory(tc.db, isDeleteIsTrue)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowArticlesByChildCategory] error : ", err)
+		return articleLst, err
+	}
+	for _, data := range articels {
+		articleR := AdminArticlesList{
+			Id:          data.Id,
+			Title:       data.Title,
+			Description: data.Description,
+			Img:         "/files/img/news/" + data.Img,
+			View:        data.View,
+			Status:      data.Status,
+			IsDelete:    data.IsDelete,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
+		}
+		articleLst = append(articleLst, articleR)
+	}
+
+	return articleLst, nil
+}
+
+func retrieveArticlesDeteledByChildCategory(db *sql.DB, isDeleteIsTrue bool) ([]Articles, error) {
+	articles := []Articles{}
+	query := `
+	select
+		articles.id ,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	from
+		articles
+	where
+		 articles.is_deleted = $1
+	order by
+		articles.created_at desc;				
+	`
+	rows, err := db.Query(query, isDeleteIsTrue)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesDeteledByChildCategory] query error  %v", err)
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	for rows.Next() {
+		var idArticle, view, idUser, idChildCategory int64
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var createdAt, updatedAt time.Time
+		var status, isDeleted bool
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		article := Articles{
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
+		}
+		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesDeteledByChildCategory] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return articles, nil
 }
 
 func (tc StoreArticle) ShowArticleById(idArticle int) (Articles, error) {

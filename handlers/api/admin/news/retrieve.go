@@ -33,6 +33,18 @@ func ShowArticles(service article.IArticleService) http.HandlerFunc {
 	}
 }
 
+func ShowArticlesDeleted(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showArticles, err := service.ShowArticlesDeleteByChildCategory()
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showArticles)
+	}
+}
+
 func ShowDetailArticle(service article.IArticleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idArticle := chi.URLParam(r, "id_article")

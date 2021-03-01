@@ -18,6 +18,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Route("/article", func(router chi.Router) {
 			router.Post("/create", CreateArticle(st))
 			router.Get("/{id_child_category}/views", ShowArticles(st))
+			router.Get("/views-deleted", ShowArticlesDeleted(st))
 			router.Put("/{id_article}/update", UpdateArticle(st))
 			router.Get("/{id_article}/detail", ShowDetailArticle(st))
 			router.Put("/{id_article}/approval", ApprovalArticle(st))
