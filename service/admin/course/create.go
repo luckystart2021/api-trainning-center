@@ -19,7 +19,7 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 		response.Status = false
 		response.Message = "Ngày bắt đầu khóa học không hợp lệ"
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStartTime] parse start time error %v", err)
-		return response, err
+		return response, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 
 	endTime, err := utils.ParseStringToTime(endDate)
@@ -27,7 +27,7 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 		response.Status = false
 		response.Message = "Ngày kết thúc khóa học không hợp lệ"
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStartTime] parse end time error %v", err)
-		return response, err
+		return response, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 
 	graduationTime, err := utils.ParseStringToTime(graduationDate)
@@ -35,7 +35,7 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 		response.Status = false
 		response.Message = "Ngày tốt nghiệp khóa học không hợp lệ"
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStartTime] parse graduation time error %v", err)
-		return response, err
+		return response, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 
 	testTime, err := utils.ParseStringToTime(testDate)
@@ -43,7 +43,7 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 		response.Status = false
 		response.Message = "Ngày thi sác hạch khóa học không hợp lệ"
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStartTime] parse test time error %v", err)
-		return response, err
+		return response, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 
 	if err := CreateCourseByRequest(st.db, userName, name, trainingSystem, startTime, endTime, graduationTime, testTime); err != nil {
