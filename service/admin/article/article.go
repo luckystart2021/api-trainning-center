@@ -12,6 +12,7 @@ type IArticleService interface {
 	ShowArticlesByChildCategory(idChildCategory int) ([]AdminArticlesList, error)
 	ShowArticlesDeleteByChildCategory() ([]AdminArticlesList, error)
 	ShowArticlesUnApproval() ([]AdminArticlesList, error)
+	GetAllNews() ([]AdminArticlesList, error)
 	ShowArticleById(idArticle int) (Articles, error)
 	ShowArticle(idArticle int, meta string) (ArticleDetail, error)
 	ShowCategories(idCategoryParent int) ([]CategoriesResponse, error)

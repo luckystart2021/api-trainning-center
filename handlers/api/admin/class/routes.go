@@ -18,13 +18,6 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Route("/class", func(router chi.Router) {
 			router.Post("/create", CreateClass(st))
 			router.Put("/{id}/update", UpdateClass(st))
-			// router.Get("/{id_category}/views", RetrieveClass(st))
-			// router.Get("/{id_category}/views", RetrieveChildCategories(st))
-			// router.Get("/{id_child_category}/view/detail", RetrieveChildCategory(st))
-			// router.Post("/create", CreateChildCategory(st))
-			// router.Put("/{id}/update", UpdateChildCategory(st))
-			// router.Put("/{id}/delete", DeleteChildCategory(st))
-			// router.Put("/{id}/un-delete", UnDeleteChildCategory(st))
 		})
 	}
 }

@@ -431,6 +431,102 @@ func (tc StoreArticle) ShowArticlesUnApproval() ([]AdminArticlesList, error) {
 
 	return articleLst, nil
 }
+func (tc StoreArticle) GetAllNews() ([]AdminArticlesList, error) {
+	articleLst := []AdminArticlesList{}
+	articels, err := retrieveAllArticles(tc.db, statusInActive)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveAllArticles] error : ", err)
+		return articleLst, err
+	}
+
+	for _, data := range articels {
+		articleR := AdminArticlesList{
+			Id:          data.Id,
+			Title:       data.Title,
+			Description: data.Description,
+			Img:         "/files/img/news/" + data.Img,
+			View:        data.View,
+			Status:      data.Status,
+			IsDelete:    data.IsDelete,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
+		}
+		articleLst = append(articleLst, articleR)
+	}
+
+	return articleLst, nil
+}
+
+func retrieveAllArticles(db *sql.DB, statusInActive bool) ([]Articles, error) {
+	articles := []Articles{}
+	query := `
+	SELECT
+		articles.id ,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	FROM
+		articles
+	WHERE
+		 articles.status = $1
+		 AND articles.is_deleted = $2
+	ORDER BY
+		articles.created_at DESC;				
+	`
+	rows, err := db.Query(query, statusActive, isDeleteIsFalse)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] query error  %v", err)
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	for rows.Next() {
+		var idArticle, view, idUser, idChildCategory int64
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var createdAt, updatedAt time.Time
+		var status, isDeleted bool
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] Scan error  %v", err)
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		article := Articles{
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
+		}
+		articles = append(articles, article)
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return articles, nil
+}
 
 func retrieveArticlesUnApproval(db *sql.DB, statusInActive bool) ([]Articles, error) {
 	articles := []Articles{}

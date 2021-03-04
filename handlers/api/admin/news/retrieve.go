@@ -57,6 +57,18 @@ func ShowArticlesUnApproval(service article.IArticleService) http.HandlerFunc {
 	}
 }
 
+func ShowAllNews(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showAllArticles, err := service.GetAllNews()
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showAllArticles)
+	}
+}
+
 func ShowDetailArticle(service article.IArticleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idArticle := chi.URLParam(r, "id_article")

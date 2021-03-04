@@ -16,16 +16,19 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Route("/article", func(router chi.Router) {
-			router.Post("/create", CreateArticle(st))
 			router.Get("/{id_child_category}/views", ShowArticles(st))
+			router.Post("/create", CreateArticle(st))
 			router.Get("/views-deleted", ShowArticlesDeleted(st))
 			router.Get("/views-un-approval", ShowArticlesUnApproval(st))
-			router.Put("/{id_article}/update", UpdateArticle(st))
-			router.Get("/{id_article}/detail", ShowDetailArticle(st))
-			router.Put("/{id_article}/approval", ApprovalArticle(st))
-			router.Put("/{id_article}/un-approval", UnApprovalArticle(st))
-			router.Put("/{id_article}/delete", DeleteArticle(st))
-			router.Put("/{id_article}/un-delete", UnDeleteArticle(st))
+			router.Get("/views-all", ShowAllNews(st))
+			router.Route("/{id_article}", func(router chi.Router) {
+				router.Put("/update", UpdateArticle(st))
+				router.Get("/detail", ShowDetailArticle(st))
+				router.Put("/approval", ApprovalArticle(st))
+				router.Put("/un-approval", UnApprovalArticle(st))
+				router.Put("/delete", DeleteArticle(st))
+				router.Put("/un-delete", UnDeleteArticle(st))
+			})
 		})
 	}
 }
