@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/models/admin/account"
 	"api-trainning-center/service/response"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -17,17 +18,26 @@ func (tc StoreArticle) UpdateArticle(idArticle, idChildCategoryP int, userName, 
 		return resp, err
 	}
 
-	if err := updateArticleByRequest(tc.db, idArticle, idUser.Id, idChildCategoryP, userName, title, description, details, meta, keyWordSEO, image); err != nil {
+	count, err := updateArticleByRequest(tc.db, idArticle, idUser.Id, idChildCategoryP, userName, title, description, details, meta, keyWordSEO, image)
+	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateArticle]Update Article DB err  %v", err)
 		return resp, err
 	}
-	resp.Status = true
-	resp.Message = "Cập nhật bài viết thành công"
+
+	if count > 0 {
+		resp.Status = true
+		resp.Message = "Cập nhật bài viết thành công"
+	} else {
+		resp.Status = false
+		resp.Message = "Cập nhật bài viết không thành công"
+	}
+
 	return resp, nil
 }
 
-func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) error {
+func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (int64, error) {
 	timeUpdate := time.Now()
+	var rowsAffected int64
 	if image == "" || len(image) == 0 {
 		query := `
 	update
@@ -45,10 +55,16 @@ func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int,
 	where
 		id = $1
 	`
-		_, err := db.Exec(query, idArticle, idUser, idChildCategoryP, title, description, details, meta, keyWordSEO, userName, timeUpdate)
+		res, err := db.Exec(query, idArticle, idUser, idChildCategoryP, title, description, details, meta, keyWordSEO, userName, timeUpdate)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[updateArticleByRequest] Update Article DB err  %v", err)
-			return err
+			return 0, err
+		}
+		// check how many rows affected
+		rowsAffected, err = res.RowsAffected()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[updateArticleByRequest] Update Article DB err  %v", err)
+			return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 	} else {
 		query1 := `
@@ -68,12 +84,18 @@ func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int,
 		where
 			id = $1
 		`
-		_, err := db.Exec(query1, idArticle, idUser, idChildCategoryP, title, description, details, image, meta, keyWordSEO, userName, timeUpdate)
+		res, err := db.Exec(query1, idArticle, idUser, idChildCategoryP, title, description, details, image, meta, keyWordSEO, userName, timeUpdate)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[updateArticleByRequest] Update Article DB err  %v", err)
-			return err
+			return 0, err
+		}
+		// check how many rows affected
+		rowsAffected, err = res.RowsAffected()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[updateArticleByRequest] Update Article DB err  %v", err)
+			return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 	}
 
-	return nil
+	return rowsAffected, nil
 }
