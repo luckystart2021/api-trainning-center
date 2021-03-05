@@ -124,7 +124,7 @@ func (acc AccountRequest) Validate(action string) error {
 		if acc.Address == "" {
 			return errors.New("Bạn chưa nhập địa chỉ")
 		} else {
-			if len(acc.Address) > 250 {
+			if len(acc.Address) > 500 {
 				return errors.New("Địa chỉ quá dài")
 			}
 		}
