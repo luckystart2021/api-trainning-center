@@ -11,7 +11,7 @@ type ISlideService interface {
 	ShowDetailSlide(idSlide int) (slide.Slide, error)
 	ShowSlides() ([]ShowSlides, error)
 	CreateSlide(userName, title, img string) (response.MessageResponse, error)
-	UpdateSlide(id int, title, img string) (response.MessageResponse, error)
+	UpdateSlide(id int, title, img, hide string) (response.MessageResponse, error)
 	HideSlideById(idSlide int) (response.MessageResponse, error)
 	UnHideSlideById(idSlide int) (response.MessageResponse, error)
 	DeleteSlideById(idSlide int) (response.MessageResponse, error)
