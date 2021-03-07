@@ -3,7 +3,7 @@ package seo
 import "database/sql"
 
 type ISeoService interface {
-	
+	ShowSeos() (Seo, error)
 }
 
 type StoreSeo struct {
