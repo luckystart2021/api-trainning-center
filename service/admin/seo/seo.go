@@ -1,9 +1,14 @@
 package seo
 
-import "database/sql"
+import (
+	modelSeo "api-trainning-center/models/admin/seo"
+	"api-trainning-center/service/response"
+	"database/sql"
+)
 
 type ISeoService interface {
 	ShowSeos() (Seo, error)
+	UpdateSeo(id int, req modelSeo.SeoRequest) (response.MessageResponse, error)
 }
 
 type StoreSeo struct {
