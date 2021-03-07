@@ -106,6 +106,7 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] query error  %v", err)
 		return categories, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var id, idCategory int64
 		var title, meta, createdBy, updateBy string

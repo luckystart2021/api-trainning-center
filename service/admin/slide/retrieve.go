@@ -110,7 +110,7 @@ func retrieveSlide(db *sql.DB) ([]slide.Slide, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveSlide] query error  %v", err)
 		return slides, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var title, img, createBy string
 		var createdAt time.Time

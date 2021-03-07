@@ -82,6 +82,7 @@ func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusAct
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string

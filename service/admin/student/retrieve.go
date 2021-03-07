@@ -88,6 +88,7 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllStudents] query error  %v", err)
 		return students, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		student := student.Student{}
 		var createdAt, updatedAt time.Time

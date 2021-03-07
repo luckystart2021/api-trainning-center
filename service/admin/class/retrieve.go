@@ -91,6 +91,7 @@ func FindAllClass(db *sql.DB) ([]class.Class, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllClass] query error  %v", err)
 		return classLst, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		class := class.Class{}
 		var createdAt, updatedAt time.Time

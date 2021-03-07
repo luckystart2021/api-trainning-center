@@ -267,6 +267,7 @@ func retrieveQuestion(db *sql.DB, questionType int, liet bool) ([]QuestionResp, 
 	}
 	rs := res
 	index := 0
+	defer rows.Close()
 	for rows.Next() {
 		index++
 		var r QuestionResp
@@ -300,6 +301,7 @@ func retrieveQuestionLiet(db *sql.DB) ([]QuestionResp, error) {
 	}
 	rs := res
 	index := 0
+	defer rows.Close()
 	for rows.Next() {
 		index++
 		var r QuestionResp
@@ -382,6 +384,7 @@ func retrieveBoDe(db *sql.DB, rank string) []int {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveBoDe] query error  %v", err)
 		return resp
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var r int
 		err = rows.Scan(&r)

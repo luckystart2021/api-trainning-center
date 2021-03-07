@@ -71,6 +71,7 @@ func retrieveResultNewsByKey(db *sql.DB, searchKey string, statusActive, isDelet
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveResultNewsByKey] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string

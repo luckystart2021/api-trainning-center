@@ -106,7 +106,7 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] query error  %v", err)
 		return users, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var email sql.NullString

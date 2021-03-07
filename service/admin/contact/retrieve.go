@@ -42,7 +42,7 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] query error  %v", err)
 		return contacts, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var fullName, phone, message string
 		var email, subject sql.NullString

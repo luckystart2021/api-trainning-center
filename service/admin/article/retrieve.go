@@ -245,6 +245,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -319,6 +320,7 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -490,6 +492,7 @@ func retrieveAllArticles(db *sql.DB, statusInActive bool) ([]Articles, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -560,6 +563,7 @@ func retrieveArticlesUnApproval(db *sql.DB, statusInActive bool) ([]Articles, er
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesUnApproval] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -630,6 +634,7 @@ func retrieveArticlesDeteledByChildCategory(db *sql.DB, isDeleteIsTrue bool) ([]
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesDeteledByChildCategory] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -798,6 +803,7 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNews] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -897,6 +903,7 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
@@ -996,6 +1003,7 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
 		var title, description, details, img, meta, keywordseo, createdBy, updateBy string

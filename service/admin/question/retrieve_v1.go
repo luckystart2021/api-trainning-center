@@ -124,6 +124,7 @@ func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] query error  %v", err)
 		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var id int
@@ -198,6 +199,7 @@ func retrieveRanks(db *sql.DB) ([]Rank, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveRanks] query error  %v", err)
 		return ranks, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	var rank Rank
 	for rows.Next() {
 		err = rows.Scan(&rank.Id, &rank.Name, &rank.Time, &rank.NumberQuestion, &rank.PointPass)
@@ -232,7 +234,7 @@ func retrieveTestSuite(db *sql.DB, idRank int) ([]TestSuite, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] query error  %v", err)
 		return testSuites, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var id int

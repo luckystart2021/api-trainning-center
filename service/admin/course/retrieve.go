@@ -114,7 +114,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
 		return courses, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var graduationDate sql.NullTime

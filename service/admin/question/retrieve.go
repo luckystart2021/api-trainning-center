@@ -33,7 +33,7 @@ func retrieveShowQuestionsExam(db *sql.DB) ([]ResponseQuestionExam, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] query error  %v", err)
 		return questionsExam, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var id int
@@ -160,7 +160,7 @@ func retrieveQuestionsSystem(db *sql.DB) ([]QuestionSystem, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] query error  %v", err)
 		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var id int64
@@ -222,7 +222,7 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestions] query error  %v", err)
 		return questions, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var err error
 		var questionName, id string

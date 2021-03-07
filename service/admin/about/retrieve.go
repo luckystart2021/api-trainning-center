@@ -34,6 +34,7 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] query error  %v", err)
 		return abouts, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var title, description, subtitle, img string
 		err = rows.Scan(&title, &description, &subtitle, &img)
