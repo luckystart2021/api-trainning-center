@@ -137,6 +137,11 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		}
 		users = append(users, user)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 	return users, nil
 }
 

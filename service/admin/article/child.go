@@ -113,6 +113,13 @@ func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusAct
 		}
 		articles = append(articles, article)
 	}
+
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")

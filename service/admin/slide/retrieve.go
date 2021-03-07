@@ -131,6 +131,12 @@ func retrieveSlide(db *sql.DB) ([]slide.Slide, error) {
 		}
 		slides = append(slides, slide)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveSlide] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(slides) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveSlide] No Data  %v", err)
 		return slides, errors.New("Không có dữ liệu từ hệ thống")

@@ -148,6 +148,12 @@ func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 		}
 		questions = append(questions, question)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(questions) == 0 {
 		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestion] No Data  %v", err)
 		return questions, errors.New("Không có dữ liệu từ hệ thống")
@@ -209,6 +215,12 @@ func retrieveRanks(db *sql.DB) ([]Rank, error) {
 		}
 		ranks = append(ranks, rank)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveRanks] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(ranks) == 0 {
 		logrus.WithFields(logrus.Fields{}).Infof("[retrieveRanks] No Data  %v", err)
 		return ranks, errors.New("Không có dữ liệu từ hệ thống")
@@ -249,6 +261,11 @@ func retrieveTestSuite(db *sql.DB, idRank int) ([]TestSuite, error) {
 			Name: name,
 		}
 		testSuites = append(testSuites, testSuite)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveTestSuite] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	if len(testSuites) == 0 {

@@ -66,6 +66,12 @@ func retrieveContact(db *sql.DB) ([]Contact, error) {
 		}
 		contacts = append(contacts, contact)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(contacts) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveContact] No Data  %v", err)
 		return contacts, errors.New("Không có dữ liệu từ hệ thống")

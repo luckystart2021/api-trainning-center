@@ -53,6 +53,12 @@ func retrieveAbout(db *sql.DB) ([]About, error) {
 		abouts = append(abouts, about)
 	}
 
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(abouts) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAbout] No Data  %v", err)
 		return abouts, errors.New("Không có dữ liệu từ hệ thống")

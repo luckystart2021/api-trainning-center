@@ -131,6 +131,12 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 		}
 		categories = append(categories, category)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	
 	if len(categories) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCategories] No Data  %v", err)
 		return categories, errors.New("Không có dữ liệu từ hệ thống")

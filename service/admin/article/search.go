@@ -103,6 +103,11 @@ func retrieveResultNewsByKey(db *sql.DB, searchKey string, statusActive, isDelet
 		}
 		articles = append(articles, article)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveResultNewsByKey] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveResultNewsByKey] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")

@@ -97,6 +97,11 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		students = append(students, student)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllStudents] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 
 	if len(students) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllStudents] No Data  %v", err)

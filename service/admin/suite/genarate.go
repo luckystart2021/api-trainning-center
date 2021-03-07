@@ -280,6 +280,11 @@ func retrieveQuestion(db *sql.DB, questionType int, liet bool) ([]QuestionResp, 
 
 		rs = append(rs, r)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestion] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 
 	return rs, nil
 }
@@ -313,6 +318,11 @@ func retrieveQuestionLiet(db *sql.DB) ([]QuestionResp, error) {
 		}
 
 		rs = append(rs, r)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionLiet] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
 	return rs, nil
@@ -395,5 +405,6 @@ func retrieveBoDe(db *sql.DB, rank string) []int {
 
 		resp = append(resp, r)
 	}
+
 	return resp
 }

@@ -277,6 +277,12 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 		}
 		articles = append(articles, article)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")
@@ -351,6 +357,11 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesByChildCategory] No Data  %v", err)
@@ -524,6 +535,11 @@ func retrieveAllArticles(db *sql.DB, statusInActive bool) ([]Articles, error) {
 		}
 		articles = append(articles, article)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveAllArticles] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")
@@ -595,6 +611,11 @@ func retrieveArticlesUnApproval(db *sql.DB, statusInActive bool) ([]Articles, er
 		}
 		articles = append(articles, article)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesUnApproval] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesUnApproval] No Data  %v", err)
 		return articles, errors.New("Không có dữ liệu từ hệ thống")
@@ -665,6 +686,11 @@ func retrieveArticlesDeteledByChildCategory(db *sql.DB, isDeleteIsTrue bool) ([]
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesDeteledByChildCategory] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticlesDeteledByChildCategory] No Data  %v", err)
@@ -810,10 +836,7 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
 		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
-		if err == sql.ErrNoRows {
-			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNews] No Data  %v", err)
-			return articles, errors.New("Không có dữ liệu từ hệ thống")
-		}
+
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNews] Scan error  %v", err)
 			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -837,6 +860,15 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNews] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNews] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return articles, nil
 }
@@ -934,6 +966,12 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] No Data  %v", err)
@@ -1034,6 +1072,11 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 			UpdatedBy:       updateBy,
 		}
 		articles = append(articles, article)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	if len(articles) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveNotificationNew] No Data  %v", err)

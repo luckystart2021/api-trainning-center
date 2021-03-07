@@ -100,6 +100,11 @@ func FindAllClass(db *sql.DB) ([]class.Class, error) {
 		class.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		classLst = append(classLst, class)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllClass] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
 
 	if len(classLst) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllClass] No Data  %v", err)

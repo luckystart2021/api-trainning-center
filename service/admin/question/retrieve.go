@@ -49,6 +49,12 @@ func retrieveShowQuestionsExam(db *sql.DB) ([]ResponseQuestionExam, error) {
 		}
 		questionsExam = append(questionsExam, questionExam)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveShowQuestionsExam] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(questionsExam) == 0 {
 		logrus.WithFields(logrus.Fields{}).Infof("[retrieveShowQuestionsExam] No Data  %v", err)
 		return questionsExam, errors.New("Không có dữ liệu từ hệ thống")
@@ -187,6 +193,12 @@ func retrieveQuestionsSystem(db *sql.DB) ([]QuestionSystem, error) {
 		}
 		questions = append(questions, questionSystem)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestionsSystem] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(questions) == 0 {
 		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestionsSystem] No Data  %v", err)
 		return questions, errors.New("Không có dữ liệu từ hệ thống")
@@ -264,6 +276,12 @@ func retrieveQuestions(db *sql.DB, code string) ([]Question, error) {
 		}
 		questions = append(questions, question)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveQuestions] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(questions) == 0 {
 		logrus.WithFields(logrus.Fields{}).Infof("[retrieveQuestions] No Data  %v", err)
 		return questions, errors.New("Không có dữ liệu từ hệ thống")

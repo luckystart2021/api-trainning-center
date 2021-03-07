@@ -147,6 +147,12 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 		}
 		courses = append(courses, course)
 	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	if len(courses) == 0 {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] No Data  %v", err)
 		return courses, errors.New("Không có dữ liệu từ hệ thống")
