@@ -20,5 +20,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Get("/popular/news", GetFavoriteNews(st))
 		router.Get("/news/search", SearchNews(st))
 		router.Get("/home/notification/news", NotificationNews(st))
+		router.Get("/{id_category}/news-homepage", GetArticlesHomePage(st))
 	}
 }

@@ -184,3 +184,28 @@ func getDataPage(page int, data []article.Article) ([]ArticleResponse, error) {
 
 	return articlesResponse, nil
 }
+
+func GetArticlesHomePage(service article.IArticleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		code := chi.URLParam(r, "id_category")
+		if code == "" || len(code) == 0 {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không tồn tại"))
+			return
+		}
+		idCategory, err := strconv.Atoi(code)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã danh mục không hợp lệ"))
+			return
+		}
+
+		showArticles, err := service.ShowArticlesHomePage(idCategory)
+		if err != nil {
+			response.RespondWithError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, showArticles)
+	}
+}

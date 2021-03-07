@@ -1033,3 +1033,26 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 	}
 	return articles, nil
 }
+
+func (tc StoreArticle) ShowArticlesHomePage(idCategory int) ([]Article, error) {
+	article := []Article{}
+	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowArticles] error : ", err)
+		return article, err
+	}
+	for _, data := range articels {
+		articleR := Article{
+			Id:          data.Id,
+			Title:       data.Title,
+			Img:         "/files/img/news/" + data.Img,
+			Meta:        data.Meta,
+			Description: data.Description,
+			CreatedAt:   data.CreatedAt,
+			CreatedBy:   data.CreatedBy,
+		}
+		article = append(article, articleR)
+	}
+	logrus.WithFields(logrus.Fields{}).Info("[ShowArticles] retrieve success")
+	return article, nil
+}
