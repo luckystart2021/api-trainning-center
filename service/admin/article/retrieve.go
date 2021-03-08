@@ -46,6 +46,26 @@ type Articles struct {
 	UpdatedBy       string `json:"updated_by"`
 }
 
+type Articles1 struct {
+	Id              int64  `json:"id"`
+	IdUser          int64  `json:"id_user"`
+	IdCategory      int64  `json:"id_category"`
+	IdChildCategory int64  `json:"id_child_category"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	Detail          string `json:"detail"`
+	Img             string `json:"img"`
+	Meta            string `json:"meta"`
+	Keyword         string `json:"keyword"`
+	View            int64  `json:"view"`
+	Status          bool   `json:"status"`
+	IsDelete        bool   `json:"is_deleted"`
+	CreatedAt       string `json:"created_at"`
+	CreatedBy       string `json:"created_by"`
+	UpdatedAt       string `json:"updated_at"`
+	UpdatedBy       string `json:"updated_by"`
+}
+
 type AdminArticlesList struct {
 	Id          int64  `json:"id"`
 	Title       string `json:"title"`
@@ -699,18 +719,19 @@ func retrieveArticlesDeteledByChildCategory(db *sql.DB, isDeleteIsTrue bool) ([]
 	return articles, nil
 }
 
-func (tc StoreArticle) ShowArticleById(idArticle int) (Articles, error) {
+func (tc StoreArticle) ShowArticleById(idArticle int) (Articles1, error) {
 	articleInAdmin, err := retrieveArticleInAdmin(tc.db, idArticle)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowArticleById] error : ", err)
-		return Articles{}, err
+		return Articles1{}, err
 	}
 	return articleInAdmin, nil
 }
 
-func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles, error) {
+func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles1, error) {
 	query := `
 	select
+		c2.id as idCategory ,
 		articles.id,
 		articles.id_user,
 		articles.id_child_category,
@@ -729,26 +750,29 @@ func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles, error) {
 		articles.updated_by
 	from
 		articles
+	join child_category cc on articles.id_child_category = cc.id 
+	join category c2 on cc.id_category = c2.id 
 	where
 		articles.id = $1		
 	`
 	rows := db.QueryRow(query, idArticle)
-	var id, view, idUser, idChildCategory int64
+	var id, view, idUser, idChildCategory, idCategory int64
 	var title, description, details, img, meta, keywordseo, createdBy, updateBy string
 	var createdAt, updatedAt time.Time
 	var status, isDeleted bool
-	err := rows.Scan(&id, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+	err := rows.Scan(&idCategory, &id, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticleInAdmin] No Data  %v", err)
-		return Articles{}, errors.New("Không có dữ liệu từ hệ thống")
+		return Articles1{}, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticleInAdmin] Scan error  %v", err)
-		return Articles{}, err
+		return Articles1{}, err
 	}
-	article := Articles{
+	article := Articles1{
 		Id:              id,
 		IdUser:          idUser,
+		IdCategory:      idCategory,
 		IdChildCategory: idChildCategory,
 		Title:           title,
 		Description:     description,
