@@ -7,7 +7,7 @@ import (
 )
 
 type ISeoService interface {
-	ShowSeos() (Seo, error)
+	ShowSeos() (SeoResponse, error)
 	UpdateSeo(id int, req modelSeo.SeoRequest) (response.MessageResponse, error)
 }
 
