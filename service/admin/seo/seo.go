@@ -7,8 +7,11 @@ import (
 )
 
 type ISeoService interface {
+	ShowSeoTags() ([]SeoTagsResponse, error)
+	ShowDetailSeoTags(id int) (SeoTagsResponse, error)
 	ShowSeos() (SeoResponse, error)
 	UpdateSeo(id int, req modelSeo.SeoRequest) (response.MessageResponse, error)
+	CreateSeoTag(name string) (response.MessageResponse, error)
 }
 
 type StoreSeo struct {
