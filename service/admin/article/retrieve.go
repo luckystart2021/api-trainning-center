@@ -1,6 +1,7 @@
 package article
 
 import (
+	"api-trainning-center/service/constant"
 	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
@@ -203,11 +204,11 @@ func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bo
 	return article, nil
 }
 
-func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
+func (tc StoreArticle) ShowArticles(idCategory, pageNumber int) ([]Article, error) {
 	article := []Article{}
-	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+	articels, err := retrieveAllArticlesByPage(tc.db, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse, pageNumber)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[ShowArticles] error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveArticles] error : ", err)
 		return article, err
 	}
 	for _, data := range articels {
@@ -224,6 +225,92 @@ func (tc StoreArticle) ShowArticles(idCategory int) ([]Article, error) {
 	}
 	logrus.WithFields(logrus.Fields{}).Info("[ShowArticles] retrieve success")
 	return article, nil
+}
+
+func retrieveAllArticlesByPage(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool, pageNumber int) ([]Articles, error) {
+	offset := (pageNumber - 1) * constant.ItemsPerPage
+	articles := []Articles{}
+	query := `
+	SELECT
+		articles.id ,
+		articles.id_user,
+		articles.id_child_category,
+		articles.title ,
+		articles.description,
+		articles.details ,
+		articles.image ,
+		articles.meta ,
+		articles.keywordseo,
+		articles.view,
+		articles.status,
+		articles.is_deleted,
+		articles.created_at,
+		articles.created_by,
+		articles.updated_at,
+		articles.updated_by
+	FROM
+		articles
+	INNER JOIN child_category c ON
+		c.id = articles.id_child_category
+	INNER JOIN category c2 ON
+		c.id_category = c2.id
+	WHERE
+		c2.id = $1
+		and articles.status = $2
+		and articles.is_deleted = $3
+		and c.is_deleted = $4
+	ORDER BY
+		articles.created_at DESC
+	LIMIT $5 OFFSET $6		
+	`
+	rows, err := db.Query(query, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse, constant.ItemsPerPage, offset)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] query error  %v", err)
+		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var idArticle, view, idUser, idChildCategory int64
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var createdAt, updatedAt time.Time
+		var status, isDeleted bool
+		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Scan error  %v", err)
+			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		article := Articles{
+			Id:              idArticle,
+			IdUser:          idUser,
+			IdChildCategory: idChildCategory,
+			Title:           title,
+			Description:     description,
+			Detail:          details,
+			Img:             img,
+			Meta:            meta,
+			Keyword:         keywordseo,
+			View:            view,
+			Status:          status,
+			IsDelete:        isDeleted,
+			CreatedAt:       utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			CreatedBy:       createdBy,
+			UpdatedAt:       utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
+			UpdatedBy:       updateBy,
+		}
+		articles = append(articles, article)
+	}
+	err = rows.Err()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] Rows error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
+	if len(articles) == 0 {
+		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveArticles] No Data  %v", err)
+		return articles, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return articles, nil
 }
 
 func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
@@ -1113,7 +1200,7 @@ func (tc StoreArticle) ShowArticlesHomePage(idCategory int) ([]Article, error) {
 	article := []Article{}
 	articels, err := retrieveArticles(tc.db, idCategory, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[ShowArticles] error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveArticles] error : ", err)
 		return article, err
 	}
 	for _, data := range articels {
@@ -1128,6 +1215,6 @@ func (tc StoreArticle) ShowArticlesHomePage(idCategory int) ([]Article, error) {
 		}
 		article = append(article, articleR)
 	}
-	logrus.WithFields(logrus.Fields{}).Info("[ShowArticles] retrieve success")
+	logrus.WithFields(logrus.Fields{}).Info("[retrieveArticles] retrieve success")
 	return article, nil
 }

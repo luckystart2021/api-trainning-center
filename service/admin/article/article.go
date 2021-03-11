@@ -6,7 +6,8 @@ import (
 )
 
 type IArticleService interface {
-	ShowArticles(idChildCategory int) ([]Article, error)
+	CountArticles(idCategory int) (int, error)
+	ShowArticles(idCategory, pageNumber int) ([]Article, error)
 	ShowArticlesHomePage(idChildCategory int) ([]Article, error)
 	ShowNews() ([]Article, error)
 	GetNotificationNews() ([]NotificationNews, error)

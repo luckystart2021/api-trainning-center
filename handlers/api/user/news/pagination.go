@@ -25,8 +25,8 @@ func GetArticlePagination(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		showArticles, err := service.ShowArticles(idCategory)
-		if len(showArticles) == 0 {
+		countArticles, err := service.CountArticles(idCategory)
+		if countArticles == 0 {
 			respPage := []utils.PageNumberResponse{}
 			respPage = append(respPage, utils.PageNumberResponse{PageNumber: 0})
 			response.RespondWithJSON(w, http.StatusOK, respPage)
@@ -36,7 +36,7 @@ func GetArticlePagination(service article.IArticleService) http.HandlerFunc {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
-		calculatePageNumber := utils.CalculatePageNumber(len(showArticles))
+		calculatePageNumber := utils.CalculatePageNumber(countArticles)
 
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, calculatePageNumber)

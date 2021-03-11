@@ -73,20 +73,20 @@ func GetArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		showArticles, err := service.ShowArticles(idCategory)
+		showArticles, err := service.ShowArticles(idCategory, pageNo)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		resp, err := getDataPage(pageNo, showArticles)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
+		// resp, err := getDataPage(pageNo, showArticles)
+		// if err != nil {
+		// 	// If the structure of the body is wrong, return an HTTP error
+		// 	response.RespondWithError(w, http.StatusBadRequest, err)
+		// 	return
+		// }
 		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, resp)
+		response.RespondWithJSON(w, http.StatusOK, showArticles)
 	}
 }
 
