@@ -57,8 +57,8 @@ func GetChildArticlesPagination(service article.IArticleService) http.HandlerFun
 			return
 		}
 
-		showChildArticles, err := service.ShowChildArticles(metaChild, metaParent)
-		if len(showChildArticles) == 0 {
+		countChildArticles, err := service.CountChildArticles(metaChild, metaParent)
+		if countChildArticles == 0 {
 			respPage := []utils.PageNumberResponse{}
 			respPage = append(respPage, utils.PageNumberResponse{PageNumber: 0})
 			response.RespondWithJSON(w, http.StatusOK, respPage)
@@ -69,7 +69,7 @@ func GetChildArticlesPagination(service article.IArticleService) http.HandlerFun
 			return
 		}
 
-		calculatePageNumber := utils.CalculatePageNumber(len(showChildArticles))
+		calculatePageNumber := utils.CalculatePageNumber(countChildArticles)
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, calculatePageNumber)
 	}

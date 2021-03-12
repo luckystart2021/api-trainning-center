@@ -6,6 +6,7 @@ import (
 )
 
 type IArticleService interface {
+	CountChildArticles(metaChild, metaParent string) (int, error)
 	CountArticles(idCategory int) (int, error)
 	ShowArticles(idCategory, pageNumber int) ([]Article, error)
 	ShowArticlesHomePage(idChildCategory int) ([]Article, error)
@@ -18,7 +19,7 @@ type IArticleService interface {
 	ShowArticleById(idArticle int) (Articles1, error)
 	ShowArticle(idArticle int, meta string) (ArticleDetail, error)
 	ShowCategories(idCategoryParent int) ([]CategoriesResponse, error)
-	ShowChildArticles(metaChild, metaParent string) ([]ChildCategoryNewsList, error)
+	ShowChildArticles(metaChild, metaParent string, pageNo int) ([]ChildCategoryNewsList, error)
 	CreateArticle(idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (response.MessageResponse, error)
 	UpdateArticle(idArticle, idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) (response.MessageResponse, error)
 	ApprovalArticleById(idArticle int, userName string) (response.MessageResponse, error)

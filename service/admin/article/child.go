@@ -1,6 +1,7 @@
 package article
 
 import (
+	"api-trainning-center/service/constant"
 	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
@@ -19,11 +20,38 @@ type ChildCategoryNewsList struct {
 	CreatedBy   string `json:"created_by"`
 }
 
-func (tc StoreArticle) ShowChildArticles(metaChild, metaParent string) ([]ChildCategoryNewsList, error) {
-	childCategoryNewsList := []ChildCategoryNewsList{}
-	childCategories, err := retrieveChildCategories(tc.db, metaChild, metaParent, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
+func (tc StoreArticle) CountChildArticles(metaChild, metaParent string) (int, error) {
+	var count int
+	query := `
+	SELECT
+		COUNT(*)
+	FROM
+		articles
+	INNER JOIN child_category c ON
+		c.id = articles.id_child_category
+	INNER JOIN category c1 ON
+		c.id_category = c1.id
+	WHERE
+		c.meta = $1
+		AND articles.status = $2
+		AND articles.is_deleted = $3
+		AND c1.meta = $4
+		AND c.is_deleted = $5
+	`
+	row := tc.db.QueryRow(query, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse)
+	err := row.Scan(&count)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[ShowChildArticles] error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[CountChildArticles] error : ", err)
+		return count, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	return count, nil
+}
+
+func (tc StoreArticle) ShowChildArticles(metaChild, metaParent string, pageNo int) ([]ChildCategoryNewsList, error) {
+	childCategoryNewsList := []ChildCategoryNewsList{}
+	childCategories, err := retrieveChildCategories(tc.db, metaChild, metaParent, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse, pageNo)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[retrieveChildCategories] error : ", err)
 		return childCategoryNewsList, err
 	}
 	for _, data := range childCategories {
@@ -42,10 +70,11 @@ func (tc StoreArticle) ShowChildArticles(metaChild, metaParent string) ([]ChildC
 	return childCategoryNewsList, nil
 }
 
-func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
+func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool, pageNo int) ([]Articles, error) {
+	offset := (pageNo - 1) * constant.ItemsPerPage
 	articles := []Articles{}
 	query := `
-	select
+	SELECT
 		articles.id ,
 		articles.id_user,
 		articles.id_child_category,
@@ -62,22 +91,23 @@ func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusAct
 		articles.created_by,
 		articles.updated_at,
 		articles.updated_by
-	from
+	FROM
 		articles
-	inner join child_category c on
+	INNER JOIN child_category c ON
 		c.id = articles.id_child_category
-	inner join category c1 on
+	INNER JOIN category c1 ON
 		c.id_category = c1.id
-	where
+	WHERE
 		c.meta = $1
 		and articles.status = $2
 		and articles.is_deleted = $3
 		and c1.meta = $4
 		and c.is_deleted = $5
-	order by
-		articles.created_at desc;
+	ORDER BY
+		articles.created_at DESC
+	LIMIT $6 OFFSET $7;
 	`
-	rows, err := db.Query(query, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse)
+	rows, err := db.Query(query, metaChild, statusActive, isDeleteIsFalse, metaParent, childCategoryIsDeleteIsFalse, constant.ItemsPerPage, offset)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveChildCategories] query error  %v", err)
 		return articles, errors.New("Lỗi hệ thống vui lòng thử lại")

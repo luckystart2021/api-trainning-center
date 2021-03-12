@@ -48,20 +48,14 @@ func GetChildArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		showChildArticles, err := service.ShowChildArticles(metaChild, metaParent)
+		showChildArticles, err := service.ShowChildArticles(metaChild, metaParent, pageNo)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		resp, err := getDataPageChildArticles(pageNo, showChildArticles)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
 		// send Result response
-		response.RespondWithJSON(w, http.StatusOK, resp)
+		response.RespondWithJSON(w, http.StatusOK, showChildArticles)
 	}
 }
 

@@ -79,12 +79,6 @@ func GetArticles(service article.IArticleService) http.HandlerFunc {
 			return
 		}
 
-		// resp, err := getDataPage(pageNo, showArticles)
-		// if err != nil {
-		// 	// If the structure of the body is wrong, return an HTTP error
-		// 	response.RespondWithError(w, http.StatusBadRequest, err)
-		// 	return
-		// }
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, showArticles)
 	}
