@@ -12,6 +12,8 @@ type ISeoService interface {
 	ShowSeos() (SeoResponse, error)
 	UpdateSeo(id int, req modelSeo.SeoRequest) (response.MessageResponse, error)
 	CreateSeoTag(name string) (response.MessageResponse, error)
+	UpdateSeoTags(id int, name string) (response.MessageResponse, error)
+	DeleteSeoTags(id int) (response.MessageResponse, error)
 }
 
 type StoreSeo struct {

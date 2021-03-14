@@ -25,6 +25,46 @@ func (st StoreSeo) UpdateSeo(id int, req modelSeo.SeoRequest) (response.MessageR
 	return resp, nil
 }
 
+func (st StoreSeo) UpdateSeoTags(id int, name string) (response.MessageResponse, error) {
+	resp := response.MessageResponse{}
+	count, err := updateSeoTagByRequest(st.db, id, name)
+	if err != nil {
+		return resp, err
+	}
+	if count > 0 {
+		resp.Status = true
+		resp.Message = "Cập nhật thành công"
+	} else {
+		resp.Status = false
+		resp.Message = "Cập nhật không thành công"
+	}
+	return resp, nil
+}
+
+func updateSeoTagByRequest(db *sql.DB, id int, name string) (int64, error) {
+	query := `
+	UPDATE
+		article_tag
+	SET
+		name = $2
+	WHERE
+		id = $1;
+	`
+	res, err := db.Exec(query, id, name)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[updateSeoTagByRequest] update seo tag in DB err  %v", err)
+		return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+	// check how many rows affected
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[RowsAffected] update seo tag in DB err  %v", err)
+		return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
+	return rowsAffected, nil
+}
+
 func updateSeoByRequest(db *sql.DB, id int, req modelSeo.SeoRequest) (int64, error) {
 	query := `
 	UPDATE

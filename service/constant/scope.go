@@ -2,6 +2,6 @@ package constant
 
 const (
 	ADMIN        = "ADMIN"
-	ItemsPerPage = 10
+	ItemsPerPage = 2
 	Domain       = "https://api.dtc-project.tk"
 )
