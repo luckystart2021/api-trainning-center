@@ -51,7 +51,6 @@ func CkUpload() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reps := response.UploadResponse{}
 		if r.Method == "POST" {
-
 			err := r.ParseMultipartForm(32 << 20)
 			if err != nil {
 				log.Printf("ERROR: %s\n", err)

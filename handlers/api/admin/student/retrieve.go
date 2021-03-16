@@ -33,7 +33,7 @@ func GetStudent(service student.IStudentService) http.HandlerFunc {
 		idStudent, err := strconv.Atoi(id)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã học viên con không hợp lệ"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã học viên không hợp lệ"))
 			return
 		}
 		showStudent, err := service.ShowStudent(idStudent)

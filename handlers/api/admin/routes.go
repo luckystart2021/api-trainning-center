@@ -14,6 +14,7 @@ import (
 	"api-trainning-center/handlers/api/admin/slide"
 	"api-trainning-center/handlers/api/admin/student"
 	"api-trainning-center/handlers/api/admin/suite"
+	"api-trainning-center/handlers/api/admin/vehicle"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -35,5 +36,6 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Group(student.Router(db, client))
 		router.Group(seo.Router(db, client))
 		router.Group(seo_tag.Router(db, client))
+		router.Group(vehicle.Router(db, client))
 	}
 }
