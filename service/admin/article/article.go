@@ -26,7 +26,7 @@ type IArticleService interface {
 	UnApprovalArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	DeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
 	UnDeleteArticleById(idArticle int, userName string) (response.MessageResponse, error)
-	ShowFavoriteNews() ([]Article, error)
+	ShowFavoriteNews() ([]ArticlePopular, error)
 	ShowResultNewsByKey(searchKey string) ([]Article, error)
 }
 

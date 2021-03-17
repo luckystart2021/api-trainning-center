@@ -20,6 +20,17 @@ type Article struct {
 	CreatedBy   string `json:"created_by"`
 }
 
+type ArticlePopular struct {
+	Id           int64  `json:"id"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	Img          string `json:"img"`
+	Meta         string `json:"meta"`
+	MetaCategory string `json:"meta_category"`
+	CreatedAt    string `json:"created_at"`
+	CreatedBy    string `json:"created_by"`
+}
+
 type NotificationNews struct {
 	Id        int64  `json:"id"`
 	Title     string `json:"title"`
@@ -37,6 +48,25 @@ type Articles struct {
 	Detail          string `json:"detail"`
 	Img             string `json:"img"`
 	Meta            string `json:"meta"`
+	Keyword         string `json:"keyword"`
+	View            int64  `json:"view"`
+	Status          bool   `json:"status"`
+	IsDelete        bool   `json:"is_deleted"`
+	CreatedAt       string `json:"created_at"`
+	CreatedBy       string `json:"created_by"`
+	UpdatedAt       string `json:"updated_at"`
+	UpdatedBy       string `json:"updated_by"`
+}
+type ArticlesPopular struct {
+	Id              int64  `json:"id"`
+	IdUser          int64  `json:"id_user"`
+	IdChildCategory int64  `json:"id_child_category"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	Detail          string `json:"detail"`
+	Img             string `json:"img"`
+	Meta            string `json:"meta"`
+	MetaCategory    string `json:"meta_category"`
 	Keyword         string `json:"keyword"`
 	View            int64  `json:"view"`
 	Status          bool   `json:"status"`
@@ -984,22 +1014,23 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 	return articles, nil
 }
 
-func (tc StoreArticle) ShowFavoriteNews() ([]Article, error) {
-	article := []Article{}
+func (tc StoreArticle) ShowFavoriteNews() ([]ArticlePopular, error) {
+	article := []ArticlePopular{}
 	articels, err := retrieveFavoriteNews(tc.db, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowFavoriteNews] error : ", err)
 		return article, err
 	}
 	for _, data := range articels {
-		articleR := Article{
-			Id:          data.Id,
-			Title:       data.Title,
-			Img:         "/files/img/news/" + data.Img,
-			Meta:        data.Meta,
-			Description: data.Description,
-			CreatedAt:   data.CreatedAt,
-			CreatedBy:   data.CreatedBy,
+		articleR := ArticlePopular{
+			Id:           data.Id,
+			Title:        data.Title,
+			Img:          "/files/img/news/" + data.Img,
+			Meta:         data.Meta,
+			MetaCategory: data.MetaCategory,
+			Description:  data.Description,
+			CreatedAt:    data.CreatedAt,
+			CreatedBy:    data.CreatedBy,
 		}
 		article = append(article, articleR)
 	}
@@ -1007,10 +1038,11 @@ func (tc StoreArticle) ShowFavoriteNews() ([]Article, error) {
 	return article, nil
 }
 
-func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]Articles, error) {
-	articles := []Articles{}
+func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDeleteIsFalse bool) ([]ArticlesPopular, error) {
+	articles := []ArticlesPopular{}
 	query := `
 	select 
+		c2.meta,
 		articles.id ,
 		articles.id_user,
 		articles.id_child_category,
@@ -1049,17 +1081,18 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 	defer rows.Close()
 	for rows.Next() {
 		var idArticle, view, idUser, idChildCategory int64
-		var title, description, details, img, meta, keywordseo, createdBy, updateBy string
+		var title, description, details, img, meta, keywordseo, createdBy, updateBy, metaCategory string
 		var createdAt, updatedAt time.Time
 		var status, isDeleted bool
-		err = rows.Scan(&idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
+		err = rows.Scan(&metaCategory, &idArticle, &idUser, &idChildCategory, &title, &description, &details, &img, &meta, &keywordseo, &view, &status, &isDeleted, &createdAt, &createdBy, &updatedAt, &updateBy)
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveFavoriteNews] Scan error  %v", err)
 			return articles, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
-		article := Articles{
+		article := ArticlesPopular{
 			Id:              idArticle,
+			MetaCategory:    metaCategory,
 			IdUser:          idUser,
 			IdChildCategory: idChildCategory,
 			Title:           title,
