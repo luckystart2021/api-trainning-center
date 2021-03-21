@@ -29,6 +29,7 @@ func AuthJwtVerify(next http.Handler) http.Handler {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã xác thực không tồn tại, vui lòng đăng nhập lại"))
 			return
 		}
+		
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			//Make sure that the token method conform to "SigningMethodHMAC"
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

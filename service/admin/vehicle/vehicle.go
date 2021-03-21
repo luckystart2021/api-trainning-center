@@ -7,8 +7,6 @@ import (
 )
 
 type IVehicleService interface {
-	// ShowStudents() ([]student.Student, error)
-	// ShowStudent(idStudent int) (student.Student, error)
 	CreateVehicle(req vehicle.VehicleRequest, userName string) (response.MessageResponse, error)
 	UpdateVehicle(id int, req vehicle.VehicleUpdateRequest, userName string) (response.MessageResponse, error)
 	ShowVehicles() ([]vehicle.Vehicle, error)
