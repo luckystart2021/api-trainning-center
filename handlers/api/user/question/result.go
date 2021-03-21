@@ -42,10 +42,19 @@ func validate(req result.Result) error {
 	if len(req.Answers) == 0 {
 		return errors.New("Vui lòng chọn câu trả lời")
 	}
+
 	if checkOverlap(req.Answers) {
 		return errors.New("Vui lòng không chọn trùng câu hỏi")
 	}
+
 	if checkLenght(req.Answers) {
+		return errors.New("Vui lòng chọn đáp án hợp lệ")
+	}
+
+	for _, data := range req.Answers {
+		if data.IdAnswer == "A" || data.IdAnswer == "B" || data.IdAnswer == "C" || data.IdAnswer == "D" {
+			continue
+		}
 		return errors.New("Vui lòng chọn đáp án hợp lệ")
 	}
 
