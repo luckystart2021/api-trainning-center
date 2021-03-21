@@ -44,7 +44,8 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 		created_by,
 		created_at,
 		updated_by,
-		updated_at
+		updated_at,
+		cmnd
 	FROM
 		student
 	WHERE
@@ -52,7 +53,7 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 	`
 	rows := db.QueryRow(query, idStudent)
 	var createdAt, updatedAt time.Time
-	err := rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt)
+	err := rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt, &student.CMND)
 	student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	if err == sql.ErrNoRows {
@@ -80,7 +81,8 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		created_by,
 		created_at,
 		updated_by,
-		updated_at
+		updated_at,
+		cmnd
 	FROM
 		student;`
 	rows, err := db.Query(query)
@@ -92,7 +94,7 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 	for rows.Next() {
 		student := student.Student{}
 		var createdAt, updatedAt time.Time
-		err = rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt)
+		err = rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt, &student.CMND)
 		student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		students = append(students, student)

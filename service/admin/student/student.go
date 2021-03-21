@@ -9,7 +9,8 @@ import (
 type IStudentService interface {
 	ShowStudents() ([]student.Student, error)
 	ShowStudent(idStudent int) (student.Student, error)
-	CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int) (response.MessageResponse, error)
+	CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string) (response.MessageResponse, error)
+	UpdateStudent(idStudent int, sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string) (response.MessageResponse, error)
 }
 
 type StoreStudent struct {

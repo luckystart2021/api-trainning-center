@@ -17,6 +17,7 @@ type StudentRequest struct {
 	Phone       string `json:"phone"`
 	Address     string `json:"address"`
 	FullName    string `json:"full_name"`
+	CMND        string `json:"cmnd"`
 }
 
 func CreateStudent(service student.IStudentService) http.HandlerFunc {
@@ -34,7 +35,7 @@ func CreateStudent(service student.IStudentService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName, req.IdClass)
+		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName, req.IdClass, req.CMND)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -79,6 +80,13 @@ func (s StudentRequest) validate() error {
 	}
 	if len(s.Address) > 500 {
 		return errors.New("Địa chỉ quá dài")
+	}
+
+	if s.CMND == "" {
+		return errors.New("Bạn chưa nhập số chứng minh nhân dân")
+	}
+	if len(s.CMND) > 20 {
+		return errors.New("Số chứng minh nhân dân không hợp lệ")
 	}
 
 	return nil

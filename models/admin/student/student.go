@@ -13,4 +13,5 @@ type Student struct {
 	CreatedBy   string `json:"created_by"`
 	UpdatedAt   string `json:"updated_at"`
 	UpdatedBy   string `json:"updated_by"`
+	CMND        string `json:"cmnd"`
 }
