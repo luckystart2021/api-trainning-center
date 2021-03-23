@@ -21,7 +21,6 @@ func FileUpload(r *http.Request, fileName string) (string, error) {
 	if err != nil {
 		return "", errors.New("Xảy ra lỗi khi nhận file")
 	}
-
 	// checkFilenameExtension := FilenameExtension(handler.Filename)
 	// logrus.WithFields(logrus.Fields{}).Info("[FileUpload] Scan extension file", checkFilenameExtension)
 	// if checkFilenameExtension != ".jpg" || checkFilenameExtension != ".png" {
