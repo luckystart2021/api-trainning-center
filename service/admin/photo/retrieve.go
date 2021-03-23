@@ -59,7 +59,8 @@ func findAlbum(db *sql.DB) ([]photo.Album, error) {
 		name,
 		meta
 	FROM
-		album;
+		album
+	ORDER BY id;
 	`
 	rows, err := db.Query(query)
 
