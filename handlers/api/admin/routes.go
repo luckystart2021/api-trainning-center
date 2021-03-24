@@ -2,6 +2,7 @@ package admin
 
 import (
 	"api-trainning-center/handlers/api/admin/account"
+	"api-trainning-center/handlers/api/admin/album"
 	"api-trainning-center/handlers/api/admin/child_category"
 	"api-trainning-center/handlers/api/admin/class"
 	"api-trainning-center/handlers/api/admin/contact"
@@ -37,5 +38,6 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Group(seo.Router(db, client))
 		router.Group(seo_tag.Router(db, client))
 		router.Group(vehicle.Router(db, client))
+		router.Group(album.Router(db, client))
 	}
 }

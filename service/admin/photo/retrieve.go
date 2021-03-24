@@ -21,7 +21,7 @@ type PhotosResponse struct {
 }
 
 func (st StorePhoto) ShowPhotos(idAlbum int) ([]PhotosResponse, error) {
-	album, err := findAlbum(st.db)
+	album, err := FindAlbum(st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[findAlbum] error : ", err)
 		return nil, err
@@ -51,7 +51,7 @@ func (st StorePhoto) ShowPhotos(idAlbum int) ([]PhotosResponse, error) {
 	return photosResp, nil
 }
 
-func findAlbum(db *sql.DB) ([]photo.Album, error) {
+func FindAlbum(db *sql.DB) ([]photo.Album, error) {
 	albums := []photo.Album{}
 	query := `
 	SELECT
