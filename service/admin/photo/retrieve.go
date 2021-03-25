@@ -127,7 +127,7 @@ func FindAllPhotos(db *sql.DB) ([]photo.Photo, error) {
 	return photos, nil
 }
 
-func (st StorePhoto) ShowPhotos(idAlbum int) ([]PhotosResponse, error) {
+func (st StorePhoto) ShowPhotos() ([]PhotosResponse, error) {
 	album, err := FindAlbum(st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[findAlbum] error : ", err)

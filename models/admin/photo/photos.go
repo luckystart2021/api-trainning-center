@@ -17,3 +17,10 @@ type Album struct {
 	Name string `json:"name"`
 	Meta string `json:"meta"`
 }
+
+type PhotoRequest struct {
+	IdAlbum string `json:"id_album"`
+	Img     string `json:"img"`
+	Title   string `json:"title"`
+	Meta    string `json:"meta"`
+}

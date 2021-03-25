@@ -10,6 +10,6 @@ import (
 func Router(db *sql.DB) func(chi.Router) {
 	st := photo.NewStorePhoto(db)
 	return func(router chi.Router) {
-		router.Get("/{id_album}/photos", GetPhotos(st))
+		router.Get("/photos", GetPhotos(st))
 	}
 }

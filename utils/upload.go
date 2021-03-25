@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
@@ -10,6 +11,29 @@ import (
 	"strings"
 	"time"
 )
+
+func FilesUpload(file multipart.File, handler multipart.FileHeader, fileName string) (string, error) {
+	defer file.Close() //close the file when we finish
+	//this is path which  we want to store the file
+	saveFileName := "upload/img/" + fileName + "/"
+	if _, err := os.Stat(saveFileName); os.IsNotExist(err) {
+		os.Mkdir(saveFileName, 0755)
+	}
+	// info, err := os.Stat()
+	fileImg := FilenameWithoutExtension(handler.Filename) + "_" + buildFileName() + FilenameExtension(handler.Filename)
+	f, err := os.OpenFile(saveFileName+fileImg, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return "", errors.New("Lỗi open file")
+	}
+	defer f.Close()
+
+	if _, err := io.Copy(f, file); err != nil {
+		return "", errors.New("Lỗi copy file")
+	}
+
+	//here we save our file to our path
+	return fileImg, nil
+}
 
 func FileUpload(r *http.Request, fileName string) (string, error) {
 	//ParseMultipartForm parses a request body as multipart/form-data
