@@ -9,7 +9,6 @@ import (
 	"api-trainning-center/handlers/api/user/question"
 	"api-trainning-center/handlers/api/user/seo"
 	"api-trainning-center/handlers/api/user/slide"
-	"api-trainning-center/handlers/api/user/upload"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -23,7 +22,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Group(about.Router(db))
 		router.Group(news.Router(db))
 		router.Group(slide.Router(db))
-		router.Group(upload.Router())
 		router.Group(seo.Router(db))
 		router.Group(photo.Router(db))
 	}
