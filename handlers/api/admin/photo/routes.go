@@ -13,6 +13,7 @@ import (
 func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 	st := photo.NewStorePhoto(db)
 	return func(router chi.Router) {
+		// photo
 		router.Use(middlewares.AuthJwtVerify)
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Route("/photo", func(router chi.Router) {
