@@ -2,6 +2,7 @@ package photo
 
 import (
 	"api-trainning-center/service/response"
+	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
 
@@ -10,8 +11,18 @@ import (
 
 func (st StorePhoto) DeletePhoto(id int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
+	photo, err := FindOnePhoto(st.db, id)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[DeletePhoto] error : ", err)
+		return resp, err
+	}
 	count, err := deletePhotoByRequest(st.db, id)
 	if err != nil {
+		return resp, err
+	}
+	err = utils.DeleteFile("upload/img/album/" + photo.Img)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[DeletePhoto] error : ", err)
 		return resp, err
 	}
 	if count > 0 {

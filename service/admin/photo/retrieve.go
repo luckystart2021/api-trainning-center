@@ -2,6 +2,7 @@ package photo
 
 import (
 	"api-trainning-center/models/admin/photo"
+	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
 
@@ -21,14 +22,23 @@ type PhotosResponse struct {
 	Photos    []PhotoResponse `json:"photo"`
 }
 
-func (st StorePhoto) ShowPhotoInAdmin(id int) (photo.Photo, error) {
-	p := photo.Photo{}
+func (st StorePhoto) ShowPhotoInAdmin(id int) (photo.PhotoResponse, error) {
+	p := photo.PhotoResponse{}
 	photo, err := FindOnePhoto(st.db, id)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowPhotoInAdmin] error : ", err)
 		return p, err
 	}
-	return photo, nil
+	p.Id = photo.Id
+	p.IdAlbum = photo.IdAlbum
+	p.Title = photo.Title
+	p.Meta = photo.Meta
+	p.Img = "/files/img/album/" + photo.Img
+	p.CreatedBy = photo.CreatedBy
+	p.UpdatedBy = photo.UpdatedBy
+	p.CreatedAt = utils.TimeIn(photo.CreatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	p.UpdatedAt = utils.TimeIn(photo.UpdatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	return p, nil
 }
 
 func FindOnePhoto(db *sql.DB, id int) (photo.Photo, error) {
@@ -50,8 +60,7 @@ func FindOnePhoto(db *sql.DB, id int) (photo.Photo, error) {
 		id = $1;
 	`
 	rows := db.QueryRow(query, id)
-	var img string
-	err := rows.Scan(&photo.Id, &img, &photo.Title, &photo.Meta, &photo.CreatedBy, &photo.CreatedAt, &photo.UpdatedBy, &photo.UpdatedAt, &photo.IdAlbum)
+	err := rows.Scan(&photo.Id, &photo.Img, &photo.Title, &photo.Meta, &photo.CreatedBy, &photo.CreatedAt, &photo.UpdatedBy, &photo.UpdatedAt, &photo.IdAlbum)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindOnePhoto] No Data  %v", err)
 		return photo, errors.New("Không có dữ liệu từ hệ thống")
@@ -59,7 +68,6 @@ func FindOnePhoto(db *sql.DB, id int) (photo.Photo, error) {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindOnePhoto] Scan error  %v", err)
 	}
-	photo.Img = "/files/img/album/" + img
 	return photo, nil
 }
 
