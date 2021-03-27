@@ -138,9 +138,9 @@ func (st StorePhoto) ShowPhotos() ([]PhotosResponse, error) {
 		photosResponse := PhotosResponse{}
 		photosResponse.AlbumName = dataAlbum.Name
 		photosResponse.AlbumMeta = dataAlbum.Meta
-		photos, err := findPhotosByIdAlbum(st.db, dataAlbum.Id)
+		photos, err := FindPhotosByIdAlbum(st.db, dataAlbum.Id)
 		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Error("[findPhotosByIdAlbum] error : ", err)
+			logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
 			return nil, err
 		}
 		photosR := []PhotoResponse{}
@@ -199,7 +199,7 @@ func FindAlbum(db *sql.DB) ([]photo.Album, error) {
 	return albums, nil
 }
 
-func findPhotosByIdAlbum(db *sql.DB, idAlbum int) ([]photo.Photo, error) {
+func FindPhotosByIdAlbum(db *sql.DB, idAlbum int) ([]photo.Photo, error) {
 	photos := []photo.Photo{}
 	query := `
 	SELECT

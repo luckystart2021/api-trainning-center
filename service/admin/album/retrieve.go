@@ -3,6 +3,7 @@ package album
 import (
 	"api-trainning-center/models/admin/photo"
 	photoService "api-trainning-center/service/admin/photo"
+	"api-trainning-center/utils"
 	"database/sql"
 	"errors"
 
@@ -18,13 +19,37 @@ func (st StoreAlbum) GetListAlbum() ([]photo.Album, error) {
 	return albumLst, nil
 }
 
-func (st StoreAlbum) GetAlbumDetail(id int) (photo.Album, error) {
+func (st StoreAlbum) GetAlbumDetail(id int) (photo.AlbumResponse, error) {
+	photoR := photo.AlbumResponse{}
 	album, err := FindOneAlbum(st.db, id)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[FindOneAlbum] error : ", err)
-		return photo.Album{}, err
+		return photo.AlbumResponse{}, err
 	}
-	return album, nil
+	photoR.Id = album.Id
+	photoR.Meta = album.Meta
+	photoR.Name = album.Name
+	photos, err := photoService.FindPhotosByIdAlbum(st.db, id)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
+		return photo.AlbumResponse{}, err
+	}
+	photosR := []photo.PhotoResponse{}
+	for _, data := range photos {
+		photo := photo.PhotoResponse{}
+		photo.Id = data.Id
+		photo.IdAlbum = data.IdAlbum
+		photo.Img = "/files/img/album/" + data.Img
+		photo.Meta = data.Meta
+		photo.Title = data.Title
+		photo.CreatedAt = utils.TimeIn(data.CreatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+		photo.CreatedBy = data.CreatedBy
+		photo.UpdatedAt = utils.TimeIn(data.UpdatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+		photo.UpdatedBy = data.UpdatedBy
+		photosR = append(photosR, photo)
+	}
+	photoR.Photos = photosR
+	return photoR, nil
 }
 
 func FindOneAlbum(db *sql.DB, idAlbum int) (photo.Album, error) {
