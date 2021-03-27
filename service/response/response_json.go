@@ -10,6 +10,12 @@ type MessageResponse struct {
 	Message string `json:"message"`
 }
 
+type MessageAlbumResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+	Id      int    `json:"id"`
+}
+
 type UploadResponse struct {
 	Url string `json:"url"`
 }

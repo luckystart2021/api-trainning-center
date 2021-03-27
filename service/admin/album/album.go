@@ -9,7 +9,7 @@ import (
 type IAlbumService interface {
 	GetListAlbum() ([]photo.Album, error)
 	GetAlbumDetail(id int) (photo.AlbumResponse, error)
-	CreateAlbum(name, meta string) (response.MessageResponse, error)
+	CreateAlbum(name, meta string) (response.MessageAlbumResponse, error)
 	UpdateAlbum(id int, name, meta string) (response.MessageResponse, error)
 	DeleteAlbum(id int) (response.MessageResponse, error)
 }

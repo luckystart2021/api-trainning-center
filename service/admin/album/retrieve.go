@@ -72,6 +72,7 @@ func FindOneAlbum(db *sql.DB, idAlbum int) (photo.Album, error) {
 	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindOneAlbum] Scan error  %v", err)
+		return album, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return album, nil
 }
