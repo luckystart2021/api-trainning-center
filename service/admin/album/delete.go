@@ -14,6 +14,12 @@ import (
 
 func (st StoreAlbum) DeleteAlbum(id int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
+	_, err := FindOneAlbum(st.db, id)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindOneAlbum] error : ", err)
+		return resp, err
+	}
+
 	photos, err := photoService.FindPhotosByIdAlbum(st.db, id)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
