@@ -1,7 +1,9 @@
 package album
 
 import (
+	photoService "api-trainning-center/service/admin/photo"
 	"api-trainning-center/service/response"
+	"api-trainning-center/utils"
 	"context"
 	"database/sql"
 	"errors"
@@ -12,12 +14,26 @@ import (
 
 func (st StoreAlbum) DeleteAlbum(id int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
+	photos, err := photoService.FindPhotosByIdAlbum(st.db, id)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
+		return resp, err
+	}
+
 	count, err := deleteAlbumByRequest(st.db, id)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[deleteAlbumByRequest] Delete album DB err  %v", err)
 		return resp, err
 	}
+
 	if count > 0 {
+		for _, data := range photos {
+			err = utils.DeleteFile("upload/img/album/" + data.Img)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{}).Error("[DeletePhoto] error : ", err)
+				return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
+			}
+		}
 		resp.Status = true
 		resp.Message = "Xóa thông tin album thành công"
 	} else {

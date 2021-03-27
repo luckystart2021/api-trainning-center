@@ -23,7 +23,7 @@ func (st StorePhoto) DeletePhoto(id int) (response.MessageResponse, error) {
 	err = utils.DeleteFile("upload/img/album/" + photo.Img)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[DeletePhoto] error : ", err)
-		return resp, err
+		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	if count > 0 {
 		resp.Status = true
