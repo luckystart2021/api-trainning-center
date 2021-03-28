@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/null"
 )
 
 func (st StoreStudent) ShowStudents() ([]student.Student, error) {
@@ -45,7 +46,12 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 		created_at,
 		updated_by,
 		updated_at,
-		cmnd
+		cmnd,
+		cnsk,
+		gplx,
+		experience_driver,
+		km_safe,
+		id_role
 	FROM
 		student
 	WHERE
@@ -53,9 +59,17 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 	`
 	rows := db.QueryRow(query, idStudent)
 	var createdAt, updatedAt time.Time
-	err := rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt, &student.CMND)
+	var gplx null.String
+	err := rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone,
+		&student.Address, &student.FullName, &student.IdClass, &student.CreatedBy,
+		&createdAt, &student.UpdatedBy, &updatedAt, &student.CMND,
+		&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm, &student.IdRole)
 	student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	if gplx.Valid {
+		student.GPLX = gplx.String
+	}
+
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindOneStudent] No Data  %v", err)
 		return student, errors.New("Không có dữ liệu từ hệ thống")
@@ -82,7 +96,12 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		created_at,
 		updated_by,
 		updated_at,
-		cmnd
+		cmnd,
+		cnsk,
+		gplx,
+		experience_driver,
+		km_safe,
+		id_role
 	FROM
 		student;`
 	rows, err := db.Query(query)
@@ -94,10 +113,21 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 	for rows.Next() {
 		student := student.Student{}
 		var createdAt, updatedAt time.Time
-		err = rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone, &student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt, &student.UpdatedBy, &updatedAt, &student.CMND)
+		var gplx null.String
+		err = rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone,
+			&student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt,
+			&student.UpdatedBy, &updatedAt, &student.CMND,
+			&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm, &student.IdRole)
 		student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+		if gplx.Valid {
+			student.GPLX = gplx.String
+		}
 		students = append(students, student)
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindOneStudent] Scan error  %v", err)
+		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 	err = rows.Err()
 	if err != nil {

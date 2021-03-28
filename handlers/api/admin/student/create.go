@@ -18,6 +18,11 @@ type StudentRequest struct {
 	Address     string `json:"address"`
 	FullName    string `json:"full_name"`
 	CMND        string `json:"cmnd"`
+	CNSK        bool   `json:"cnsk"`
+	GPLX        string `json:"gplx"`
+	Exp         int    `json:"exp"`
+	NumberOfKm  int    `json:"number_of_km"`
+	IdRole      int    `json:"id_role"`
 }
 
 func CreateStudent(service student.IStudentService) http.HandlerFunc {
@@ -35,7 +40,9 @@ func CreateStudent(service student.IStudentService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName, req.IdClass, req.CMND)
+		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address,
+			req.FullName, userRole.UserName, req.IdClass, req.CMND,
+			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.IdRole)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -87,6 +94,14 @@ func (s StudentRequest) validate() error {
 	}
 	if len(s.CMND) > 20 {
 		return errors.New("Số chứng minh nhân dân không hợp lệ")
+	}
+
+	if len(s.GPLX) > 50 {
+		return errors.New("Giấy phép lái xe không hợp lệ")
+	}
+
+	if s.IdRole == 0 {
+		return errors.New("Mã chức vụ không hợp lệ")
 	}
 
 	return nil
