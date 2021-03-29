@@ -17,9 +17,27 @@ type PhotoResponse struct {
 }
 
 type PhotosResponse struct {
-	AlbumName string          `json:"album_name"`
-	AlbumMeta string          `json:"album_meta"`
-	Photos    []PhotoResponse `json:"photo"`
+	Id        int           `json:"id"`
+	AlbumName string        `json:"album_name"`
+	AlbumMeta string        `json:"album_meta"`
+	Photos    PhotoResponse `json:"photo"`
+}
+
+func (st StorePhoto) ShowPhoto(idAlbum int) ([]PhotoResponse, error) {
+	ps := []PhotoResponse{}
+	photos, err := FindPhotosByIdAlbum(st.db, idAlbum)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
+		return nil, err
+	}
+	for _, data := range photos {
+		p := PhotoResponse{}
+		p.Img = "/files/img/album/" + data.Img
+		p.Meta = data.Meta
+		p.Title = data.Title
+		ps = append(ps, p)
+	}
+	return ps, nil
 }
 
 func (st StorePhoto) ShowPhotoInAdmin(id int) (photo.PhotoResponse, error) {
@@ -144,26 +162,46 @@ func (st StorePhoto) ShowPhotos() ([]PhotosResponse, error) {
 	photosResp := []PhotosResponse{}
 	for _, dataAlbum := range album {
 		photosResponse := PhotosResponse{}
+		photosResponse.Id = dataAlbum.Id
 		photosResponse.AlbumName = dataAlbum.Name
 		photosResponse.AlbumMeta = dataAlbum.Meta
-		photos, err := FindPhotosByIdAlbum(st.db, dataAlbum.Id)
+		photos, err := findPhotosThumbnailByIdAlbum(st.db, dataAlbum.Id)
 		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
-			return nil, err
+			logrus.WithFields(logrus.Fields{}).Error("[findPhotosThumbnailByIdAlbum] error : ", err)
+			continue
 		}
-		photosR := []PhotoResponse{}
-		for _, data := range photos {
-			photo := PhotoResponse{}
-			photo.Img = "/files/img/album/" + data.Img
-			photo.Meta = data.Meta
-			photo.Title = data.Title
-			photosR = append(photosR, photo)
-		}
-		photosResponse.Photos = photosR
+		photosResponse.Photos.Img = "/files/img/album/" + photos.Img
+		photosResponse.Photos.Meta = photos.Meta
+		photosResponse.Photos.Title = photos.Title
 		photosResp = append(photosResp, photosResponse)
 	}
-
 	return photosResp, nil
+}
+
+func findPhotosThumbnailByIdAlbum(db *sql.DB, id int) (photo.Photo, error) {
+	photo := photo.Photo{}
+	query := `
+	SELECT
+		img,
+		title,
+		p.meta
+	FROM
+		photos p
+	WHERE id_album = $1
+	ORDER BY created_at DESC
+	LIMIT 1;
+	`
+	rows := db.QueryRow(query, id)
+	err := rows.Scan(&photo.Img, &photo.Title, &photo.Meta)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[findPhotosThumbnailByIdAlbum] No Data  %v", err)
+		return photo, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[findPhotosThumbnailByIdAlbum] Scan error  %v", err)
+		return photo, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return photo, nil
 }
 
 func FindAlbum(db *sql.DB) ([]photo.Album, error) {

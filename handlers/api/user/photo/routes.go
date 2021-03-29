@@ -11,5 +11,6 @@ func Router(db *sql.DB) func(chi.Router) {
 	st := photo.NewStorePhoto(db)
 	return func(router chi.Router) {
 		router.Get("/photos", GetPhotos(st))
+		router.Get("/photo/{id}", GetPhoto(st))
 	}
 }
