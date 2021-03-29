@@ -8,7 +8,7 @@ import (
 
 type IPhotoService interface {
 	ShowPhotos() ([]PhotosResponse, error)
-	ShowPhoto(idAlbum int) ([]PhotoResponse, error)
+	ShowPhoto(idAlbum int) (PhotoUserResponse, error)
 	ShowPhotosInAdmin() ([]photo.Photo, error)
 	ShowPhotoInAdmin(id int) (photo.PhotoResponse, error)
 	DeletePhoto(id int) (response.MessageResponse, error)

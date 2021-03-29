@@ -23,21 +23,62 @@ type PhotosResponse struct {
 	Photos    PhotoResponse `json:"photo"`
 }
 
-func (st StorePhoto) ShowPhoto(idAlbum int) ([]PhotoResponse, error) {
-	ps := []PhotoResponse{}
+type PhotoUserResponse struct {
+	AlbumName string          `json:"title"`
+	AlbumMeta string          `json:"meta"`
+	Photos    []PhotoResponse `json:"photos"`
+}
+
+func (st StorePhoto) ShowPhoto(idAlbum int) (PhotoUserResponse, error) {
+	ps := PhotoUserResponse{}
 	photos, err := FindPhotosByIdAlbum(st.db, idAlbum)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[FindPhotosByIdAlbum] error : ", err)
-		return nil, err
+		return ps, err
 	}
+
+	album, err := findOneAlbum(st.db, idAlbum)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindOneAlbum] error : ", err)
+		return ps, err
+	}
+	ps.AlbumMeta = album.Meta
+	ps.AlbumName = album.Name
+	photoss := []PhotoResponse{}
 	for _, data := range photos {
 		p := PhotoResponse{}
 		p.Img = "/files/img/album/" + data.Img
 		p.Meta = data.Meta
 		p.Title = data.Title
-		ps = append(ps, p)
+		photoss = append(photoss, p)
 	}
+	ps.Photos = photoss
 	return ps, nil
+}
+
+func findOneAlbum(db *sql.DB, idAlbum int) (photo.Album, error) {
+	album := photo.Album{}
+	query := `
+	SELECT
+		id,
+		name,
+		meta
+	FROM
+		album
+	WHERE
+		id = $1;
+	`
+	rows := db.QueryRow(query, idAlbum)
+	err := rows.Scan(&album.Id, &album.Name, &album.Meta)
+	if err == sql.ErrNoRows {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindOneAlbum] No Data  %v", err)
+		return album, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindOneAlbum] Scan error  %v", err)
+		return album, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return album, nil
 }
 
 func (st StorePhoto) ShowPhotoInAdmin(id int) (photo.PhotoResponse, error) {
