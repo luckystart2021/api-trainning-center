@@ -18,5 +18,4 @@ type Student struct {
 	GPLX        string `json:"gplx"`
 	Exp         int    `json:"exp"`
 	NumberOfKm  int    `json:"number_of_km"`
-	IdRole      int    `json:"id_role"`
 }

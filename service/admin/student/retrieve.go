@@ -50,8 +50,7 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 		cnsk,
 		gplx,
 		experience_driver,
-		km_safe,
-		id_role
+		km_safe
 	FROM
 		student
 	WHERE
@@ -63,7 +62,7 @@ func FindOneStudent(db *sql.DB, idStudent int) (student.Student, error) {
 	err := rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone,
 		&student.Address, &student.FullName, &student.IdClass, &student.CreatedBy,
 		&createdAt, &student.UpdatedBy, &updatedAt, &student.CMND,
-		&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm, &student.IdRole)
+		&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm)
 	student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	if gplx.Valid {
@@ -100,8 +99,7 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		cnsk,
 		gplx,
 		experience_driver,
-		km_safe,
-		id_role
+		km_safe
 	FROM
 		student;`
 	rows, err := db.Query(query)
@@ -117,7 +115,7 @@ func FindAllStudents(db *sql.DB) ([]student.Student, error) {
 		err = rows.Scan(&student.Id, &student.Code, &student.Sex, &student.DateOfBirth, &student.Phone,
 			&student.Address, &student.FullName, &student.IdClass, &student.CreatedBy, &createdAt,
 			&student.UpdatedBy, &updatedAt, &student.CMND,
-			&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm, &student.IdRole)
+			&student.CNSK, &gplx, &student.Exp, &student.NumberOfKm)
 		student.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		student.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		if gplx.Valid {

@@ -22,7 +22,6 @@ type StudentRequest struct {
 	GPLX        string `json:"gplx"`
 	Exp         int    `json:"exp"`
 	NumberOfKm  int    `json:"number_of_km"`
-	IdRole      int    `json:"id_role"`
 }
 
 func CreateStudent(service student.IStudentService) http.HandlerFunc {
@@ -42,7 +41,7 @@ func CreateStudent(service student.IStudentService) http.HandlerFunc {
 		userRole := r.Context().Value("values").(middlewares.Vars)
 		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address,
 			req.FullName, userRole.UserName, req.IdClass, req.CMND,
-			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.IdRole)
+			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -98,10 +97,6 @@ func (s StudentRequest) validate() error {
 
 	if len(s.GPLX) > 50 {
 		return errors.New("Giấy phép lái xe không hợp lệ")
-	}
-
-	if s.IdRole == 0 {
-		return errors.New("Mã chức vụ không hợp lệ")
 	}
 
 	return nil

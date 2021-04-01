@@ -9,9 +9,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (st StoreStudent) UpdateStudent(id int, sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string, cnsk bool, gplx string, exp, numberKm, idRole int) (response.MessageResponse, error) {
+func (st StoreStudent) UpdateStudent(id int, sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string, cnsk bool, gplx string, exp, numberKm int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
-	count, err := updateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, id, cnsk, gplx, exp, numberKm, idRole)
+	count, err := updateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, id, cnsk, gplx, exp, numberKm)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateStudentByRequest] Update student DB err  %v", err)
 		return resp, err
@@ -26,7 +26,7 @@ func (st StoreStudent) UpdateStudent(id int, sex, dayOfBirth, phone, address, fu
 	return resp, nil
 }
 
-func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string, id int, cnsk bool, gplx string, exp, numberKm, idRole int) (int64, error) {
+func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string, id int, cnsk bool, gplx string, exp, numberKm int) (int64, error) {
 	timeUpdate := time.Now()
 	query := `
 	UPDATE
@@ -44,12 +44,11 @@ func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, add
 		cnsk = $11,
 		gplx =$12,
 		experience_driver =$13,
-		km_safe =$14,
-		id_role=$15
+		km_safe =$14
 	WHERE
 		id =$10;
 	`
-	res, err := db.Exec(query, sex, dayOfBirth, phone, address, fullName, idClass, userName, timeUpdate, cmnd, id, cnsk, gplx, exp, numberKm, idRole)
+	res, err := db.Exec(query, sex, dayOfBirth, phone, address, fullName, idClass, userName, timeUpdate, cmnd, id, cnsk, gplx, exp, numberKm)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateVehicleByRequest] update vehicle in DB err  %v", err)
 		return 0, errors.New("Lỗi hệ thống vui lòng thử lại")
