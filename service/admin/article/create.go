@@ -29,7 +29,7 @@ func (tc StoreArticle) CreateArticle(idChildCategoryP int, userName, title, desc
 func CreateArticleByRequest(db *sql.DB, idUser int, idChildCategoryP int, userName, title, description, details, meta, keyWordSEO, image string) error {
 	query := `
 	INSERT INTO articles
-	(id_user, id_child_category, title, description, details, image, meta, keywordseo, created_by, updated_by)
+	(user_id, child_category_id, title, description, details, image, meta, keywordseo, created_by, updated_by)
 	VALUES
 		($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 	`

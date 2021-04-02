@@ -37,8 +37,8 @@ func retrieveResultNewsByKey(db *sql.DB, searchKey string, statusActive, isDelet
 	query := `
 	select 
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -55,7 +55,7 @@ func retrieveResultNewsByKey(db *sql.DB, searchKey string, statusActive, isDelet
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	inner join category c2 on
 		c.id_category = c2.id
 	where

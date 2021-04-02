@@ -28,7 +28,7 @@ func (tc StoreArticle) CountChildArticles(metaChild, metaParent string) (int, er
 	FROM
 		articles
 	INNER JOIN child_category c ON
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	INNER JOIN category c1 ON
 		c.id_category = c1.id
 	WHERE
@@ -76,8 +76,8 @@ func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusAct
 	query := `
 	SELECT
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -94,7 +94,7 @@ func retrieveChildCategories(db *sql.DB, metaChild, metaParent string, statusAct
 	FROM
 		articles
 	INNER JOIN child_category c ON
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	INNER JOIN category c1 ON
 		c.id_category = c1.id
 	WHERE

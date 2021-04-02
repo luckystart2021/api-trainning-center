@@ -176,8 +176,8 @@ func retrieveArticle(db *sql.DB, idArticle int, statusActive, isDeleteIsFalse bo
 	query := `
 	select
 		articles.id,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -263,8 +263,8 @@ func retrieveAllArticlesByPage(db *sql.DB, idCategory int, statusActive, isDelet
 	query := `
 	SELECT
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -281,7 +281,7 @@ func retrieveAllArticlesByPage(db *sql.DB, idCategory int, statusActive, isDelet
 	FROM
 		articles
 	INNER JOIN child_category c ON
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	INNER JOIN category c2 ON
 		c.id_category = c2.id
 	WHERE
@@ -348,8 +348,8 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 	query := `
 	select
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -366,7 +366,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	inner join category c2 on
 		c.id_category = c2.id
 	where
@@ -432,8 +432,8 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 	query := `
 	select
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -450,7 +450,7 @@ func retrieveArticlesByChildCategory(db *sql.DB, idCategory int, statusActive, i
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	where
 		c.id = $1
 		and articles.status = $2
@@ -612,8 +612,8 @@ func retrieveAllArticles(db *sql.DB, statusInActive bool) ([]Articles, error) {
 	query := `
 	SELECT
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -689,8 +689,8 @@ func retrieveArticlesUnApproval(db *sql.DB, statusInActive bool) ([]Articles, er
 	query := `
 	select
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -765,8 +765,8 @@ func retrieveArticlesDeteledByChildCategory(db *sql.DB, isDeleteIsTrue bool) ([]
 	query := `
 	select
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -850,8 +850,8 @@ func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles1, error) {
 	select
 		c2.id as idCategory ,
 		articles.id,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -867,7 +867,7 @@ func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles1, error) {
 		articles.updated_by
 	from
 		articles
-	join child_category cc on articles.id_child_category = cc.id 
+	join child_category cc on articles.child_category_id = cc.id 
 	join category c2 on cc.id_category = c2.id 
 	where
 		articles.id = $1		
@@ -936,8 +936,8 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 	query := `
 	select 
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -954,7 +954,7 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	inner join category c2 on
 		c.id_category = c2.id
 	where
@@ -1044,8 +1044,8 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 	select 
 		c2.meta,
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -1062,7 +1062,7 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	inner join category c2 on
 		c.id_category = c2.id
 	where
@@ -1150,8 +1150,8 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 	query := `
 	select 
 		articles.id ,
-		articles.id_user,
-		articles.id_child_category,
+		articles.user_id,
+		articles.child_category_id,
 		articles.title ,
 		articles.description,
 		articles.details ,
@@ -1168,7 +1168,7 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 	from
 		articles
 	inner join child_category c on
-		c.id = articles.id_child_category
+		c.id = articles.child_category_id
 	inner join category c2 on
 		c.id_category = c2.id
 	where

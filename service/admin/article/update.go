@@ -43,8 +43,8 @@ func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int,
 	update
 		articles
 	set
-		id_user = $2,
-		id_child_category = $3,
+		user_id = $2,
+		child_category_id = $3,
 		title = $4,
 		description = $5,
 		details = $6,
@@ -71,8 +71,8 @@ func updateArticleByRequest(db *sql.DB, idArticle, idUser, idChildCategoryP int,
 		update
 			articles
 		set
-			id_user = $2,
-			id_child_category = $3,
+			user_id = $2,
+			child_category_id = $3,
 			title = $4,
 			description = $5,
 			details = $6,
