@@ -25,7 +25,7 @@ func updateChildCategoryByRequest(db *sql.DB, userName, title, meta string, idCa
 	UPDATE child_category
 		SET 
 			title=$1,
-		    id_category=$2,
+		    category_id=$2,
 		    meta=$3, 
 		    updated_at=$4, 
 			updated_by=$5

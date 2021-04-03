@@ -22,7 +22,7 @@ func (st StorePhoto) CreatePhoto(req photo.PhotoRequest, userName string) (respo
 func createPhotoByRequest(db *sql.DB, req photo.PhotoRequest, userName string) error {
 	query := `
 	INSERT INTO photos
-		(img, id_album, title, meta, created_by, updated_by)
+		(img, album_id, title, meta, created_by, updated_by)
 	VALUES($1,$2,$3,$4,$5,$6);
 	`
 	_, err := db.Exec(query, req.Img, req.IdAlbum, req.Title, req.Meta, userName, userName)

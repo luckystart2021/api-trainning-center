@@ -21,7 +21,7 @@ func (st StoreClass) CreateClass(userName, className string, idCource, idTeacher
 func CreateClassByRequest(db *sql.DB, userName, className string, idCource, idTeacher, quantity int64) error {
 	query := `
 	INSERT INTO class
-		(code, name, id_course, quantity, id_teacher, created_by, updated_by) 
+		(code, name, course_id, quantity, teacher_id, created_by, updated_by) 
 	(
 	SELECT
 		CONCAT('L-', COUNT(*)+1), $1, $2, $3, $4, $5, $6

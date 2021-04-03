@@ -21,7 +21,7 @@ func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, 
 func CreateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string, cnsk bool, gplx string, exp, numberKm int) error {
 	query := `
 	INSERT INTO student
-		(code, sex, dateofbirth, phone, address, fullname, id_class, created_by, updated_by, cmnd, cnsk, gplx, experience_driver, km_safe)
+		(code, sex, dateofbirth, phone, address, fullname, class_id, created_by, updated_by, cmnd, cnsk, gplx, experience_driver, km_safe)
  	(
 	SELECT
 		CONCAT('HV', COUNT(*)+1), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13

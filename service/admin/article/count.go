@@ -16,7 +16,7 @@ func (tc StoreArticle) CountArticles(idCategory int) (int, error) {
 	INNER JOIN child_category c ON
 		c.id = articles.child_category_id
 	INNER JOIN category c2 ON
-		c.id_category = c2.id
+		c.category_id = c2.id
 	WHERE
 		c2.id = $1
 		and articles.status = $2

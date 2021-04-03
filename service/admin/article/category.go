@@ -56,7 +56,7 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int, childCategoryIsDeleteI
 	select
 		id,
 		title,
-		id_category,
+		category_id,
 		meta,
 		created_at,
 		created_by,
@@ -65,7 +65,7 @@ func RetrieveCategories(db *sql.DB, idCategoryParent int, childCategoryIsDeleteI
 	from
 		child_category cc
 	where
-		id_category = $1
+		category_id = $1
 		and is_deleted = $2
 	order by
 		id

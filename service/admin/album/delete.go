@@ -60,7 +60,7 @@ func deleteAlbumByRequest(db *sql.DB, id int) (int64, error) {
 		FROM 
 			photos
 		WHERE 
-			id_album=$1;
+		album_id=$1;
 	`
 	_, err = tx.ExecContext(ctx, queryDeletePhotos, id)
 	if err != nil {

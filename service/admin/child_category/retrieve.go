@@ -37,7 +37,7 @@ func retrieveCategory(db *sql.DB, idChildCategory int) (article.Categories, erro
 	category := article.Categories{}
 	query := `
 	SELECT 
-		id, title, id_category, meta, created_at, created_by, updated_at, updated_by
+		id, title, category_id, meta, created_at, created_by, updated_at, updated_by
 	FROM 
 		child_category
 	WHERE id = $1;
@@ -86,7 +86,7 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 	select
 		id,
 		title,
-		id_category,
+		category_id,
 		meta,
 		created_at,
 		created_by,
@@ -96,7 +96,7 @@ func retrieveCategories(db *sql.DB, idCategoryParent int) ([]Categories, error) 
 	from
 		child_category cc
 	where
-		id_category = $1
+		category_id = $1
 	order by
 		id
 	`

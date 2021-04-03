@@ -37,7 +37,7 @@ func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, add
 		phone = $3,
 		address = $4,
 		fullname =$5,
-		id_class = $6,
+		class_id = $6,
 		updated_by = $7,
 		updated_at = $8,
 		cmnd = $9,

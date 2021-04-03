@@ -283,7 +283,7 @@ func retrieveAllArticlesByPage(db *sql.DB, idCategory int, statusActive, isDelet
 	INNER JOIN child_category c ON
 		c.id = articles.child_category_id
 	INNER JOIN category c2 ON
-		c.id_category = c2.id
+		c.category_id = c2.id
 	WHERE
 		c2.id = $1
 		and articles.status = $2
@@ -368,7 +368,7 @@ func retrieveArticles(db *sql.DB, idCategory int, statusActive, isDeleteIsFalse,
 	inner join child_category c on
 		c.id = articles.child_category_id
 	inner join category c2 on
-		c.id_category = c2.id
+		c.category_id = c2.id
 	where
 		c2.id = $1
 		and articles.status = $2
@@ -868,7 +868,7 @@ func retrieveArticleInAdmin(db *sql.DB, idArticle int) (Articles1, error) {
 	from
 		articles
 	join child_category cc on articles.child_category_id = cc.id 
-	join category c2 on cc.id_category = c2.id 
+	join category c2 on cc.category_id = c2.id 
 	where
 		articles.id = $1		
 	`
@@ -956,7 +956,7 @@ func retrieveNews(db *sql.DB, statusActive, isDeleteIsFalse, childCategoryIsDele
 	inner join child_category c on
 		c.id = articles.child_category_id
 	inner join category c2 on
-		c.id_category = c2.id
+		c.category_id = c2.id
 	where
 		articles.status = $1
 		and articles.is_deleted = $2
@@ -1064,7 +1064,7 @@ func retrieveFavoriteNews(db *sql.DB, statusActive, isDeleteIsFalse, childCatego
 	inner join child_category c on
 		c.id = articles.child_category_id
 	inner join category c2 on
-		c.id_category = c2.id
+		c.category_id = c2.id
 	where
 		articles.status = $1
 		and articles.is_deleted = $2
@@ -1170,7 +1170,7 @@ func retrieveNotificationNew(db *sql.DB, statusActive, isDeleteIsFalse, childCat
 	inner join child_category c on
 		c.id = articles.child_category_id
 	inner join category c2 on
-		c.id_category = c2.id
+		c.category_id = c2.id
 	where
 		articles.status = $1
 		and articles.is_deleted = $2

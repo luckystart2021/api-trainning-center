@@ -21,7 +21,7 @@ func (st StoreChildCategory) CreateChildCategory(userName, title, meta string, i
 func CreateChildCategoryByRequest(db *sql.DB, userName, title, meta string, idCategory int) error {
 	query := `
 	INSERT INTO child_category
-		(title, id_category, meta, created_by, updated_by)
+		(title, category_id, meta, created_by, updated_by)
 	VALUES($1, $2, $3, $4, $5);
 	`
 	_, err := db.Exec(query, title, idCategory, meta, userName, userName)

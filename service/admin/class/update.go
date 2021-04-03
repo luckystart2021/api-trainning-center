@@ -26,9 +26,9 @@ func UpdateClassByRequest(db *sql.DB, idClass int, userName, className string, i
 		class
 	SET
 		"name" = $1,
-		id_course = $2,
+		course_id = $2,
 		quantity = $3,
-		id_teacher = $4,
+		teacher_id = $4,
 		updated_by = $5,
 		updated_at = $6
 	WHERE

@@ -57,7 +57,7 @@ func retrieveResultNewsByKey(db *sql.DB, searchKey string, statusActive, isDelet
 	inner join child_category c on
 		c.id = articles.child_category_id
 	inner join category c2 on
-		c.id_category = c2.id
+		c.category_id = c2.id
 	where
 		articles.status = $1
 		and articles.is_deleted = $2

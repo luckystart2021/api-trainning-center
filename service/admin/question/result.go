@@ -84,7 +84,7 @@ func retrieveNumberAndPointPass(db *sql.DB, idSuite int) (NumberAndPointPassResp
 	FROM
 		testsuite t
 	INNER JOIN rank_vehicle rv ON
-		rv.id = t.id_rank
+		rv.id = t.rank_id
 	WHERE t.id = $1
 	`
 	row := db.QueryRow(query, idSuite)

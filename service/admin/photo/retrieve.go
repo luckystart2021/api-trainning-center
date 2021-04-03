@@ -112,7 +112,7 @@ func FindOnePhoto(db *sql.DB, id int) (photo.Photo, error) {
 		created_at,
 		updated_by,
 		updated_at,
-		id_album
+		album_id
 	FROM
 		photos
 	WHERE
@@ -144,7 +144,7 @@ func FindAllPhotos(db *sql.DB) ([]photo.Photo, error) {
 	query := `
 	SELECT
 		id,
-		id_album,
+		album_id,
 		img,
 		title,
 		meta,
@@ -228,7 +228,7 @@ func findPhotosThumbnailByIdAlbum(db *sql.DB, id int) (photo.Photo, error) {
 		p.meta
 	FROM
 		photos p
-	WHERE id_album = $1
+	WHERE album_id = $1
 	ORDER BY created_at DESC
 	LIMIT 1;
 	`
@@ -298,13 +298,13 @@ func FindPhotosByIdAlbum(db *sql.DB, idAlbum int) ([]photo.Photo, error) {
 		created_at,
 		updated_by,
 		updated_at,
-		id_album
+		album_id
 	FROM
 		photos p
 	INNER JOIN 
-		album a ON a.id = p.id_album
+		album a ON a.id = p.album_id
 	WHERE
-		id_album = $1;
+		album_id = $1;
 	`
 	rows, err := db.Query(query, idAlbum)
 	if err != nil {

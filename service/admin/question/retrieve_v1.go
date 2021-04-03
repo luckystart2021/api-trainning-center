@@ -114,9 +114,9 @@ func retrieveQuestion(db *sql.DB, idSuite int) ([]Questions, error) {
 	FROM
 		testsuite_question tq
 	JOIN question q2 ON
-		tq.id_question = q2.id
+		tq.question_id = q2.id
 	WHERE
-		tq.id_testsuite = $1
+		tq.testsuite_id = $1
 	ORDER by tq.id 
 	`
 	rows, err := db.Query(query, idSuite)
@@ -237,7 +237,7 @@ func retrieveTestSuite(db *sql.DB, idRank int) ([]TestSuite, error) {
 	FROM
 		testsuite t
 	JOIN rank_vehicle rv ON
-		t.id_rank = rv.id
+		t.rank_id = rv.id
 	WHERE
 		rv.id = $1
 	`

@@ -35,7 +35,7 @@ func updatePhotoByRequest(db *sql.DB, id int, req photo.PhotoRequest, userName s
 		UPDATE
 			photos
 		SET
-			id_album = $1,
+		album_id = $1,
 			title = $2,
 			meta = $3,
 			updated_by = $4,
@@ -59,7 +59,7 @@ func updatePhotoByRequest(db *sql.DB, id int, req photo.PhotoRequest, userName s
 		UPDATE
 			photos
 		SET
-			id_album = $1,
+			album_id = $1,
 			img = $2,
 			title = $3,
 			meta = $4,

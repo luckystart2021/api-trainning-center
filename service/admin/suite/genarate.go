@@ -331,7 +331,7 @@ func retrieveQuestionLiet(db *sql.DB) ([]QuestionResp, error) {
 func insertSuiteTestAndQuestion(db *sql.DB, idSuiteTest, idQuestion int) int64 {
 	query := `
 	INSERT INTO testsuite_question
-		(id_testsuite, id_question)
+		(testsuite_id, question_id)
 	VALUES($1, $2);
 	`
 	res, err := db.Exec(query, idSuiteTest, idQuestion)
@@ -358,7 +358,7 @@ func insertSuiteTest(db *sql.DB, number int, rank string) int64 {
 		idDe := strconv.Itoa(j + 1)
 		maDe := "Đề " + idDe
 		query := `
-		INSERT INTO testsuite(name, id_rank)
+		INSERT INTO testsuite(name, rank_id)
 		VALUES($1, $2);
 		`
 		res, err := db.Exec(query, maDe, idRank)
@@ -387,7 +387,7 @@ func retrieveBoDe(db *sql.DB, rank string) []int {
 	from 
 		testsuite 
 	where 
-		id_rank = $1
+		rank_id = $1
 	`
 	rows, err := db.Query(query, idRank)
 	if err != nil {
