@@ -9,6 +9,7 @@ var TableNames = struct {
 	Articles          string
 	Category          string
 	ChildCategory     string
+	ChildSubject      string
 	Class             string
 	Contact           string
 	Course            string
@@ -33,6 +34,7 @@ var TableNames = struct {
 	Articles:          "articles",
 	Category:          "category",
 	ChildCategory:     "child_category",
+	ChildSubject:      "child_subject",
 	Class:             "class",
 	Contact:           "contact",
 	Course:            "course",
