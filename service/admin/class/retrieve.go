@@ -35,10 +35,8 @@ func FindOneClass(db *sql.DB, idStudent int) (class.Class, error) {
 	SELECT
 		id,
 		code,
-		name,
 		course_id,
 		quantity,
-		teacher_id,
 		is_deleted,
 		created_by,
 		updated_by,
@@ -53,7 +51,7 @@ func FindOneClass(db *sql.DB, idStudent int) (class.Class, error) {
 	`
 	rows := db.QueryRow(query, idStudent)
 	var createdAt, updatedAt time.Time
-	err := rows.Scan(&class.Id, &class.Code, &class.Name, &class.IdCourse, &class.Quantity, &class.IdTeacher, &class.IsDelete, &class.CreatedBy, &class.UpdatedBy, &createdAt, &updatedAt)
+	err := rows.Scan(&class.Id, &class.Code, &class.IdCourse, &class.Quantity, &class.IsDelete, &class.CreatedBy, &class.UpdatedBy, &createdAt, &updatedAt)
 	class.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	class.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	if err == sql.ErrNoRows {
@@ -72,10 +70,8 @@ func FindAllClass(db *sql.DB) ([]class.Class, error) {
 	SELECT
 		id,
 		code,
-		name,
 		course_id,
 		quantity,
-		teacher_id,
 		is_deleted,
 		created_by,
 		updated_by,
@@ -97,7 +93,7 @@ func FindAllClass(db *sql.DB) ([]class.Class, error) {
 	for rows.Next() {
 		class := class.Class{}
 		var createdAt, updatedAt time.Time
-		err = rows.Scan(&class.Id, &class.Code, &class.Name, &class.IdCourse, &class.Quantity, &class.IdTeacher, &class.IsDelete, &class.CreatedBy, &class.UpdatedBy, &createdAt, &updatedAt)
+		err = rows.Scan(&class.Id, &class.Code, &class.IdCourse, &class.Quantity, &class.IsDelete, &class.CreatedBy, &class.UpdatedBy, &createdAt, &updatedAt)
 		class.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		class.UpdatedAt = utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 		classLst = append(classLst, class)

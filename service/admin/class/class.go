@@ -7,8 +7,8 @@ import (
 )
 
 type IClassService interface {
-	CreateClass(userName, className string, idCource, idTeacher, quantity int64) (response.MessageResponse, error)
-	UpdateClass(idClass int, userName, className string, idCource, idTeacher, quantity int64, isDeleted bool) (response.MessageResponse, error)
+	CreateClass(userName string, idCource, quantity int64) (response.MessageResponse, error)
+	UpdateClass(idClass int, userName string, idCource, quantity int64, isDeleted bool) (response.MessageResponse, error)
 	GetListClass() ([]class.Class, error)
 	GetDetailClass(idClass int) (class.Class, error)
 }

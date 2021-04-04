@@ -13,10 +13,8 @@ import (
 )
 
 type ClassUpdateRequest struct {
-	Name      string `json:"name"`
 	IdCourse  int64  `json:"id_course"`
 	Quantity  int64  `json:"quantity"`
-	IdTeacher int64  `json:"id_teacher"`
 	IdDeleted bool   `json:"is_deleted"`
 }
 
@@ -49,7 +47,7 @@ func UpdateClass(service class.IClassService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.UpdateClass(idClass, userRole.UserName, req.Name, req.IdCourse, req.IdTeacher, req.Quantity, req.IdDeleted)
+		resp, err := service.UpdateClass(idClass, userRole.UserName, req.IdCourse, req.Quantity, req.IdDeleted)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -60,23 +58,12 @@ func UpdateClass(service class.IClassService) http.HandlerFunc {
 }
 
 func (c ClassUpdateRequest) validate() error {
-	if c.Name == "" {
-		return errors.New("Tên lớp chưa được nhập")
-	}
-	if len(c.Name) > 2000 {
-		return errors.New("Tên lớp không hợp lệ")
-	}
-
 	if c.IdCourse == 0 {
 		return errors.New("Mã khóa học chưa được nhập")
 	}
 
 	if c.Quantity == 0 {
 		return errors.New("Số lượng học viên chưa được nhập")
-	}
-
-	if c.IdTeacher == 0 {
-		return errors.New("Mã giáo viên chưa được nhập")
 	}
 
 	return nil
