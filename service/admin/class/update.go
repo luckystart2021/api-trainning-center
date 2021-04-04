@@ -9,9 +9,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (st StoreClass) UpdateClass(idClass int, userName, className string, idCource, idTeacher, quantity int64) (response.MessageResponse, error) {
+func (st StoreClass) UpdateClass(idClass int, userName, className string, idCource, idTeacher, quantity int64, isDeleted bool) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
-	if err := UpdateClassByRequest(st.db, idClass, userName, className, idCource, idTeacher, quantity); err != nil {
+	if err := UpdateClassByRequest(st.db, idClass, userName, className, idCource, idTeacher, quantity, isDeleted); err != nil {
 		return resp, err
 	}
 	resp.Status = true
@@ -19,7 +19,7 @@ func (st StoreClass) UpdateClass(idClass int, userName, className string, idCour
 	return resp, nil
 }
 
-func UpdateClassByRequest(db *sql.DB, idClass int, userName, className string, idCource, idTeacher, quantity int64) error {
+func UpdateClassByRequest(db *sql.DB, idClass int, userName, className string, idCource, idTeacher, quantity int64, isDeleted bool) error {
 	timeUpdate := time.Now()
 	query := `
 	UPDATE
@@ -30,11 +30,12 @@ func UpdateClassByRequest(db *sql.DB, idClass int, userName, className string, i
 		quantity = $3,
 		teacher_id = $4,
 		updated_by = $5,
-		updated_at = $6
+		updated_at = $6,
+		is_deleted = $8
 	WHERE
 		id = $7;
 	`
-	_, err := db.Exec(query, className, idCource, quantity, idTeacher, userName, timeUpdate, idClass)
+	_, err := db.Exec(query, className, idCource, quantity, idTeacher, userName, timeUpdate, idClass, isDeleted)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[UpdateClassByRequest] update class DB err  %v", err)
 		return errors.New("Lỗi hệ thống, vui lòng thử lại")

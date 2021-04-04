@@ -83,10 +83,12 @@ func FindAllClass(db *sql.DB) ([]class.Class, error) {
 		updated_at
 	FROM
 		class
+	WHERE 
+		is_deleted = $1
 	ORDER BY 
 		created_at DESC;
 	`
-	rows, err := db.Query(query)
+	rows, err := db.Query(query, false)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllClass] query error  %v", err)
 		return classLst, errors.New("Lỗi hệ thống vui lòng thử lại")
