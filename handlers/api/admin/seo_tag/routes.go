@@ -18,7 +18,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Route("/seo-tag", func(router chi.Router) {
 			router.Get("/views", GetSeoTag(st))
 			router.Post("/create", CreateSeoTag(st))
-			router.Put("/{id}/update", UpdateSeoTag(st))
+			router.Put("/update", UpdateSeoTag(st))
 			router.Delete("/{id}/delete", DeleteSeoTag(st))
 			router.Get("/{id}/view-detail", GetDetailSeoTag(st))
 		})

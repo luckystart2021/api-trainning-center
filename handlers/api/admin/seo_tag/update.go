@@ -6,45 +6,39 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 	"strings"
-
-	"github.com/go-chi/chi"
 )
+
+type SeoTagUpdateRequest struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
 
 func UpdateSeoTag(service seo.ISeoService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		if id == "" {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không được rỗng"))
-			return
-		}
-
-		idTag, err := strconv.Atoi(id)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
-			return
-		}
-		req := SeoTagRequest{}
-		err = json.NewDecoder(r.Body).Decode(&req)
+		req := []SeoTagUpdateRequest{}
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		t := strings.TrimSpace(req.Name)
-		if len(t) == 0 {
-			// If input is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập tên"))
-			return
+
+		resp := response.MessageResponse{}
+		for _, data := range req {
+			t := strings.TrimSpace(data.Name)
+			if len(t) == 0 {
+				// If input is wrong, return an HTTP error
+				response.RespondWithError(w, http.StatusBadRequest, errors.New("Vui lòng nhập tên"))
+				return
+			}
+			resp, err = service.UpdateSeoTags(data.Id, t)
+			if err != nil {
+				response.RespondWithError(w, http.StatusBadRequest, err)
+				return
+			}
+			// send Result response
 		}
-		resp, err := service.UpdateSeoTags(idTag, t)
-		if err != nil {
-			response.RespondWithError(w, http.StatusBadRequest, err)
-			return
-		}
-		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, resp)
 	}
 }

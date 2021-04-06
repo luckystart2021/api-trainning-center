@@ -60,6 +60,7 @@ type ArticlesTag struct {
 }
 
 type ArticlesTagResponse struct {
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -79,6 +80,7 @@ func (st StoreSeo) ShowSeos() (SeoResponse, error) {
 	articlesTagResponses := []ArticlesTagResponse{}
 	for _, data := range articlesTag {
 		articlesTagResponse := ArticlesTagResponse{}
+		articlesTagResponse.Id = data.Id
 		articlesTagResponse.Name = data.Name
 		articlesTagResponses = append(articlesTagResponses, articlesTagResponse)
 	}
