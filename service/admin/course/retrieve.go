@@ -19,6 +19,7 @@ type Course struct {
 	TestDate       string `json:"test_date"`
 	TrainingSystem string `json:"training_system"`
 	Status         bool   `json:"status"`
+	Time           string `json:"time"`
 	CreatedAt      string `json:"created_at"`
 	UpdatedAt      string `json:"updated_at"`
 	CreatedBy      string `json:"created_by"`
@@ -65,7 +66,7 @@ func RetrieveCourse(idCourse string, db *sql.DB) (Course, error) {
 	query := `
 	SELECT 
 		id, code, name, start_date, end_date, graduation_date, test_date, 
-		training_system, status, created_by, created_at, updated_by, updated_at
+		training_system, status, created_by, created_at, updated_by, updated_at, time
 	FROM 
 		course
 	WHERE
@@ -75,7 +76,7 @@ func RetrieveCourse(idCourse string, db *sql.DB) (Course, error) {
 	var startDate, endDate, testDate, createdAt, updatedAt time.Time
 
 	err := rows.Scan(&courses.Id, &courses.Code, &courses.Name, &startDate, &endDate, &graduationDate,
-		&testDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &createdAt, &courses.UpdatedBy, &updatedAt)
+		&testDate, &courses.TrainingSystem, &courses.Status, &courses.CreatedBy, &createdAt, &courses.UpdatedBy, &updatedAt, &courses.Time)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveCourse] No Data  %v", err)
 		return courses, errors.New("Không có dữ liệu từ hệ thống")
@@ -101,7 +102,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 	query := `
 	SELECT 
 		id, code, name, start_date, end_date, graduation_date, test_date, 
-		training_system, status, created_by, created_at, updated_by, updated_at
+		training_system, status, created_by, created_at, updated_by, updated_at, time
 	FROM 
 		course
 	WHERE
@@ -122,8 +123,10 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 		var code, name, trainingSystem, createdBy, updatedBy string
 		var startDate, endDate, testDate, createdAt, updatedAt time.Time
 		var status bool
-
-		err = rows.Scan(&id, &code, &name, &startDate, &endDate, &graduationDate, &testDate, &trainingSystem, &status, &createdBy, &createdAt, &updatedBy, &updatedAt)
+		var timeC string
+		err = rows.Scan(&id, &code, &name, &startDate, &endDate,
+			&graduationDate, &testDate, &trainingSystem, &status,
+			&createdBy, &createdAt, &updatedBy, &updatedAt, &timeC)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] Scan error  %v", err)
 			return courses, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -137,6 +140,7 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 			TestDate:       utils.TimeIn(testDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY),
 			TrainingSystem: trainingSystem,
 			Status:         status,
+			Time:           timeC,
 			CreatedAt:      utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
 			UpdatedAt:      utils.TimeIn(updatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS),
 			CreatedBy:      createdBy,

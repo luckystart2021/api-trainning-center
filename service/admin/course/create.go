@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem string) (response.MessageResponse, error) {
+func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, timeC string) (response.MessageResponse, error) {
 	response := response.MessageResponse{}
 
 	startTime, err := utils.ParseStringToTime(startDate)
@@ -46,7 +46,7 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 		return response, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
 
-	if err := CreateCourseByRequest(st.db, userName, name, trainingSystem, startTime, endTime, graduationTime, testTime); err != nil {
+	if err := CreateCourseByRequest(st.db, userName, name, trainingSystem, startTime, endTime, graduationTime, testTime, timeC); err != nil {
 		return response, err
 	}
 	response.Status = true
@@ -54,13 +54,13 @@ func (st StoreCourse) CreateCourse(userName, name, startDate, endDate, graduatio
 	return response, nil
 }
 
-func CreateCourseByRequest(db *sql.DB, userName, name, trainingSystem string, startDate, endDate, graduationDate, testDate time.Time) error {
+func CreateCourseByRequest(db *sql.DB, userName, name, trainingSystem string, startDate, endDate, graduationDate, testDate time.Time, time string) error {
 	query := fmt.Sprintf(`
 	INSERT INTO course
-	(code, name , start_date, end_date, graduation_date, test_date, training_system, created_by, updated_by)
-	(SELECT CONCAT('%s-K', COUNT(*)+1), $1, $2, $3, $4, $5, $6, $7, $7 FROM course);
+	(code, name , start_date, end_date, graduation_date, test_date, training_system, created_by, updated_by, time)
+	(SELECT CONCAT('%s-K', COUNT(*)+1), $1, $2, $3, $4, $5, $6, $7, $7, $8 FROM course);
 	`, trainingSystem)
-	_, err := db.Exec(query, name, startDate, endDate, graduationDate, testDate, trainingSystem, userName)
+	_, err := db.Exec(query, name, startDate, endDate, graduationDate, testDate, trainingSystem, userName, time)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateCourseByRequest]Insert Course DB err  %v", err)
 		return errors.New("Lỗi hệ thống, vui lòng thử lại")

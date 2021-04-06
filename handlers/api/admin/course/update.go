@@ -39,7 +39,7 @@ func UpdateCourse(service course.ICourseService) http.HandlerFunc {
 		}
 
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.UpdateCourse(idCourse, userRole.UserName, req.Name, req.StartDate, req.EndDate, req.GraduationDate, req.TestDate, req.TrainingSystem)
+		resp, err := service.UpdateCourse(idCourse, userRole.UserName, req.Name, req.StartDate, req.EndDate, req.GraduationDate, req.TestDate, req.TrainingSystem, req.Time)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

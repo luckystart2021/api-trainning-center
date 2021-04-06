@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (st StoreCourse) UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem string) (response.MessageResponse, error) {
+func (st StoreCourse) UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error) {
 	response := response.MessageResponse{}
 
 	startTime, err := utils.ParseStringToTime(startDate)
@@ -45,7 +45,7 @@ func (st StoreCourse) UpdateCourse(idCourse int, userName, name, startDate, endD
 		return response, err
 	}
 
-	if err := updateCourseByRequest(st.db, idCourse, userName, name, trainingSystem, startTime, endTime, graduationTime, testTime); err != nil {
+	if err := updateCourseByRequest(st.db, idCourse, userName, name, trainingSystem, startTime, endTime, graduationTime, testTime, time); err != nil {
 		return response, err
 	}
 	response.Status = true
@@ -53,7 +53,7 @@ func (st StoreCourse) UpdateCourse(idCourse int, userName, name, startDate, endD
 	return response, nil
 }
 
-func updateCourseByRequest(db *sql.DB, idCourse int, userName, name, trainingSystem string, startDate, endDate, graduationDate, testDate time.Time) error {
+func updateCourseByRequest(db *sql.DB, idCourse int, userName, name, trainingSystem string, startDate, endDate, graduationDate, testDate time.Time, timeC string) error {
 	timeUpdate := time.Now()
 	query := `
 	UPDATE
@@ -66,11 +66,12 @@ func updateCourseByRequest(db *sql.DB, idCourse int, userName, name, trainingSys
 		test_date = $6,
 		training_system = $7,
 		updated_by = $8,
-		updated_at = $9
+		updated_at = $9,
+		time = $10
 	WHERE
 		id = $1;
 	`
-	_, err := db.Exec(query, idCourse, name, startDate, endDate, graduationDate, testDate, trainingSystem, userName, timeUpdate)
+	_, err := db.Exec(query, idCourse, name, startDate, endDate, graduationDate, testDate, trainingSystem, userName, timeUpdate, timeC)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateCourseByRequest] Update DB err  %v", err)
 		return errors.New("Lỗi hệ thống, vui lòng thử lại")

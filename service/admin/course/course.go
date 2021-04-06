@@ -9,8 +9,8 @@ type ICourseService interface {
 	ShowCoursesActive() ([]Course, error)
 	ShowCoursesInActive() ([]Course, error)
 	ShowCourses(idCourse string) (Course, error)
-	CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem string) (response.MessageResponse, error)
-	UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem string) (response.MessageResponse, error)
+	CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)
+	UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)
 }
 
 type StoreCourse struct {

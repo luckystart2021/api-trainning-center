@@ -17,6 +17,7 @@ type Course struct {
 	GraduationDate string `json:"graduation_date"`
 	TestDate       string `json:"test_date"`
 	TrainingSystem string `json:"training_system"`
+	Time           string `json:"time"`
 }
 
 func CreateCourse(service course.ICourseService) http.HandlerFunc {
@@ -35,7 +36,7 @@ func CreateCourse(service course.ICourseService) http.HandlerFunc {
 		}
 
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.CreateCourse(userRole.UserName, req.Name, req.StartDate, req.EndDate, req.GraduationDate, req.TestDate, req.TrainingSystem)
+		resp, err := service.CreateCourse(userRole.UserName, req.Name, req.StartDate, req.EndDate, req.GraduationDate, req.TestDate, req.TrainingSystem, req.Time)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -83,6 +84,13 @@ func (c Course) validate() error {
 
 	if len(c.GraduationDate) > 10 || !validate.CheckDate(c.GraduationDate) {
 		return errors.New("Ngày tốt nghiệp khóa học không đúng định dạng")
+	}
+
+	if c.Time == "" {
+		return errors.New("Thời gian học chưa được nhập")
+	}
+	if len(c.Name) > 20 {
+		return errors.New("Thời gian học không hợp lệ")
 	}
 
 	return nil
