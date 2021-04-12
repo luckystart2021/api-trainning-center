@@ -101,7 +101,7 @@ func validateUpdate(q *QuestionRequest) error {
 	if q.Result == "" || len(q.Result) == 0 {
 		return errors.New("Vui lòng nhập đáp án")
 	}
-	if len(q.Result) > 2 {
+	if len(q.Result) >= 2 {
 		return errors.New("Đáp án không hợp lệ")
 	}
 
