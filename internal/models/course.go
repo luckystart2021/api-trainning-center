@@ -37,6 +37,7 @@ type Course struct {
 	CreatedAt      time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedBy      string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
 	UpdatedAt      time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	Time           string    `boil:"time" json:"time" toml:"time" yaml:"time"`
 
 	R *courseR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L courseL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -56,6 +57,7 @@ var CourseColumns = struct {
 	CreatedAt      string
 	UpdatedBy      string
 	UpdatedAt      string
+	Time           string
 }{
 	ID:             "id",
 	Code:           "code",
@@ -70,6 +72,7 @@ var CourseColumns = struct {
 	CreatedAt:      "created_at",
 	UpdatedBy:      "updated_by",
 	UpdatedAt:      "updated_at",
+	Time:           "time",
 }
 
 // Generated where
@@ -111,6 +114,7 @@ var CourseWhere = struct {
 	CreatedAt      whereHelpertime_Time
 	UpdatedBy      whereHelperstring
 	UpdatedAt      whereHelpertime_Time
+	Time           whereHelperstring
 }{
 	ID:             whereHelperint{field: "\"course\".\"id\""},
 	Code:           whereHelperstring{field: "\"course\".\"code\""},
@@ -125,6 +129,7 @@ var CourseWhere = struct {
 	CreatedAt:      whereHelpertime_Time{field: "\"course\".\"created_at\""},
 	UpdatedBy:      whereHelperstring{field: "\"course\".\"updated_by\""},
 	UpdatedAt:      whereHelpertime_Time{field: "\"course\".\"updated_at\""},
+	Time:           whereHelperstring{field: "\"course\".\"time\""},
 }
 
 // CourseRels is where relationship names are stored.
@@ -148,8 +153,8 @@ func (*courseR) NewStruct() *courseR {
 type courseL struct{}
 
 var (
-	courseAllColumns            = []string{"id", "code", "name", "start_date", "end_date", "graduation_date", "test_date", "training_system", "status", "created_by", "created_at", "updated_by", "updated_at"}
-	courseColumnsWithoutDefault = []string{"code", "name", "start_date", "end_date", "graduation_date", "test_date", "training_system", "created_by", "updated_by"}
+	courseAllColumns            = []string{"id", "code", "name", "start_date", "end_date", "graduation_date", "test_date", "training_system", "status", "created_by", "created_at", "updated_by", "updated_at", "time"}
+	courseColumnsWithoutDefault = []string{"code", "name", "start_date", "end_date", "graduation_date", "test_date", "training_system", "created_by", "updated_by", "time"}
 	courseColumnsWithDefault    = []string{"id", "status", "created_at", "updated_at"}
 	coursePrimaryKeyColumns     = []string{"id"}
 )

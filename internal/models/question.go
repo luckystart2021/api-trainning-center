@@ -33,7 +33,7 @@ type Question struct {
 	Answerc       null.String `boil:"answerc" json:"answerc,omitempty" toml:"answerc" yaml:"answerc,omitempty"`
 	Answerd       null.String `boil:"answerd" json:"answerd,omitempty" toml:"answerd" yaml:"answerd,omitempty"`
 	Img           null.String `boil:"img" json:"img,omitempty" toml:"img" yaml:"img,omitempty"`
-	QuestionType  string      `boil:"question_type" json:"question_type" toml:"question_type" yaml:"question_type"`
+	QuestionType  null.String `boil:"question_type" json:"question_type,omitempty" toml:"question_type" yaml:"question_type,omitempty"`
 
 	R *questionR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L questionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -75,7 +75,7 @@ var QuestionWhere = struct {
 	Answerc       whereHelpernull_String
 	Answerd       whereHelpernull_String
 	Img           whereHelpernull_String
-	QuestionType  whereHelperstring
+	QuestionType  whereHelpernull_String
 }{
 	ID:            whereHelperint{field: "\"question\".\"id\""},
 	Name:          whereHelperstring{field: "\"question\".\"name\""},
@@ -86,7 +86,7 @@ var QuestionWhere = struct {
 	Answerc:       whereHelpernull_String{field: "\"question\".\"answerc\""},
 	Answerd:       whereHelpernull_String{field: "\"question\".\"answerd\""},
 	Img:           whereHelpernull_String{field: "\"question\".\"img\""},
-	QuestionType:  whereHelperstring{field: "\"question\".\"question_type\""},
+	QuestionType:  whereHelpernull_String{field: "\"question\".\"question_type\""},
 }
 
 // QuestionRels is where relationship names are stored.

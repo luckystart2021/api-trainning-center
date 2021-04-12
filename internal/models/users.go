@@ -35,7 +35,6 @@ type User struct {
 	Fullname    string      `boil:"fullname" json:"fullname" toml:"fullname" yaml:"fullname"`
 	Address     string      `boil:"address" json:"address" toml:"address" yaml:"address"`
 	IsDelete    bool        `boil:"is_delete" json:"is_delete" toml:"is_delete" yaml:"is_delete"`
-	Available   bool        `boil:"available" json:"available" toml:"available" yaml:"available"`
 	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -54,7 +53,6 @@ var UserColumns = struct {
 	Fullname    string
 	Address     string
 	IsDelete    string
-	Available   string
 	CreatedAt   string
 }{
 	ID:          "id",
@@ -68,7 +66,6 @@ var UserColumns = struct {
 	Fullname:    "fullname",
 	Address:     "address",
 	IsDelete:    "is_delete",
-	Available:   "available",
 	CreatedAt:   "created_at",
 }
 
@@ -86,7 +83,6 @@ var UserWhere = struct {
 	Fullname    whereHelperstring
 	Address     whereHelperstring
 	IsDelete    whereHelperbool
-	Available   whereHelperbool
 	CreatedAt   whereHelpertime_Time
 }{
 	ID:          whereHelperint{field: "\"users\".\"id\""},
@@ -100,7 +96,6 @@ var UserWhere = struct {
 	Fullname:    whereHelperstring{field: "\"users\".\"fullname\""},
 	Address:     whereHelperstring{field: "\"users\".\"address\""},
 	IsDelete:    whereHelperbool{field: "\"users\".\"is_delete\""},
-	Available:   whereHelperbool{field: "\"users\".\"available\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"users\".\"created_at\""},
 }
 
@@ -125,9 +120,9 @@ func (*userR) NewStruct() *userR {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "username", "password", "email", "role", "sex", "dateofbirth", "phone", "fullname", "address", "is_delete", "available", "created_at"}
+	userAllColumns            = []string{"id", "username", "password", "email", "role", "sex", "dateofbirth", "phone", "fullname", "address", "is_delete", "created_at"}
 	userColumnsWithoutDefault = []string{"username", "password", "email", "role", "sex", "dateofbirth", "phone", "fullname", "address"}
-	userColumnsWithDefault    = []string{"id", "is_delete", "available", "created_at"}
+	userColumnsWithDefault    = []string{"id", "is_delete", "created_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 )
 
