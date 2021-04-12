@@ -86,7 +86,7 @@ type IQuestionService interface {
 	ShowResult(result result.Result) (ResponseResult, error)
 	ShowQuestionsSystem() ([]QuestionSystem, error)
 	ShowQuestionSystem(idQuestion string) (QuestionSystem, error)
-	UpdateQuestion(idQuestion int, name, answerA, answerB, answerC, answerD, img, result string, liet bool) (response.MessageResponse, error)
+	UpdateQuestion(idQuestion int, name, answerA, answerB, answerC, answerD, img, result string, liet bool, typeQ string) (response.MessageResponse, error)
 }
 
 type StoreQuestion struct {
