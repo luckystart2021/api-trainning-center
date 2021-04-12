@@ -22,9 +22,9 @@ func (tc StoreQuestion) CreateQuestion(name, answerA, answerB, answerC, answerD,
 func CreateQuestionByRequest(db *sql.DB, name, answerA, answerB, answerC, answerD, img, result string, liet bool, typeQ string) error {
 	query := `
 	INSERT INTO question
-		(name, anwser_correct, paralysis, answera, answerb, answerc, answerd, img, question_type)
+		(id ,name, anwser_correct, paralysis, answera, answerb, answerc, answerd, img, question_type)
 	VALUES
-		($1, $2, $3, $4, $5, $6, $7, $8, $9);
+		(NEXTVAL('question_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8, $9);
 	`
 	_, err := db.Exec(query, name, result, liet, answerA, answerB, answerC, answerD, img, typeQ)
 	if err != nil {
