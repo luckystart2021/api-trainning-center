@@ -10,15 +10,15 @@ import (
 )
 
 type QuestionRequest struct {
-	Name    string `json:"name"`
-	AnswerA string `json:"answer_a"`
-	AnswerB string `json:"answer_b"`
-	AnswerC string `json:"answer_c"`
-	AnswerD string `json:"answer_d"`
-	Img     string `json:"img"`
-	Result  string `json:"result"`
-	Liet    string `json:"liet"`
-	// QuestionType string `json:"question_type"`
+	Name         string `json:"name"`
+	AnswerA      string `json:"answer_a"`
+	AnswerB      string `json:"answer_b"`
+	AnswerC      string `json:"answer_c"`
+	AnswerD      string `json:"answer_d"`
+	Img          string `json:"img"`
+	Result       string `json:"result"`
+	Liet         string `json:"liet"`
+	QuestionType string `json:"question_type"`
 }
 
 // CreateQuestion controller for creating new question
@@ -34,14 +34,14 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 		}
 
 		req := QuestionRequest{
-			Name:   r.FormValue("name"),
-			Result: r.FormValue("anwser_correct"),
-			Liet:   r.FormValue("liet"),
-			// QuestionType: r.FormValue("question_type"),
-			AnswerA: r.FormValue("answer_a"),
-			AnswerB: r.FormValue("answer_b"),
-			AnswerC: r.FormValue("answer_c"),
-			AnswerD: r.FormValue("answer_d"),
+			Name:         r.FormValue("name"),
+			Result:       r.FormValue("anwser_correct"),
+			Liet:         r.FormValue("liet"),
+			QuestionType: r.FormValue("question_type"),
+			AnswerA:      r.FormValue("answer_a"),
+			AnswerB:      r.FormValue("answer_b"),
+			AnswerC:      r.FormValue("answer_c"),
+			AnswerD:      r.FormValue("answer_d"),
 		}
 		if imageName != "" || len(imageName) > 0 {
 			req.Img = imageName
@@ -59,7 +59,7 @@ func CreateQuestion(service questionServeice.IQuestionService) http.HandlerFunc 
 			return
 		}
 
-		resp, err := service.CreateQuestion(req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet)
+		resp, err := service.CreateQuestion(req.Name, req.AnswerA, req.AnswerB, req.AnswerC, req.AnswerD, req.Img, req.Result, liet, req.QuestionType)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -101,13 +101,13 @@ func validate(q *QuestionRequest) error {
 	if q.Result == "" || len(q.Result) == 0 {
 		return errors.New("Vui lòng nhập đáp án")
 	}
-	if len(q.Result) >= 2 {
+	if len(q.Result) > 2 {
 		return errors.New("Đáp án không hợp lệ")
 	}
 
-	// if q.QuestionType == "" || len(q.QuestionType) == 0 {
-	// 	return errors.New("Vui lòng nhập loại câu hỏi")
-	// }
+	if q.QuestionType == "" || len(q.QuestionType) == 0 {
+		return errors.New("Vui lòng nhập loại câu hỏi")
+	}
 
 	if len(q.Img) > 2000 {
 		return errors.New("Hình ảnh không hợp lệ")
