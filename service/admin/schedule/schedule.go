@@ -1,12 +1,11 @@
 package schedule
 
 import (
-	"api-trainning-center/service/response"
 	"database/sql"
 )
 
 type IScheduleService interface {
-	GenerateSchedule(courseID int) (response.MessageResponse, error)
+	GenerateSchedule(courseID int) ([]ScheduleResponse, error)
 }
 
 type StoreSchedule struct {

@@ -31,6 +31,7 @@ type Subject struct {
 	UpdatedBy string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	TeacherID int       `boil:"teacher_id" json:"teacher_id" toml:"teacher_id" yaml:"teacher_id"`
+	Group     int       `boil:"group" json:"group" toml:"group" yaml:"group"`
 
 	R *subjectR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L subjectL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -45,6 +46,7 @@ var SubjectColumns = struct {
 	UpdatedBy string
 	UpdatedAt string
 	TeacherID string
+	Group     string
 }{
 	ID:        "id",
 	Name:      "name",
@@ -54,6 +56,7 @@ var SubjectColumns = struct {
 	UpdatedBy: "updated_by",
 	UpdatedAt: "updated_at",
 	TeacherID: "teacher_id",
+	Group:     "group",
 }
 
 // Generated where
@@ -67,6 +70,7 @@ var SubjectWhere = struct {
 	UpdatedBy whereHelperstring
 	UpdatedAt whereHelpertime_Time
 	TeacherID whereHelperint
+	Group     whereHelperint
 }{
 	ID:        whereHelperint{field: "\"subject\".\"id\""},
 	Name:      whereHelperstring{field: "\"subject\".\"name\""},
@@ -76,21 +80,25 @@ var SubjectWhere = struct {
 	UpdatedBy: whereHelperstring{field: "\"subject\".\"updated_by\""},
 	UpdatedAt: whereHelpertime_Time{field: "\"subject\".\"updated_at\""},
 	TeacherID: whereHelperint{field: "\"subject\".\"teacher_id\""},
+	Group:     whereHelperint{field: "\"subject\".\"group\""},
 }
 
 // SubjectRels is where relationship names are stored.
 var SubjectRels = struct {
 	Teacher       string
 	ChildSubjects string
+	ClassSubjects string
 }{
 	Teacher:       "Teacher",
 	ChildSubjects: "ChildSubjects",
+	ClassSubjects: "ClassSubjects",
 }
 
 // subjectR is where relationships are stored.
 type subjectR struct {
 	Teacher       *Teacher
 	ChildSubjects ChildSubjectSlice
+	ClassSubjects ClassSubjectSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -102,8 +110,8 @@ func (*subjectR) NewStruct() *subjectR {
 type subjectL struct{}
 
 var (
-	subjectAllColumns            = []string{"id", "name", "time", "created_by", "created_at", "updated_by", "updated_at", "teacher_id"}
-	subjectColumnsWithoutDefault = []string{"name", "time", "created_by", "updated_by", "teacher_id"}
+	subjectAllColumns            = []string{"id", "name", "time", "created_by", "created_at", "updated_by", "updated_at", "teacher_id", "group"}
+	subjectColumnsWithoutDefault = []string{"name", "time", "created_by", "updated_by", "teacher_id", "group"}
 	subjectColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	subjectPrimaryKeyColumns     = []string{"id"}
 )
@@ -418,6 +426,27 @@ func (o *Subject) ChildSubjects(mods ...qm.QueryMod) childSubjectQuery {
 	return query
 }
 
+// ClassSubjects retrieves all the class_subject's ClassSubjects with an executor.
+func (o *Subject) ClassSubjects(mods ...qm.QueryMod) classSubjectQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"class_subject\".\"subject_id\"=?", o.ID),
+	)
+
+	query := ClassSubjects(queryMods...)
+	queries.SetFrom(query.Query, "\"class_subject\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"class_subject\".*"})
+	}
+
+	return query
+}
+
 // LoadTeacher allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
 func (subjectL) LoadTeacher(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSubject interface{}, mods queries.Applicator) error {
@@ -614,6 +643,101 @@ func (subjectL) LoadChildSubjects(ctx context.Context, e boil.ContextExecutor, s
 	return nil
 }
 
+// LoadClassSubjects allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (subjectL) LoadClassSubjects(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSubject interface{}, mods queries.Applicator) error {
+	var slice []*Subject
+	var object *Subject
+
+	if singular {
+		object = maybeSubject.(*Subject)
+	} else {
+		slice = *maybeSubject.(*[]*Subject)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &subjectR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &subjectR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`class_subject`), qm.WhereIn(`class_subject.subject_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load class_subject")
+	}
+
+	var resultSlice []*ClassSubject
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice class_subject")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on class_subject")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for class_subject")
+	}
+
+	if len(classSubjectAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ClassSubjects = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &classSubjectR{}
+			}
+			foreign.R.Subject = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.SubjectID {
+				local.R.ClassSubjects = append(local.R.ClassSubjects, foreign)
+				if foreign.R == nil {
+					foreign.R = &classSubjectR{}
+				}
+				foreign.R.Subject = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetTeacher of the subject to the related item.
 // Sets o.R.Teacher to related.
 // Adds o to related.R.Subjects.
@@ -705,6 +829,59 @@ func (o *Subject) AddChildSubjects(ctx context.Context, exec boil.ContextExecuto
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &childSubjectR{
+				Subject: o,
+			}
+		} else {
+			rel.R.Subject = o
+		}
+	}
+	return nil
+}
+
+// AddClassSubjects adds the given related objects to the existing relationships
+// of the subject, optionally inserting them as new records.
+// Appends related to o.R.ClassSubjects.
+// Sets related.R.Subject appropriately.
+func (o *Subject) AddClassSubjects(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ClassSubject) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.SubjectID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"class_subject\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"subject_id"}),
+				strmangle.WhereClause("\"", "\"", 2, classSubjectPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.SubjectID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &subjectR{
+			ClassSubjects: related,
+		}
+	} else {
+		o.R.ClassSubjects = append(o.R.ClassSubjects, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &classSubjectR{
 				Subject: o,
 			}
 		} else {

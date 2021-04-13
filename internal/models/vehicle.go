@@ -23,64 +23,69 @@ import (
 
 // Vehicle is an object representing the database table.
 type Vehicle struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Biensoxe  string    `boil:"biensoxe" json:"biensoxe" toml:"biensoxe" yaml:"biensoxe"`
-	Loaixe    string    `boil:"loaixe" json:"loaixe" toml:"loaixe" yaml:"loaixe"`
-	Status    bool      `boil:"status" json:"status" toml:"status" yaml:"status"`
-	IsDeleted bool      `boil:"is_deleted" json:"is_deleted" toml:"is_deleted" yaml:"is_deleted"`
-	CreatedBy string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	UpdatedBy string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	ID         int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Biensoxe   string    `boil:"biensoxe" json:"biensoxe" toml:"biensoxe" yaml:"biensoxe"`
+	Loaixe     string    `boil:"loaixe" json:"loaixe" toml:"loaixe" yaml:"loaixe"`
+	Status     bool      `boil:"status" json:"status" toml:"status" yaml:"status"`
+	IsDeleted  bool      `boil:"is_deleted" json:"is_deleted" toml:"is_deleted" yaml:"is_deleted"`
+	CreatedBy  string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	CreatedAt  time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt  time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	UpdatedBy  string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	IsContract bool      `boil:"is_contract" json:"is_contract" toml:"is_contract" yaml:"is_contract"`
 
 	R *vehicleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L vehicleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var VehicleColumns = struct {
-	ID        string
-	Biensoxe  string
-	Loaixe    string
-	Status    string
-	IsDeleted string
-	CreatedBy string
-	CreatedAt string
-	UpdatedAt string
-	UpdatedBy string
+	ID         string
+	Biensoxe   string
+	Loaixe     string
+	Status     string
+	IsDeleted  string
+	CreatedBy  string
+	CreatedAt  string
+	UpdatedAt  string
+	UpdatedBy  string
+	IsContract string
 }{
-	ID:        "id",
-	Biensoxe:  "biensoxe",
-	Loaixe:    "loaixe",
-	Status:    "status",
-	IsDeleted: "is_deleted",
-	CreatedBy: "created_by",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	UpdatedBy: "updated_by",
+	ID:         "id",
+	Biensoxe:   "biensoxe",
+	Loaixe:     "loaixe",
+	Status:     "status",
+	IsDeleted:  "is_deleted",
+	CreatedBy:  "created_by",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
+	UpdatedBy:  "updated_by",
+	IsContract: "is_contract",
 }
 
 // Generated where
 
 var VehicleWhere = struct {
-	ID        whereHelperint
-	Biensoxe  whereHelperstring
-	Loaixe    whereHelperstring
-	Status    whereHelperbool
-	IsDeleted whereHelperbool
-	CreatedBy whereHelperstring
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
-	UpdatedBy whereHelperstring
+	ID         whereHelperint
+	Biensoxe   whereHelperstring
+	Loaixe     whereHelperstring
+	Status     whereHelperbool
+	IsDeleted  whereHelperbool
+	CreatedBy  whereHelperstring
+	CreatedAt  whereHelpertime_Time
+	UpdatedAt  whereHelpertime_Time
+	UpdatedBy  whereHelperstring
+	IsContract whereHelperbool
 }{
-	ID:        whereHelperint{field: "\"vehicle\".\"id\""},
-	Biensoxe:  whereHelperstring{field: "\"vehicle\".\"biensoxe\""},
-	Loaixe:    whereHelperstring{field: "\"vehicle\".\"loaixe\""},
-	Status:    whereHelperbool{field: "\"vehicle\".\"status\""},
-	IsDeleted: whereHelperbool{field: "\"vehicle\".\"is_deleted\""},
-	CreatedBy: whereHelperstring{field: "\"vehicle\".\"created_by\""},
-	CreatedAt: whereHelpertime_Time{field: "\"vehicle\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"vehicle\".\"updated_at\""},
-	UpdatedBy: whereHelperstring{field: "\"vehicle\".\"updated_by\""},
+	ID:         whereHelperint{field: "\"vehicle\".\"id\""},
+	Biensoxe:   whereHelperstring{field: "\"vehicle\".\"biensoxe\""},
+	Loaixe:     whereHelperstring{field: "\"vehicle\".\"loaixe\""},
+	Status:     whereHelperbool{field: "\"vehicle\".\"status\""},
+	IsDeleted:  whereHelperbool{field: "\"vehicle\".\"is_deleted\""},
+	CreatedBy:  whereHelperstring{field: "\"vehicle\".\"created_by\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"vehicle\".\"created_at\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"vehicle\".\"updated_at\""},
+	UpdatedBy:  whereHelperstring{field: "\"vehicle\".\"updated_by\""},
+	IsContract: whereHelperbool{field: "\"vehicle\".\"is_contract\""},
 }
 
 // VehicleRels is where relationship names are stored.
@@ -100,9 +105,9 @@ func (*vehicleR) NewStruct() *vehicleR {
 type vehicleL struct{}
 
 var (
-	vehicleAllColumns            = []string{"id", "biensoxe", "loaixe", "status", "is_deleted", "created_by", "created_at", "updated_at", "updated_by"}
+	vehicleAllColumns            = []string{"id", "biensoxe", "loaixe", "status", "is_deleted", "created_by", "created_at", "updated_at", "updated_by", "is_contract"}
 	vehicleColumnsWithoutDefault = []string{"biensoxe", "loaixe", "created_by", "updated_by"}
-	vehicleColumnsWithDefault    = []string{"id", "status", "is_deleted", "created_at", "updated_at"}
+	vehicleColumnsWithDefault    = []string{"id", "status", "is_deleted", "created_at", "updated_at", "is_contract"}
 	vehiclePrimaryKeyColumns     = []string{"id"}
 )
 
