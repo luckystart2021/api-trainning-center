@@ -71,10 +71,5 @@ func validateUpdate(req models.VehicleUpdateRequest) error {
 		return errors.New("Loại xe không hợp lệ")
 	}
 
-	_, err := strconv.ParseBool(req.IsDeleted)
-	if err != nil {
-		return errors.New("Không đúng định dạng")
-	}
-
 	return nil
 }

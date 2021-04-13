@@ -23,10 +23,10 @@ func createVehicleByRequest(db *sql.DB, req vehicle.VehicleRequest, userName str
 	query := `
 	insert
 		into
-			vehicle (biensoxe, loaixe, created_by, updated_by)
-	values($1, $2, $3, $4);
+			vehicle (biensoxe, loaixe, created_by, updated_by, is_contract)
+	values($1, $2, $3, $4, $5);
 	`
-	_, err := db.Exec(query, req.BienSoXe, req.LoaiXe, userName, userName)
+	_, err := db.Exec(query, req.BienSoXe, req.LoaiXe, userName, userName, req.IsContract)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[createVehicleByRequest] Insert vehicle DB err  %v", err)
 		return errors.New("Lỗi hệ thống, vui lòng thử lại")

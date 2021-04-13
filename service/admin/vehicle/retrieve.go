@@ -41,7 +41,8 @@ func findOneVehicle(db *sql.DB, id int) (vehicle.FindOneVehicle, error) {
 		created_by,
 		created_at,
 		updated_at,
-		updated_by
+		updated_by,
+		is_contract
 	FROM
 		vehicle
 	WHERE
@@ -49,7 +50,7 @@ func findOneVehicle(db *sql.DB, id int) (vehicle.FindOneVehicle, error) {
 	`
 	rows := db.QueryRow(query, id)
 	var createdAt, updatedAt time.Time
-	err := rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted, &vehicle.CreatedBy, &createdAt, &updatedAt, &vehicle.UpdatedBy)
+	err := rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted, &vehicle.CreatedBy, &createdAt, &updatedAt, &vehicle.UpdatedBy, &vehicle.IsContract)
 	vehicle.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	vehicle.UpdatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
 	if err == sql.ErrNoRows {
@@ -70,7 +71,8 @@ func findAllVehicles(db *sql.DB) ([]vehicle.Vehicle, error) {
 		biensoxe,
 		loaixe,
 		status,
-		is_deleted
+		is_deleted,
+		is_contract
 	FROM
 		vehicle;
 	`
@@ -82,7 +84,7 @@ func findAllVehicles(db *sql.DB) ([]vehicle.Vehicle, error) {
 	defer rows.Close()
 	for rows.Next() {
 		vehicle := vehicle.Vehicle{}
-		err = rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted)
+		err = rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted, &vehicle.IsContract)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[findAllVehicles] Scan error  %v", err)
 			return vehicles, errors.New("Lỗi hệ thống vui lòng thử lại")
