@@ -91,7 +91,7 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	users := []User{}
 	query := `
 	SELECT 
-		username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, address
+		id, username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, address
 	FROM 
 		"users"
 	WHERE 
@@ -112,12 +112,14 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		var username, password, role, sex, dateofbirth, phone, fullname, address string
 		var created_at time.Time
 		var is_delete bool
-		err = rows.Scan(&username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete, &address)
+		var id int
+		err = rows.Scan(&id, &username, &password, &email, &role, &sex, &dateofbirth, &phone, &fullname, &created_at, &is_delete, &address)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] Scan error  %v", err)
 			return users, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 		user := User{
+			Id:          id,
 			UserName:    username,
 			PassWord:    password,
 			Role:        role,
