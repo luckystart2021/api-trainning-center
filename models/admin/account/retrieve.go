@@ -42,8 +42,8 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	FROM 
 		users u 
 	WHERE 
-		u.username = $1 AND is_delete = $2;`
-	row := db.QueryRow(query, userName, ACTIVE)
+		u.username = $1;`
+	row := db.QueryRow(query, userName)
 
 	var email sql.NullString
 
