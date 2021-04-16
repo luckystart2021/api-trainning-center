@@ -93,7 +93,9 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 	SELECT 
 		id, username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, address
 	FROM 
-		"users";`
+		"users"
+	ORDER BY id DESC	
+		;`
 	rows, err := db.Query(query)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] No Data  %v", err)
