@@ -11,6 +11,8 @@ type ICourseService interface {
 	ShowCourses(idCourse string) (Course, error)
 	CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)
 	UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)
+	ActiveCourse(idCourse int, userName string) (response.MessageResponse, error)
+	InActiveCourse(idCourse int, userName string) (response.MessageResponse, error)
 }
 
 type StoreCourse struct {
