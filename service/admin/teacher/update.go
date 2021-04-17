@@ -33,6 +33,7 @@ func (st StoreTeacher) UpdateTeacher(id int, req models.Teacher, userName string
 	teacher.ExperienceDriver = req.ExperienceDriver
 	teacher.KMSafe = req.KMSafe
 	teacher.IsDeleted = req.IsDeleted
+	teacher.Email = req.Email
 
 	rowsAff, err := teacher.Update(ctx, st.db, boil.Infer())
 	if err != nil {

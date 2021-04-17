@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/badoux/checkmail"
 )
 
 func CreateTeacher(service teacher.ITeacherService) http.HandlerFunc {
@@ -82,6 +84,12 @@ func validateCreate(s models.Teacher) error {
 
 	if len(s.GPLX.String) > 50 {
 		return errors.New("Giấy phép lái xe không hợp lệ")
+	}
+
+	if s.Email.String != "" {
+		if err := checkmail.ValidateFormat(s.Email.String); err != nil {
+			return errors.New("Email không đúng định dạng")
+		}
 	}
 	return nil
 }

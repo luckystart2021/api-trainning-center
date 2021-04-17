@@ -40,6 +40,7 @@ type Teacher struct {
 	UpdatedBy        string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
 	UpdatedAt        time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	IsDeleted        bool        `boil:"is_deleted" json:"is_deleted" toml:"is_deleted" yaml:"is_deleted"`
+	Email            null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
 
 	R *teacherR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L teacherL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -62,6 +63,7 @@ var TeacherColumns = struct {
 	UpdatedBy        string
 	UpdatedAt        string
 	IsDeleted        string
+	Email            string
 }{
 	ID:               "id",
 	Fullname:         "fullname",
@@ -79,6 +81,7 @@ var TeacherColumns = struct {
 	UpdatedBy:        "updated_by",
 	UpdatedAt:        "updated_at",
 	IsDeleted:        "is_deleted",
+	Email:            "email",
 }
 
 // Generated where
@@ -100,6 +103,7 @@ var TeacherWhere = struct {
 	UpdatedBy        whereHelperstring
 	UpdatedAt        whereHelpertime_Time
 	IsDeleted        whereHelperbool
+	Email            whereHelpernull_String
 }{
 	ID:               whereHelperint{field: "\"teacher\".\"id\""},
 	Fullname:         whereHelperstring{field: "\"teacher\".\"fullname\""},
@@ -117,6 +121,7 @@ var TeacherWhere = struct {
 	UpdatedBy:        whereHelperstring{field: "\"teacher\".\"updated_by\""},
 	UpdatedAt:        whereHelpertime_Time{field: "\"teacher\".\"updated_at\""},
 	IsDeleted:        whereHelperbool{field: "\"teacher\".\"is_deleted\""},
+	Email:            whereHelpernull_String{field: "\"teacher\".\"email\""},
 }
 
 // TeacherRels is where relationship names are stored.
@@ -140,8 +145,8 @@ func (*teacherR) NewStruct() *teacherR {
 type teacherL struct{}
 
 var (
-	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted"}
-	teacherColumnsWithoutDefault = []string{"fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "gplx", "experience_driver", "km_safe", "created_by", "updated_by"}
+	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted", "email"}
+	teacherColumnsWithoutDefault = []string{"fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "gplx", "experience_driver", "km_safe", "created_by", "updated_by", "email"}
 	teacherColumnsWithDefault    = []string{"id", "cnsk", "created_at", "updated_at", "is_deleted"}
 	teacherPrimaryKeyColumns     = []string{"id"}
 )
