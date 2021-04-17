@@ -42,8 +42,8 @@ func RetrieveAccountByUserName(userName string, db *sql.DB) (User, error) {
 	FROM 
 		users u 
 	WHERE 
-		u.username = $1 AND is_delete = $2;`
-	row := db.QueryRow(query, userName, ACTIVE)
+		u.username = $1;`
+	row := db.QueryRow(query, userName)
 
 	var email sql.NullString
 
@@ -94,9 +94,9 @@ func RetrieveAccounts(db *sql.DB) ([]User, error) {
 		id, username, "password", email, "role", sex, dateofbirth, phone, fullname, created_at, is_delete, address
 	FROM 
 		"users"
-	WHERE 
-		is_delete = $1;`
-	rows, err := db.Query(query, ACTIVE)
+	ORDER BY id DESC	
+		;`
+	rows, err := db.Query(query)
 	if err == sql.ErrNoRows {
 		logrus.WithFields(logrus.Fields{}).Errorf("[RetrieveAccounts] No Data  %v", err)
 		return users, errors.New("Không có dữ liệu từ hệ thống")
