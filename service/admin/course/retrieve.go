@@ -105,11 +105,9 @@ func RetrieveCourses(status bool, db *sql.DB) ([]Course, error) {
 		training_system, status, created_by, created_at, updated_by, updated_at, time
 	FROM 
 		course
-	WHERE
-		status = $1
-	ORDER BY start_date DESC;
+	ORDER BY created_at DESC;
 	`
-	rows, err := db.Query(query, status)
+	rows, err := db.Query(query)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[retrieveCourses] query error  %v", err)
