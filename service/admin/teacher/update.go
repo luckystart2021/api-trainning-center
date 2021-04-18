@@ -8,11 +8,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreTeacher) UpdateTeacher(id int, req models.Teacher, userName string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	ctx := context.Background()
+
 	teacher, err := models.FindTeacher(ctx, st.db, id)
 	if teacher == nil {
 		return resp, errors.New("Thông tin giáo viên không tồn tại, vui lòng thử lại")
@@ -20,6 +22,20 @@ func (st StoreTeacher) UpdateTeacher(id int, req models.Teacher, userName string
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[FindTeacher] error : ", err)
 		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
+	if req.Email.String != teacher.Email.String {
+		countTeacher, err := models.Teachers(
+			qm.Where("email = ?", req.Email.String),
+		).Count(ctx, st.db)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[RetrieveTeacher] Retrieve Teachers error : ", err)
+			return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		if countTeacher > 0 {
+			resp.Message = "Email đã tồn tại, vui lòng thử lại"
+			return resp, nil
+		}
 	}
 
 	teacher.Fullname = req.Fullname

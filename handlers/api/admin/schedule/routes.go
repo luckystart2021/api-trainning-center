@@ -23,14 +23,14 @@ func GenerateSchedule(service schedule.IScheduleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		if id == "" {
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã seo không được rỗng"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không được rỗng"))
 			return
 		}
 
 		idCourse, err := strconv.Atoi(id)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
-			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã seo không hợp lệ"))
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không hợp lệ"))
 			return
 		}
 
