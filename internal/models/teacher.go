@@ -41,6 +41,8 @@ type Teacher struct {
 	UpdatedAt        time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	IsDeleted        bool        `boil:"is_deleted" json:"is_deleted" toml:"is_deleted" yaml:"is_deleted"`
 	Email            null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
+	IsContract       bool        `boil:"is_contract" json:"is_contract" toml:"is_contract" yaml:"is_contract"`
+	IsPractice       bool        `boil:"is_practice" json:"is_practice" toml:"is_practice" yaml:"is_practice"`
 
 	R *teacherR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L teacherL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -64,6 +66,8 @@ var TeacherColumns = struct {
 	UpdatedAt        string
 	IsDeleted        string
 	Email            string
+	IsContract       string
+	IsPractice       string
 }{
 	ID:               "id",
 	Fullname:         "fullname",
@@ -82,6 +86,8 @@ var TeacherColumns = struct {
 	UpdatedAt:        "updated_at",
 	IsDeleted:        "is_deleted",
 	Email:            "email",
+	IsContract:       "is_contract",
+	IsPractice:       "is_practice",
 }
 
 // Generated where
@@ -104,6 +110,8 @@ var TeacherWhere = struct {
 	UpdatedAt        whereHelpertime_Time
 	IsDeleted        whereHelperbool
 	Email            whereHelpernull_String
+	IsContract       whereHelperbool
+	IsPractice       whereHelperbool
 }{
 	ID:               whereHelperint{field: "\"teacher\".\"id\""},
 	Fullname:         whereHelperstring{field: "\"teacher\".\"fullname\""},
@@ -122,6 +130,8 @@ var TeacherWhere = struct {
 	UpdatedAt:        whereHelpertime_Time{field: "\"teacher\".\"updated_at\""},
 	IsDeleted:        whereHelperbool{field: "\"teacher\".\"is_deleted\""},
 	Email:            whereHelpernull_String{field: "\"teacher\".\"email\""},
+	IsContract:       whereHelperbool{field: "\"teacher\".\"is_contract\""},
+	IsPractice:       whereHelperbool{field: "\"teacher\".\"is_practice\""},
 }
 
 // TeacherRels is where relationship names are stored.
@@ -145,9 +155,9 @@ func (*teacherR) NewStruct() *teacherR {
 type teacherL struct{}
 
 var (
-	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted", "email"}
+	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted", "email", "is_contract", "is_practice"}
 	teacherColumnsWithoutDefault = []string{"fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "gplx", "experience_driver", "km_safe", "created_by", "updated_by", "email"}
-	teacherColumnsWithDefault    = []string{"id", "cnsk", "created_at", "updated_at", "is_deleted"}
+	teacherColumnsWithDefault    = []string{"id", "cnsk", "created_at", "updated_at", "is_deleted", "is_contract", "is_practice"}
 	teacherPrimaryKeyColumns     = []string{"id"}
 )
 
