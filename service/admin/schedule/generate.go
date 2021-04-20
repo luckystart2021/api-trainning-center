@@ -20,8 +20,14 @@ type ScheduleResponse struct {
 }
 
 type Content struct {
-	Date           string   `json:"date"`
-	SubjectContent []string `json:"subject_content"`
+	Date            string           `json:"date"`
+	SubjectContents []SubjectContent `json:"subject_contents"`
+}
+
+type SubjectContent struct {
+	Name string `json:"name"`
+	Lt   int    `json:"lt"`
+	Th   int    `json:"th"`
 }
 
 func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, error) {
@@ -56,9 +62,15 @@ func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, erro
 					models.ChildSubjectWhere.Group.EQ(null.StringFrom(strconv.Itoa(group))),
 				).All(context.Background(), st.db)
 				if len(childSubject) > 0 {
+					subjectContents := []SubjectContent{}
 					for _, data := range childSubject {
-						content.SubjectContent = append(content.SubjectContent, data.Name)
+						subjectContent := SubjectContent{}
+						subjectContent.Name = data.Name
+						subjectContent.Lt = data.LT.Int
+						subjectContent.Th = data.TH.Int
+						subjectContents = append(subjectContents, subjectContent)
 					}
+					content.SubjectContents = subjectContents
 				}
 				contents = append(contents, content)
 				scheduleResponse.Schedule = contents
@@ -76,9 +88,15 @@ func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, erro
 					models.ChildSubjectWhere.Group.EQ(null.StringFrom(strconv.Itoa(groupChild))),
 				).All(context.Background(), st.db)
 				if len(childSubject) > 0 {
+					subjectContents := []SubjectContent{}
 					for _, data := range childSubject {
-						content.SubjectContent = append(content.SubjectContent, data.Name)
+						subjectContent := SubjectContent{}
+						subjectContent.Name = data.Name
+						subjectContent.Lt = data.LT.Int
+						subjectContent.Th = data.TH.Int
+						subjectContents = append(subjectContents, subjectContent)
 					}
+					content.SubjectContents = subjectContents
 				}
 				contents = append(contents, content)
 				scheduleResponse.Schedule = contents

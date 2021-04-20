@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -32,6 +33,8 @@ type Class struct {
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	IsDeleted bool      `boil:"is_deleted" json:"is_deleted" toml:"is_deleted" yaml:"is_deleted"`
+	TeacherID null.Int  `boil:"teacher_id" json:"teacher_id,omitempty" toml:"teacher_id" yaml:"teacher_id,omitempty"`
+	VehicleID null.Int  `boil:"vehicle_id" json:"vehicle_id,omitempty" toml:"vehicle_id" yaml:"vehicle_id,omitempty"`
 
 	R *classR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L classL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -47,6 +50,8 @@ var ClassColumns = struct {
 	CreatedAt string
 	UpdatedAt string
 	IsDeleted string
+	TeacherID string
+	VehicleID string
 }{
 	ID:        "id",
 	Code:      "code",
@@ -57,6 +62,8 @@ var ClassColumns = struct {
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 	IsDeleted: "is_deleted",
+	TeacherID: "teacher_id",
+	VehicleID: "vehicle_id",
 }
 
 // Generated where
@@ -71,6 +78,8 @@ var ClassWhere = struct {
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 	IsDeleted whereHelperbool
+	TeacherID whereHelpernull_Int
+	VehicleID whereHelpernull_Int
 }{
 	ID:        whereHelperint{field: "\"class\".\"id\""},
 	Code:      whereHelperstring{field: "\"class\".\"code\""},
@@ -81,20 +90,28 @@ var ClassWhere = struct {
 	CreatedAt: whereHelpertime_Time{field: "\"class\".\"created_at\""},
 	UpdatedAt: whereHelpertime_Time{field: "\"class\".\"updated_at\""},
 	IsDeleted: whereHelperbool{field: "\"class\".\"is_deleted\""},
+	TeacherID: whereHelpernull_Int{field: "\"class\".\"teacher_id\""},
+	VehicleID: whereHelpernull_Int{field: "\"class\".\"vehicle_id\""},
 }
 
 // ClassRels is where relationship names are stored.
 var ClassRels = struct {
 	Course   string
+	Teacher  string
+	Vehicle  string
 	Students string
 }{
 	Course:   "Course",
+	Teacher:  "Teacher",
+	Vehicle:  "Vehicle",
 	Students: "Students",
 }
 
 // classR is where relationships are stored.
 type classR struct {
 	Course   *Course
+	Teacher  *Teacher
+	Vehicle  *Vehicle
 	Students StudentSlice
 }
 
@@ -107,8 +124,8 @@ func (*classR) NewStruct() *classR {
 type classL struct{}
 
 var (
-	classAllColumns            = []string{"id", "code", "course_id", "quantity", "created_by", "updated_by", "created_at", "updated_at", "is_deleted"}
-	classColumnsWithoutDefault = []string{"code", "course_id", "quantity", "created_by", "updated_by"}
+	classAllColumns            = []string{"id", "code", "course_id", "quantity", "created_by", "updated_by", "created_at", "updated_at", "is_deleted", "teacher_id", "vehicle_id"}
+	classColumnsWithoutDefault = []string{"code", "course_id", "quantity", "created_by", "updated_by", "teacher_id", "vehicle_id"}
 	classColumnsWithDefault    = []string{"id", "created_at", "updated_at", "is_deleted"}
 	classPrimaryKeyColumns     = []string{"id"}
 )
@@ -402,6 +419,34 @@ func (o *Class) Course(mods ...qm.QueryMod) courseQuery {
 	return query
 }
 
+// Teacher pointed to by the foreign key.
+func (o *Class) Teacher(mods ...qm.QueryMod) teacherQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.TeacherID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Teachers(queryMods...)
+	queries.SetFrom(query.Query, "\"teacher\"")
+
+	return query
+}
+
+// Vehicle pointed to by the foreign key.
+func (o *Class) Vehicle(mods ...qm.QueryMod) vehicleQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.VehicleID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Vehicles(queryMods...)
+	queries.SetFrom(query.Query, "\"vehicle\"")
+
+	return query
+}
+
 // Students retrieves all the student's Students with an executor.
 func (o *Class) Students(mods ...qm.QueryMod) studentQuery {
 	var queryMods []qm.QueryMod
@@ -514,6 +559,216 @@ func (classL) LoadCourse(ctx context.Context, e boil.ContextExecutor, singular b
 				local.R.Course = foreign
 				if foreign.R == nil {
 					foreign.R = &courseR{}
+				}
+				foreign.R.Classes = append(foreign.R.Classes, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadTeacher allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (classL) LoadTeacher(ctx context.Context, e boil.ContextExecutor, singular bool, maybeClass interface{}, mods queries.Applicator) error {
+	var slice []*Class
+	var object *Class
+
+	if singular {
+		object = maybeClass.(*Class)
+	} else {
+		slice = *maybeClass.(*[]*Class)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &classR{}
+		}
+		if !queries.IsNil(object.TeacherID) {
+			args = append(args, object.TeacherID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &classR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.TeacherID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.TeacherID) {
+				args = append(args, obj.TeacherID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`teacher`), qm.WhereIn(`teacher.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Teacher")
+	}
+
+	var resultSlice []*Teacher
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Teacher")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for teacher")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for teacher")
+	}
+
+	if len(classAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Teacher = foreign
+		if foreign.R == nil {
+			foreign.R = &teacherR{}
+		}
+		foreign.R.Classes = append(foreign.R.Classes, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.TeacherID, foreign.ID) {
+				local.R.Teacher = foreign
+				if foreign.R == nil {
+					foreign.R = &teacherR{}
+				}
+				foreign.R.Classes = append(foreign.R.Classes, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadVehicle allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (classL) LoadVehicle(ctx context.Context, e boil.ContextExecutor, singular bool, maybeClass interface{}, mods queries.Applicator) error {
+	var slice []*Class
+	var object *Class
+
+	if singular {
+		object = maybeClass.(*Class)
+	} else {
+		slice = *maybeClass.(*[]*Class)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &classR{}
+		}
+		if !queries.IsNil(object.VehicleID) {
+			args = append(args, object.VehicleID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &classR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.VehicleID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.VehicleID) {
+				args = append(args, obj.VehicleID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`vehicle`), qm.WhereIn(`vehicle.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Vehicle")
+	}
+
+	var resultSlice []*Vehicle
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Vehicle")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for vehicle")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for vehicle")
+	}
+
+	if len(classAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Vehicle = foreign
+		if foreign.R == nil {
+			foreign.R = &vehicleR{}
+		}
+		foreign.R.Classes = append(foreign.R.Classes, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.VehicleID, foreign.ID) {
+				local.R.Vehicle = foreign
+				if foreign.R == nil {
+					foreign.R = &vehicleR{}
 				}
 				foreign.R.Classes = append(foreign.R.Classes, local)
 				break
@@ -663,6 +918,166 @@ func (o *Class) SetCourse(ctx context.Context, exec boil.ContextExecutor, insert
 		related.R.Classes = append(related.R.Classes, o)
 	}
 
+	return nil
+}
+
+// SetTeacher of the class to the related item.
+// Sets o.R.Teacher to related.
+// Adds o to related.R.Classes.
+func (o *Class) SetTeacher(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Teacher) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"class\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"teacher_id"}),
+		strmangle.WhereClause("\"", "\"", 2, classPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.TeacherID, related.ID)
+	if o.R == nil {
+		o.R = &classR{
+			Teacher: related,
+		}
+	} else {
+		o.R.Teacher = related
+	}
+
+	if related.R == nil {
+		related.R = &teacherR{
+			Classes: ClassSlice{o},
+		}
+	} else {
+		related.R.Classes = append(related.R.Classes, o)
+	}
+
+	return nil
+}
+
+// RemoveTeacher relationship.
+// Sets o.R.Teacher to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Class) RemoveTeacher(ctx context.Context, exec boil.ContextExecutor, related *Teacher) error {
+	var err error
+
+	queries.SetScanner(&o.TeacherID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("teacher_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Teacher = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Classes {
+		if queries.Equal(o.TeacherID, ri.TeacherID) {
+			continue
+		}
+
+		ln := len(related.R.Classes)
+		if ln > 1 && i < ln-1 {
+			related.R.Classes[i] = related.R.Classes[ln-1]
+		}
+		related.R.Classes = related.R.Classes[:ln-1]
+		break
+	}
+	return nil
+}
+
+// SetVehicle of the class to the related item.
+// Sets o.R.Vehicle to related.
+// Adds o to related.R.Classes.
+func (o *Class) SetVehicle(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Vehicle) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"class\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"vehicle_id"}),
+		strmangle.WhereClause("\"", "\"", 2, classPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.VehicleID, related.ID)
+	if o.R == nil {
+		o.R = &classR{
+			Vehicle: related,
+		}
+	} else {
+		o.R.Vehicle = related
+	}
+
+	if related.R == nil {
+		related.R = &vehicleR{
+			Classes: ClassSlice{o},
+		}
+	} else {
+		related.R.Classes = append(related.R.Classes, o)
+	}
+
+	return nil
+}
+
+// RemoveVehicle relationship.
+// Sets o.R.Vehicle to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Class) RemoveVehicle(ctx context.Context, exec boil.ContextExecutor, related *Vehicle) error {
+	var err error
+
+	queries.SetScanner(&o.VehicleID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("vehicle_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Vehicle = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Classes {
+		if queries.Equal(o.VehicleID, ri.VehicleID) {
+			continue
+		}
+
+		ln := len(related.R.Classes)
+		if ln > 1 && i < ln-1 {
+			related.R.Classes[i] = related.R.Classes[ln-1]
+		}
+		related.R.Classes = related.R.Classes[:ln-1]
+		break
+	}
 	return nil
 }
 

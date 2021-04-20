@@ -13,9 +13,11 @@ import (
 )
 
 type ClassUpdateRequest struct {
-	IdCourse  int64  `json:"id_course"`
-	Quantity  int64  `json:"quantity"`
-	IdDeleted bool   `json:"is_deleted"`
+	IdCourse  int64 `json:"id_course"`
+	Quantity  int64 `json:"quantity"`
+	IdDeleted bool  `json:"is_deleted"`
+	TeacherId int64 `json:"teacher_id"`
+	VehicleId int64 `json:"vehicle_id"`
 }
 
 func UpdateClass(service class.IClassService) http.HandlerFunc {
@@ -47,7 +49,7 @@ func UpdateClass(service class.IClassService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.UpdateClass(idClass, userRole.UserName, req.IdCourse, req.Quantity, req.IdDeleted)
+		resp, err := service.UpdateClass(idClass, userRole.UserName, req.IdCourse, req.Quantity, req.IdDeleted, req.TeacherId, req.VehicleId)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

@@ -43,6 +43,7 @@ type Teacher struct {
 	Email            null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
 	IsContract       bool        `boil:"is_contract" json:"is_contract" toml:"is_contract" yaml:"is_contract"`
 	IsPractice       bool        `boil:"is_practice" json:"is_practice" toml:"is_practice" yaml:"is_practice"`
+	Status           bool        `boil:"status" json:"status" toml:"status" yaml:"status"`
 
 	R *teacherR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L teacherL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -68,6 +69,7 @@ var TeacherColumns = struct {
 	Email            string
 	IsContract       string
 	IsPractice       string
+	Status           string
 }{
 	ID:               "id",
 	Fullname:         "fullname",
@@ -88,6 +90,7 @@ var TeacherColumns = struct {
 	Email:            "email",
 	IsContract:       "is_contract",
 	IsPractice:       "is_practice",
+	Status:           "status",
 }
 
 // Generated where
@@ -112,6 +115,7 @@ var TeacherWhere = struct {
 	Email            whereHelpernull_String
 	IsContract       whereHelperbool
 	IsPractice       whereHelperbool
+	Status           whereHelperbool
 }{
 	ID:               whereHelperint{field: "\"teacher\".\"id\""},
 	Fullname:         whereHelperstring{field: "\"teacher\".\"fullname\""},
@@ -132,17 +136,21 @@ var TeacherWhere = struct {
 	Email:            whereHelpernull_String{field: "\"teacher\".\"email\""},
 	IsContract:       whereHelperbool{field: "\"teacher\".\"is_contract\""},
 	IsPractice:       whereHelperbool{field: "\"teacher\".\"is_practice\""},
+	Status:           whereHelperbool{field: "\"teacher\".\"status\""},
 }
 
 // TeacherRels is where relationship names are stored.
 var TeacherRels = struct {
+	Classes  string
 	Subjects string
 }{
+	Classes:  "Classes",
 	Subjects: "Subjects",
 }
 
 // teacherR is where relationships are stored.
 type teacherR struct {
+	Classes  ClassSlice
 	Subjects SubjectSlice
 }
 
@@ -155,9 +163,9 @@ func (*teacherR) NewStruct() *teacherR {
 type teacherL struct{}
 
 var (
-	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted", "email", "is_contract", "is_practice"}
+	teacherAllColumns            = []string{"id", "fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "created_by", "created_at", "updated_by", "updated_at", "is_deleted", "email", "is_contract", "is_practice", "status"}
 	teacherColumnsWithoutDefault = []string{"fullname", "sex", "dateofbirth", "phone", "address", "cmnd", "gplx", "experience_driver", "km_safe", "created_by", "updated_by", "email"}
-	teacherColumnsWithDefault    = []string{"id", "cnsk", "created_at", "updated_at", "is_deleted", "is_contract", "is_practice"}
+	teacherColumnsWithDefault    = []string{"id", "cnsk", "created_at", "updated_at", "is_deleted", "is_contract", "is_practice", "status"}
 	teacherPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -436,6 +444,27 @@ func (q teacherQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
+// Classes retrieves all the class's Classes with an executor.
+func (o *Teacher) Classes(mods ...qm.QueryMod) classQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"class\".\"teacher_id\"=?", o.ID),
+	)
+
+	query := Classes(queryMods...)
+	queries.SetFrom(query.Query, "\"class\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"class\".*"})
+	}
+
+	return query
+}
+
 // Subjects retrieves all the subject's Subjects with an executor.
 func (o *Teacher) Subjects(mods ...qm.QueryMod) subjectQuery {
 	var queryMods []qm.QueryMod
@@ -455,6 +484,101 @@ func (o *Teacher) Subjects(mods ...qm.QueryMod) subjectQuery {
 	}
 
 	return query
+}
+
+// LoadClasses allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (teacherL) LoadClasses(ctx context.Context, e boil.ContextExecutor, singular bool, maybeTeacher interface{}, mods queries.Applicator) error {
+	var slice []*Teacher
+	var object *Teacher
+
+	if singular {
+		object = maybeTeacher.(*Teacher)
+	} else {
+		slice = *maybeTeacher.(*[]*Teacher)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &teacherR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &teacherR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`class`), qm.WhereIn(`class.teacher_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load class")
+	}
+
+	var resultSlice []*Class
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice class")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on class")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for class")
+	}
+
+	if len(classAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Classes = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &classR{}
+			}
+			foreign.R.Teacher = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.TeacherID) {
+				local.R.Classes = append(local.R.Classes, foreign)
+				if foreign.R == nil {
+					foreign.R = &classR{}
+				}
+				foreign.R.Teacher = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadSubjects allows an eager lookup of values, cached into the
@@ -546,6 +670,129 @@ func (teacherL) LoadSubjects(ctx context.Context, e boil.ContextExecutor, singul
 				foreign.R.Teacher = local
 				break
 			}
+		}
+	}
+
+	return nil
+}
+
+// AddClasses adds the given related objects to the existing relationships
+// of the teacher, optionally inserting them as new records.
+// Appends related to o.R.Classes.
+// Sets related.R.Teacher appropriately.
+func (o *Teacher) AddClasses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Class) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.TeacherID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"class\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"teacher_id"}),
+				strmangle.WhereClause("\"", "\"", 2, classPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.TeacherID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &teacherR{
+			Classes: related,
+		}
+	} else {
+		o.R.Classes = append(o.R.Classes, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &classR{
+				Teacher: o,
+			}
+		} else {
+			rel.R.Teacher = o
+		}
+	}
+	return nil
+}
+
+// SetClasses removes all previously related items of the
+// teacher replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Teacher's Classes accordingly.
+// Replaces o.R.Classes with related.
+// Sets related.R.Teacher's Classes accordingly.
+func (o *Teacher) SetClasses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Class) error {
+	query := "update \"class\" set \"teacher_id\" = null where \"teacher_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.Classes {
+			queries.SetScanner(&rel.TeacherID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Teacher = nil
+		}
+
+		o.R.Classes = nil
+	}
+	return o.AddClasses(ctx, exec, insert, related...)
+}
+
+// RemoveClasses relationships from objects passed in.
+// Removes related items from R.Classes (uses pointer comparison, removal does not keep order)
+// Sets related.R.Teacher.
+func (o *Teacher) RemoveClasses(ctx context.Context, exec boil.ContextExecutor, related ...*Class) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.TeacherID, nil)
+		if rel.R != nil {
+			rel.R.Teacher = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("teacher_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Classes {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Classes)
+			if ln > 1 && i < ln-1 {
+				o.R.Classes[i] = o.R.Classes[ln-1]
+			}
+			o.R.Classes = o.R.Classes[:ln-1]
+			break
 		}
 	}
 

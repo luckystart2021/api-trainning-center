@@ -10,8 +10,10 @@ import (
 )
 
 type ClassRequest struct {
-	IdCourse  int64  `json:"id_course"`
-	Quantity  int64  `json:"quantity"`
+	IdCourse  int64 `json:"id_course"`
+	Quantity  int64 `json:"quantity"`
+	TeacherId int64 `json:"teacher_id"`
+	VehicleId int64 `json:"vehicle_id"`
 }
 
 func CreateClass(service class.IClassService) http.HandlerFunc {
@@ -29,7 +31,7 @@ func CreateClass(service class.IClassService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.CreateClass(userRole.UserName, req.IdCourse, req.Quantity)
+		resp, err := service.CreateClass(userRole.UserName, req.IdCourse, req.Quantity, req.TeacherId, req.VehicleId)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

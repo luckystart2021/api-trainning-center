@@ -90,10 +90,14 @@ var VehicleWhere = struct {
 
 // VehicleRels is where relationship names are stored.
 var VehicleRels = struct {
-}{}
+	Classes string
+}{
+	Classes: "Classes",
+}
 
 // vehicleR is where relationships are stored.
 type vehicleR struct {
+	Classes ClassSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -384,6 +388,245 @@ func (q vehicleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	}
 
 	return count > 0, nil
+}
+
+// Classes retrieves all the class's Classes with an executor.
+func (o *Vehicle) Classes(mods ...qm.QueryMod) classQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"class\".\"vehicle_id\"=?", o.ID),
+	)
+
+	query := Classes(queryMods...)
+	queries.SetFrom(query.Query, "\"class\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"class\".*"})
+	}
+
+	return query
+}
+
+// LoadClasses allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (vehicleL) LoadClasses(ctx context.Context, e boil.ContextExecutor, singular bool, maybeVehicle interface{}, mods queries.Applicator) error {
+	var slice []*Vehicle
+	var object *Vehicle
+
+	if singular {
+		object = maybeVehicle.(*Vehicle)
+	} else {
+		slice = *maybeVehicle.(*[]*Vehicle)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &vehicleR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &vehicleR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`class`), qm.WhereIn(`class.vehicle_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load class")
+	}
+
+	var resultSlice []*Class
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice class")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on class")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for class")
+	}
+
+	if len(classAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Classes = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &classR{}
+			}
+			foreign.R.Vehicle = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.VehicleID) {
+				local.R.Classes = append(local.R.Classes, foreign)
+				if foreign.R == nil {
+					foreign.R = &classR{}
+				}
+				foreign.R.Vehicle = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddClasses adds the given related objects to the existing relationships
+// of the vehicle, optionally inserting them as new records.
+// Appends related to o.R.Classes.
+// Sets related.R.Vehicle appropriately.
+func (o *Vehicle) AddClasses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Class) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.VehicleID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"class\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"vehicle_id"}),
+				strmangle.WhereClause("\"", "\"", 2, classPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.VehicleID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &vehicleR{
+			Classes: related,
+		}
+	} else {
+		o.R.Classes = append(o.R.Classes, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &classR{
+				Vehicle: o,
+			}
+		} else {
+			rel.R.Vehicle = o
+		}
+	}
+	return nil
+}
+
+// SetClasses removes all previously related items of the
+// vehicle replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Vehicle's Classes accordingly.
+// Replaces o.R.Classes with related.
+// Sets related.R.Vehicle's Classes accordingly.
+func (o *Vehicle) SetClasses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Class) error {
+	query := "update \"class\" set \"vehicle_id\" = null where \"vehicle_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.Classes {
+			queries.SetScanner(&rel.VehicleID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Vehicle = nil
+		}
+
+		o.R.Classes = nil
+	}
+	return o.AddClasses(ctx, exec, insert, related...)
+}
+
+// RemoveClasses relationships from objects passed in.
+// Removes related items from R.Classes (uses pointer comparison, removal does not keep order)
+// Sets related.R.Vehicle.
+func (o *Vehicle) RemoveClasses(ctx context.Context, exec boil.ContextExecutor, related ...*Class) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.VehicleID, nil)
+		if rel.R != nil {
+			rel.R.Vehicle = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("vehicle_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Classes {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Classes)
+			if ln > 1 && i < ln-1 {
+				o.R.Classes[i] = o.R.Classes[ln-1]
+			}
+			o.R.Classes = o.R.Classes[:ln-1]
+			break
+		}
+	}
+
+	return nil
 }
 
 // Vehicles retrieves all the records using an executor.

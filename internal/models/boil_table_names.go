@@ -11,15 +11,16 @@ var TableNames = struct {
 	ChildCategory     string
 	ChildSubject      string
 	Class             string
-	ClassSubject      string
 	Contact           string
 	Course            string
+	DetailSchedule    string
 	Information       string
 	Notification      string
 	Photos            string
 	Question          string
 	RankVehicle       string
 	Role              string
+	Schedule          string
 	Seo               string
 	Slide             string
 	Student           string
@@ -37,15 +38,16 @@ var TableNames = struct {
 	ChildCategory:     "child_category",
 	ChildSubject:      "child_subject",
 	Class:             "class",
-	ClassSubject:      "class_subject",
 	Contact:           "contact",
 	Course:            "course",
+	DetailSchedule:    "detail_schedule",
 	Information:       "information",
 	Notification:      "notification",
 	Photos:            "photos",
 	Question:          "question",
 	RankVehicle:       "rank_vehicle",
 	Role:              "role",
+	Schedule:          "schedule",
 	Seo:               "seo",
 	Slide:             "slide",
 	Student:           "student",
