@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -23,64 +24,94 @@ import (
 
 // Subject is an object representing the database table.
 type Subject struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Time      int       `boil:"time" json:"time" toml:"time" yaml:"time"`
-	CreatedBy string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedBy string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	TeacherID int       `boil:"teacher_id" json:"teacher_id" toml:"teacher_id" yaml:"teacher_id"`
-	Group     int       `boil:"group" json:"group" toml:"group" yaml:"group"`
+	ID              int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Time            int         `boil:"time" json:"time" toml:"time" yaml:"time"`
+	CreatedBy       string      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedBy       string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	TeacherID       null.Int    `boil:"teacher_id" json:"teacher_id,omitempty" toml:"teacher_id" yaml:"teacher_id,omitempty"`
+	Group           int         `boil:"group" json:"group" toml:"group" yaml:"group"`
+	RankID          null.Int    `boil:"rank_id" json:"rank_id,omitempty" toml:"rank_id" yaml:"rank_id,omitempty"`
+	Type            null.Int    `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
+	HourStudent     null.String `boil:"hour_student" json:"hour_student,omitempty" toml:"hour_student" yaml:"hour_student,omitempty"`
+	KMStudent       null.String `boil:"km_student" json:"km_student,omitempty" toml:"km_student" yaml:"km_student,omitempty"`
+	HourDateVehicle null.Int    `boil:"hour_date_vehicle" json:"hour_date_vehicle,omitempty" toml:"hour_date_vehicle" yaml:"hour_date_vehicle,omitempty"`
+	KMDateVehicle   null.Int    `boil:"km_date_vehicle" json:"km_date_vehicle,omitempty" toml:"km_date_vehicle" yaml:"km_date_vehicle,omitempty"`
 
 	R *subjectR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L subjectL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var SubjectColumns = struct {
-	ID        string
-	Name      string
-	Time      string
-	CreatedBy string
-	CreatedAt string
-	UpdatedBy string
-	UpdatedAt string
-	TeacherID string
-	Group     string
+	ID              string
+	Name            string
+	Time            string
+	CreatedBy       string
+	CreatedAt       string
+	UpdatedBy       string
+	UpdatedAt       string
+	TeacherID       string
+	Group           string
+	RankID          string
+	Type            string
+	HourStudent     string
+	KMStudent       string
+	HourDateVehicle string
+	KMDateVehicle   string
 }{
-	ID:        "id",
-	Name:      "name",
-	Time:      "time",
-	CreatedBy: "created_by",
-	CreatedAt: "created_at",
-	UpdatedBy: "updated_by",
-	UpdatedAt: "updated_at",
-	TeacherID: "teacher_id",
-	Group:     "group",
+	ID:              "id",
+	Name:            "name",
+	Time:            "time",
+	CreatedBy:       "created_by",
+	CreatedAt:       "created_at",
+	UpdatedBy:       "updated_by",
+	UpdatedAt:       "updated_at",
+	TeacherID:       "teacher_id",
+	Group:           "group",
+	RankID:          "rank_id",
+	Type:            "type",
+	HourStudent:     "hour_student",
+	KMStudent:       "km_student",
+	HourDateVehicle: "hour_date_vehicle",
+	KMDateVehicle:   "km_date_vehicle",
 }
 
 // Generated where
 
 var SubjectWhere = struct {
-	ID        whereHelperint
-	Name      whereHelperstring
-	Time      whereHelperint
-	CreatedBy whereHelperstring
-	CreatedAt whereHelpertime_Time
-	UpdatedBy whereHelperstring
-	UpdatedAt whereHelpertime_Time
-	TeacherID whereHelperint
-	Group     whereHelperint
+	ID              whereHelperint
+	Name            whereHelperstring
+	Time            whereHelperint
+	CreatedBy       whereHelperstring
+	CreatedAt       whereHelpertime_Time
+	UpdatedBy       whereHelperstring
+	UpdatedAt       whereHelpertime_Time
+	TeacherID       whereHelpernull_Int
+	Group           whereHelperint
+	RankID          whereHelpernull_Int
+	Type            whereHelpernull_Int
+	HourStudent     whereHelpernull_String
+	KMStudent       whereHelpernull_String
+	HourDateVehicle whereHelpernull_Int
+	KMDateVehicle   whereHelpernull_Int
 }{
-	ID:        whereHelperint{field: "\"subject\".\"id\""},
-	Name:      whereHelperstring{field: "\"subject\".\"name\""},
-	Time:      whereHelperint{field: "\"subject\".\"time\""},
-	CreatedBy: whereHelperstring{field: "\"subject\".\"created_by\""},
-	CreatedAt: whereHelpertime_Time{field: "\"subject\".\"created_at\""},
-	UpdatedBy: whereHelperstring{field: "\"subject\".\"updated_by\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"subject\".\"updated_at\""},
-	TeacherID: whereHelperint{field: "\"subject\".\"teacher_id\""},
-	Group:     whereHelperint{field: "\"subject\".\"group\""},
+	ID:              whereHelperint{field: "\"subject\".\"id\""},
+	Name:            whereHelperstring{field: "\"subject\".\"name\""},
+	Time:            whereHelperint{field: "\"subject\".\"time\""},
+	CreatedBy:       whereHelperstring{field: "\"subject\".\"created_by\""},
+	CreatedAt:       whereHelpertime_Time{field: "\"subject\".\"created_at\""},
+	UpdatedBy:       whereHelperstring{field: "\"subject\".\"updated_by\""},
+	UpdatedAt:       whereHelpertime_Time{field: "\"subject\".\"updated_at\""},
+	TeacherID:       whereHelpernull_Int{field: "\"subject\".\"teacher_id\""},
+	Group:           whereHelperint{field: "\"subject\".\"group\""},
+	RankID:          whereHelpernull_Int{field: "\"subject\".\"rank_id\""},
+	Type:            whereHelpernull_Int{field: "\"subject\".\"type\""},
+	HourStudent:     whereHelpernull_String{field: "\"subject\".\"hour_student\""},
+	KMStudent:       whereHelpernull_String{field: "\"subject\".\"km_student\""},
+	HourDateVehicle: whereHelpernull_Int{field: "\"subject\".\"hour_date_vehicle\""},
+	KMDateVehicle:   whereHelpernull_Int{field: "\"subject\".\"km_date_vehicle\""},
 }
 
 // SubjectRels is where relationship names are stored.
@@ -107,8 +138,8 @@ func (*subjectR) NewStruct() *subjectR {
 type subjectL struct{}
 
 var (
-	subjectAllColumns            = []string{"id", "name", "time", "created_by", "created_at", "updated_by", "updated_at", "teacher_id", "group"}
-	subjectColumnsWithoutDefault = []string{"name", "time", "created_by", "updated_by", "teacher_id", "group"}
+	subjectAllColumns            = []string{"id", "name", "time", "created_by", "created_at", "updated_by", "updated_at", "teacher_id", "group", "rank_id", "type", "hour_student", "km_student", "hour_date_vehicle", "km_date_vehicle"}
+	subjectColumnsWithoutDefault = []string{"name", "time", "created_by", "updated_by", "teacher_id", "group", "rank_id", "type", "hour_student", "km_student", "hour_date_vehicle", "km_date_vehicle"}
 	subjectColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	subjectPrimaryKeyColumns     = []string{"id"}
 )
@@ -440,7 +471,9 @@ func (subjectL) LoadTeacher(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &subjectR{}
 		}
-		args = append(args, object.TeacherID)
+		if !queries.IsNil(object.TeacherID) {
+			args = append(args, object.TeacherID)
+		}
 
 	} else {
 	Outer:
@@ -450,12 +483,14 @@ func (subjectL) LoadTeacher(ctx context.Context, e boil.ContextExecutor, singula
 			}
 
 			for _, a := range args {
-				if a == obj.TeacherID {
+				if queries.Equal(a, obj.TeacherID) {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.TeacherID)
+			if !queries.IsNil(obj.TeacherID) {
+				args = append(args, obj.TeacherID)
+			}
 
 		}
 	}
@@ -510,7 +545,7 @@ func (subjectL) LoadTeacher(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.TeacherID == foreign.ID {
+			if queries.Equal(local.TeacherID, foreign.ID) {
 				local.R.Teacher = foreign
 				if foreign.R == nil {
 					foreign.R = &teacherR{}
@@ -646,7 +681,7 @@ func (o *Subject) SetTeacher(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.TeacherID = related.ID
+	queries.Assign(&o.TeacherID, related.ID)
 	if o.R == nil {
 		o.R = &subjectR{
 			Teacher: related,
@@ -663,6 +698,39 @@ func (o *Subject) SetTeacher(ctx context.Context, exec boil.ContextExecutor, ins
 		related.R.Subjects = append(related.R.Subjects, o)
 	}
 
+	return nil
+}
+
+// RemoveTeacher relationship.
+// Sets o.R.Teacher to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Subject) RemoveTeacher(ctx context.Context, exec boil.ContextExecutor, related *Teacher) error {
+	var err error
+
+	queries.SetScanner(&o.TeacherID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("teacher_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Teacher = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Subjects {
+		if queries.Equal(o.TeacherID, ri.TeacherID) {
+			continue
+		}
+
+		ln := len(related.R.Subjects)
+		if ln > 1 && i < ln-1 {
+			related.R.Subjects[i] = related.R.Subjects[ln-1]
+		}
+		related.R.Subjects = related.R.Subjects[:ln-1]
+		break
+	}
 	return nil
 }
 

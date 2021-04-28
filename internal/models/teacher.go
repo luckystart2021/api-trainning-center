@@ -607,7 +607,7 @@ func (teacherL) LoadSubjects(ctx context.Context, e boil.ContextExecutor, singul
 			}
 
 			for _, a := range args {
-				if a == obj.ID {
+				if queries.Equal(a, obj.ID) {
 					continue Outer
 				}
 			}
@@ -662,7 +662,7 @@ func (teacherL) LoadSubjects(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.TeacherID {
+			if queries.Equal(local.ID, foreign.TeacherID) {
 				local.R.Subjects = append(local.R.Subjects, foreign)
 				if foreign.R == nil {
 					foreign.R = &subjectR{}
@@ -807,7 +807,7 @@ func (o *Teacher) AddSubjects(ctx context.Context, exec boil.ContextExecutor, in
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.TeacherID = o.ID
+			queries.Assign(&rel.TeacherID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -828,7 +828,7 @@ func (o *Teacher) AddSubjects(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.TeacherID = o.ID
+			queries.Assign(&rel.TeacherID, o.ID)
 		}
 	}
 
@@ -849,6 +849,76 @@ func (o *Teacher) AddSubjects(ctx context.Context, exec boil.ContextExecutor, in
 			rel.R.Teacher = o
 		}
 	}
+	return nil
+}
+
+// SetSubjects removes all previously related items of the
+// teacher replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Teacher's Subjects accordingly.
+// Replaces o.R.Subjects with related.
+// Sets related.R.Teacher's Subjects accordingly.
+func (o *Teacher) SetSubjects(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Subject) error {
+	query := "update \"subject\" set \"teacher_id\" = null where \"teacher_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.Subjects {
+			queries.SetScanner(&rel.TeacherID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Teacher = nil
+		}
+
+		o.R.Subjects = nil
+	}
+	return o.AddSubjects(ctx, exec, insert, related...)
+}
+
+// RemoveSubjects relationships from objects passed in.
+// Removes related items from R.Subjects (uses pointer comparison, removal does not keep order)
+// Sets related.R.Teacher.
+func (o *Teacher) RemoveSubjects(ctx context.Context, exec boil.ContextExecutor, related ...*Subject) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.TeacherID, nil)
+		if rel.R != nil {
+			rel.R.Teacher = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("teacher_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Subjects {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Subjects)
+			if ln > 1 && i < ln-1 {
+				o.R.Subjects[i] = o.R.Subjects[ln-1]
+			}
+			o.R.Subjects = o.R.Subjects[:ln-1]
+			break
+		}
+	}
+
 	return nil
 }
 

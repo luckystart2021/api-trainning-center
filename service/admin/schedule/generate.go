@@ -2,17 +2,32 @@ package schedule
 
 import (
 	"api-trainning-center/internal/models"
-	"api-trainning-center/service/response"
 	"api-trainning-center/utils"
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
+type Schedule struct {
+	LyThuyet []ScheduleResponse `json:"ly_thuyet"`
+	ThucHanh []ThucHanhResponse `json:"thuc_hanh"`
+}
+
+type ThucHanhResponse struct {
+	WeekDay            string `json:"week_day"`
+	Date               string `json:"date"`
+	SubjectName        string `json:"subject_name"`
+	HourStudent        string `json:"gio_hoc_vien"`
+	KmStudent          string `json:"km_hoc_vien"`
+	HourPerDateVehicle int    `json:"gio_ngay_xe"`
+	KmDateVehicle      int    `json:"km_ngay_xe"`
+}
 type ScheduleResponse struct {
 	SubjectName string    `json:"subject_name"`
 	Time        int       `json:"time"`
@@ -35,9 +50,6 @@ type SubjectContent struct {
 }
 
 func ConvertDayString(day int) string {
-	// khai báo một mảng các string
-	// toán tử ... để đếm số phần tử
-	// số phần tử của mảng là (7)
 	names := [...]string{
 		"CN",
 		"2",
@@ -50,32 +62,165 @@ func ConvertDayString(day int) string {
 	return names[day]
 }
 
-var holiday = map[string]string{
-	// "26-03-2020": "le",
-	// "30-03-2020": "le",
-	// "19-04-2020": "le",
+var (
+	holiday = map[string]string{
+		"30-04-2020": "holiday",
+		"01-05-2020": "holiday",
+		"23-04-2020": "holiday",
+		"10-05-2020": "holiday",
+	}
+	continueDate time.Time
+)
+
+func (st StoreSchedule) GenerateSchedule(courseId int) (Schedule, error) {
+	scheduleResponses := Schedule{}
+	course, _ := models.FindCourse(context.Background(), st.db, courseId)
+	if course.TrainingSystem == "B2" {
+		lyThuyet, err := generateB2(st.db, course)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[generateB2] error : ", err)
+			return scheduleResponses, err
+		}
+		scheduleResponses.LyThuyet = lyThuyet
+		thucHanh, err := generateThucHanhB2(st.db)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[generateB2] error : ", err)
+			return scheduleResponses, err
+		}
+		scheduleResponses.ThucHanh = thucHanh
+	}
+	return scheduleResponses, nil
 }
 
-func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, error) {
-	response := response.MessageResponse{}
-	scheduleResponses := []ScheduleResponse{}
-	course, _ := models.FindCourse(context.Background(), st.db, courseId)
-
-	to := course.EndDate
-	from := course.StartDate
-	// fmt.Println("SSS", from.AddDate(0, 3, 0))
-	days := to.Sub(from) / (24 * time.Hour)
-	fmt.Println("days", int(days))
-	// noofdays := int(days)
-	subjects, _ := models.Subjects(
+func generateThucHanhB2(st *sql.DB) ([]ThucHanhResponse, error) {
+	thucHanhResponses := []ThucHanhResponse{}
+	subjects, err := models.Subjects(
+		qm.Where("rank_id = ?", 1),
+		qm.And("type = ?", 2),
 		qm.OrderBy("id"),
-	).All(context.Background(), st.db)
+	).All(context.Background(), st)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[Subjects] error : ", err)
+		return nil, err
+	}
+	intDays := 0
+	for index, subject := range subjects {
+		thucHanhResponse := ThucHanhResponse{}
+		groups := subject.Group
+		if index == 0 {
+			startDay := 0
+			for i := 0; i < groups; i++ {
+				addDate := continueDate.AddDate(0, 0, startDay+1)
+				// Ngày học
+				thucHanhResponse.Date = utils.TimeIn(addDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+				// Nội dung môn học
+				thucHanhResponse.SubjectName = subject.Name
+				// Thứ trong tuần
+				date := addDate.Weekday()
+				thucHanhResponse.WeekDay = ConvertDayString(int(date))
+
+				_, ok := holiday[utils.TimeIn(addDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)]
+				if ok {
+					startDay = startDay + 1
+					nextDate := continueDate.AddDate(0, 0, startDay)
+					_, ok := holiday[utils.TimeIn(nextDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)]
+					thucHanhResponse.Date = utils.TimeIn(continueDate.AddDate(0, 0, startDay), utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+					date := continueDate.AddDate(0, 0, startDay).Weekday()
+					thucHanhResponse.WeekDay = ConvertDayString(int(date))
+					if ok {
+						next := startDay + 1
+						thucHanhResponse.Date = utils.TimeIn(continueDate.AddDate(0, 0, next), utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+						date := continueDate.AddDate(0, 0, startDay+1).Weekday()
+						thucHanhResponse.WeekDay = ConvertDayString(int(date))
+						startDay = next
+					}
+				}
+				// giờ / học viên
+				thucHanhResponse.HourStudent = subject.HourStudent.String
+				// Km / học viên
+				thucHanhResponse.KmStudent = subject.KMStudent.String
+				// giờ/ ngày xe
+				thucHanhResponse.HourPerDateVehicle = subject.HourDateVehicle.Int
+				// Km / Ngày xe
+				thucHanhResponse.KmDateVehicle = subject.KMDateVehicle.Int
+
+				thucHanhResponses = append(thucHanhResponses, thucHanhResponse)
+				intDays++
+				startDay++
+			}
+		} else {
+			ns := groups + intDays
+			startDay := intDays
+			for i := intDays; i < ns; i++ {
+				addDate := continueDate.AddDate(0, 0, startDay)
+				if index > 1 {
+					addDate = continueDate.AddDate(0, 0, startDay)
+				}
+				// Ngày học
+				thucHanhResponse.Date = utils.TimeIn(addDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+				// Nội dung môn học
+				thucHanhResponse.SubjectName = subject.Name
+				// Thứ trong tuần
+				date := addDate.Weekday()
+				thucHanhResponse.WeekDay = ConvertDayString(int(date))
+
+				_, ok := holiday[utils.TimeIn(addDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)]
+				if ok {
+					startDay = startDay + 1
+					nextDate := continueDate.AddDate(0, 0, startDay)
+					_, ok := holiday[utils.TimeIn(nextDate, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)]
+					thucHanhResponse.Date = utils.TimeIn(continueDate.AddDate(0, 0, startDay), utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+					date := continueDate.AddDate(0, 0, startDay).Weekday()
+					thucHanhResponse.WeekDay = ConvertDayString(int(date))
+					if ok {
+						next := startDay + 1
+						thucHanhResponse.Date = utils.TimeIn(continueDate.AddDate(0, 0, next), utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYY)
+						date := continueDate.AddDate(0, 0, startDay+1).Weekday()
+						thucHanhResponse.WeekDay = ConvertDayString(int(date))
+						startDay = next
+						intDays++
+					}
+					intDays++
+				}
+				// giờ / học viên
+				thucHanhResponse.HourStudent = subject.HourStudent.String
+				// Km / học viên
+				thucHanhResponse.KmStudent = subject.KMStudent.String
+				// giờ/ ngày xe
+				thucHanhResponse.HourPerDateVehicle = subject.HourDateVehicle.Int
+				// Km / Ngày xe
+				thucHanhResponse.KmDateVehicle = subject.KMDateVehicle.Int
+				thucHanhResponses = append(thucHanhResponses, thucHanhResponse)
+				intDays++
+				startDay++
+			}
+		}
+	}
+	return thucHanhResponses, nil
+}
+
+func generateB2(st *sql.DB, course *models.Course) ([]ScheduleResponse, error) {
+	scheduleResponses := []ScheduleResponse{}
+	from := course.StartDate
+	subjects, err := models.Subjects(
+		qm.Where("rank_id = ?", 1),
+		qm.And("type = ?", 1),
+		qm.OrderBy("id"),
+	).All(context.Background(), st)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[Subjects] error : ", err)
+		return nil, err
+	}
 	intDays := 0
 	for index, subject := range subjects {
 		scheduleResponse := ScheduleResponse{}
 		scheduleResponse.SubjectName = subject.Name
 		scheduleResponse.Time = subject.Time
-		teacher, _ := models.FindTeacher(context.Background(), st.db, subject.TeacherID)
+		teacher, err := models.FindTeacher(context.Background(), st, subject.TeacherID.Int)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[FindTeacher] error : ", err)
+			return nil, err
+		}
 		scheduleResponse.Teacher = teacher.Fullname
 		groups := subject.Group
 		if index == 0 {
@@ -100,10 +245,14 @@ func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, erro
 				}
 
 				group := i + 1
-				childSubject, _ := models.ChildSubjects(
+				childSubject, err := models.ChildSubjects(
 					models.ChildSubjectWhere.SubjectID.EQ(subject.ID),
 					models.ChildSubjectWhere.Group.EQ(null.StringFrom(strconv.Itoa(group))),
-				).All(context.Background(), st.db)
+				).All(context.Background(), st)
+				if err != nil {
+					logrus.WithFields(logrus.Fields{}).Error("[ChildSubjects] error : ", err)
+					return nil, err
+				}
 				if len(childSubject) > 0 {
 					subjectContents := []SubjectContent{}
 					for _, data := range childSubject {
@@ -147,11 +296,21 @@ func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, erro
 					content.WeekDay = ConvertDayString(int(date))
 					intDays++
 				}
+				// convert string to date để lưu lại ngày cuối cùng học lý thuyết
+				lastDateLyThuyet, err := time.Parse("02-01-2006", content.Date)
+				if err != nil {
+					fmt.Println(err)
+				}
+				continueDate = lastDateLyThuyet
 
-				childSubject, _ := models.ChildSubjects(
+				childSubject, err := models.ChildSubjects(
 					models.ChildSubjectWhere.SubjectID.EQ(subject.ID),
 					models.ChildSubjectWhere.Group.EQ(null.StringFrom(strconv.Itoa(groupChild))),
-				).All(context.Background(), st.db)
+				).All(context.Background(), st)
+				if err != nil {
+					logrus.WithFields(logrus.Fields{}).Error("[ChildSubjects] error : ", err)
+					return nil, err
+				}
 				if len(childSubject) > 0 {
 					subjectContents := []SubjectContent{}
 					for _, data := range childSubject {
@@ -176,7 +335,7 @@ func (st StoreSchedule) GenerateSchedule(courseId int) ([]ScheduleResponse, erro
 		}
 		scheduleResponses = append(scheduleResponses, scheduleResponse)
 	}
-	response.Status = true
-	response.Message = "Tạo lịch học thành công"
+	logrus.WithFields(logrus.Fields{}).Infoln("[Ngày học lý thuyết cuối cùng]  : ", continueDate)
+
 	return scheduleResponses, nil
 }
