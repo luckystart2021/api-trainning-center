@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -24,62 +23,76 @@ import (
 
 // Schedule is an object representing the database table.
 type Schedule struct {
-	ID        int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Day       null.Int    `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
-	StudyDate null.String `boil:"study_date" json:"study_date,omitempty" toml:"study_date" yaml:"study_date,omitempty"`
-	CreatedAt time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	CreatedBy string      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	UpdatedAt time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	UpdatedBy string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	ID          int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	CreatedBy   string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	UpdatedBy   string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	CourseID    int64     `boil:"course_id" json:"course_id" toml:"course_id" yaml:"course_id"`
+	SubjectName string    `boil:"subject_name" json:"subject_name" toml:"subject_name" yaml:"subject_name"`
+	TeacherName string    `boil:"teacher_name" json:"teacher_name" toml:"teacher_name" yaml:"teacher_name"`
+	Time        int       `boil:"time" json:"time" toml:"time" yaml:"time"`
 
 	R *scheduleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L scheduleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var ScheduleColumns = struct {
-	ID        string
-	Day       string
-	StudyDate string
-	CreatedAt string
-	CreatedBy string
-	UpdatedAt string
-	UpdatedBy string
+	ID          string
+	CreatedAt   string
+	CreatedBy   string
+	UpdatedAt   string
+	UpdatedBy   string
+	CourseID    string
+	SubjectName string
+	TeacherName string
+	Time        string
 }{
-	ID:        "id",
-	Day:       "day",
-	StudyDate: "study_date",
-	CreatedAt: "created_at",
-	CreatedBy: "created_by",
-	UpdatedAt: "updated_at",
-	UpdatedBy: "updated_by",
+	ID:          "id",
+	CreatedAt:   "created_at",
+	CreatedBy:   "created_by",
+	UpdatedAt:   "updated_at",
+	UpdatedBy:   "updated_by",
+	CourseID:    "course_id",
+	SubjectName: "subject_name",
+	TeacherName: "teacher_name",
+	Time:        "time",
 }
 
 // Generated where
 
 var ScheduleWhere = struct {
-	ID        whereHelperint64
-	Day       whereHelpernull_Int
-	StudyDate whereHelpernull_String
-	CreatedAt whereHelpertime_Time
-	CreatedBy whereHelperstring
-	UpdatedAt whereHelpertime_Time
-	UpdatedBy whereHelperstring
+	ID          whereHelperint64
+	CreatedAt   whereHelpertime_Time
+	CreatedBy   whereHelperstring
+	UpdatedAt   whereHelpertime_Time
+	UpdatedBy   whereHelperstring
+	CourseID    whereHelperint64
+	SubjectName whereHelperstring
+	TeacherName whereHelperstring
+	Time        whereHelperint
 }{
-	ID:        whereHelperint64{field: "\"schedule\".\"id\""},
-	Day:       whereHelpernull_Int{field: "\"schedule\".\"day\""},
-	StudyDate: whereHelpernull_String{field: "\"schedule\".\"study_date\""},
-	CreatedAt: whereHelpertime_Time{field: "\"schedule\".\"created_at\""},
-	CreatedBy: whereHelperstring{field: "\"schedule\".\"created_by\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"schedule\".\"updated_at\""},
-	UpdatedBy: whereHelperstring{field: "\"schedule\".\"updated_by\""},
+	ID:          whereHelperint64{field: "\"schedule\".\"id\""},
+	CreatedAt:   whereHelpertime_Time{field: "\"schedule\".\"created_at\""},
+	CreatedBy:   whereHelperstring{field: "\"schedule\".\"created_by\""},
+	UpdatedAt:   whereHelpertime_Time{field: "\"schedule\".\"updated_at\""},
+	UpdatedBy:   whereHelperstring{field: "\"schedule\".\"updated_by\""},
+	CourseID:    whereHelperint64{field: "\"schedule\".\"course_id\""},
+	SubjectName: whereHelperstring{field: "\"schedule\".\"subject_name\""},
+	TeacherName: whereHelperstring{field: "\"schedule\".\"teacher_name\""},
+	Time:        whereHelperint{field: "\"schedule\".\"time\""},
 }
 
 // ScheduleRels is where relationship names are stored.
 var ScheduleRels = struct {
-}{}
+	ScheduleContents string
+}{
+	ScheduleContents: "ScheduleContents",
+}
 
 // scheduleR is where relationships are stored.
 type scheduleR struct {
+	ScheduleContents ScheduleContentSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -91,8 +104,8 @@ func (*scheduleR) NewStruct() *scheduleR {
 type scheduleL struct{}
 
 var (
-	scheduleAllColumns            = []string{"id", "day", "study_date", "created_at", "created_by", "updated_at", "updated_by"}
-	scheduleColumnsWithoutDefault = []string{"day", "study_date", "created_by", "updated_by"}
+	scheduleAllColumns            = []string{"id", "created_at", "created_by", "updated_at", "updated_by", "course_id", "subject_name", "teacher_name", "time"}
+	scheduleColumnsWithoutDefault = []string{"created_by", "updated_by", "course_id", "subject_name", "teacher_name", "time"}
 	scheduleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	schedulePrimaryKeyColumns     = []string{"id"}
 )
@@ -370,6 +383,245 @@ func (q scheduleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (b
 	}
 
 	return count > 0, nil
+}
+
+// ScheduleContents retrieves all the schedule_content's ScheduleContents with an executor.
+func (o *Schedule) ScheduleContents(mods ...qm.QueryMod) scheduleContentQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"schedule_content\".\"schedule_id\"=?", o.ID),
+	)
+
+	query := ScheduleContents(queryMods...)
+	queries.SetFrom(query.Query, "\"schedule_content\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"schedule_content\".*"})
+	}
+
+	return query
+}
+
+// LoadScheduleContents allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (scheduleL) LoadScheduleContents(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSchedule interface{}, mods queries.Applicator) error {
+	var slice []*Schedule
+	var object *Schedule
+
+	if singular {
+		object = maybeSchedule.(*Schedule)
+	} else {
+		slice = *maybeSchedule.(*[]*Schedule)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &scheduleR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &scheduleR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`schedule_content`), qm.WhereIn(`schedule_content.schedule_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load schedule_content")
+	}
+
+	var resultSlice []*ScheduleContent
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice schedule_content")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on schedule_content")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for schedule_content")
+	}
+
+	if len(scheduleContentAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ScheduleContents = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &scheduleContentR{}
+			}
+			foreign.R.Schedule = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.ScheduleID) {
+				local.R.ScheduleContents = append(local.R.ScheduleContents, foreign)
+				if foreign.R == nil {
+					foreign.R = &scheduleContentR{}
+				}
+				foreign.R.Schedule = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddScheduleContents adds the given related objects to the existing relationships
+// of the schedule, optionally inserting them as new records.
+// Appends related to o.R.ScheduleContents.
+// Sets related.R.Schedule appropriately.
+func (o *Schedule) AddScheduleContents(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ScheduleContent) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.ScheduleID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"schedule_content\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"schedule_id"}),
+				strmangle.WhereClause("\"", "\"", 2, scheduleContentPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.ScheduleID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &scheduleR{
+			ScheduleContents: related,
+		}
+	} else {
+		o.R.ScheduleContents = append(o.R.ScheduleContents, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &scheduleContentR{
+				Schedule: o,
+			}
+		} else {
+			rel.R.Schedule = o
+		}
+	}
+	return nil
+}
+
+// SetScheduleContents removes all previously related items of the
+// schedule replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Schedule's ScheduleContents accordingly.
+// Replaces o.R.ScheduleContents with related.
+// Sets related.R.Schedule's ScheduleContents accordingly.
+func (o *Schedule) SetScheduleContents(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ScheduleContent) error {
+	query := "update \"schedule_content\" set \"schedule_id\" = null where \"schedule_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.ScheduleContents {
+			queries.SetScanner(&rel.ScheduleID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Schedule = nil
+		}
+
+		o.R.ScheduleContents = nil
+	}
+	return o.AddScheduleContents(ctx, exec, insert, related...)
+}
+
+// RemoveScheduleContents relationships from objects passed in.
+// Removes related items from R.ScheduleContents (uses pointer comparison, removal does not keep order)
+// Sets related.R.Schedule.
+func (o *Schedule) RemoveScheduleContents(ctx context.Context, exec boil.ContextExecutor, related ...*ScheduleContent) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.ScheduleID, nil)
+		if rel.R != nil {
+			rel.R.Schedule = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("schedule_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.ScheduleContents {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.ScheduleContents)
+			if ln > 1 && i < ln-1 {
+				o.R.ScheduleContents[i] = o.R.ScheduleContents[ln-1]
+			}
+			o.R.ScheduleContents = o.R.ScheduleContents[:ln-1]
+			break
+		}
+	}
+
+	return nil
 }
 
 // Schedules retrieves all the records using an executor.

@@ -5,12 +5,14 @@ import (
 	"api-trainning-center/utils"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null"
+	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
@@ -89,7 +91,83 @@ func (st StoreSchedule) GenerateSchedule(courseId int) (Schedule, error) {
 		}
 		scheduleResponses.ThucHanh = thucHanh
 	}
+	err := saveSchedules(courseId, st.db, scheduleResponses)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[saveSchedules] error : ", err)
+		return scheduleResponses, err
+	}
 	return scheduleResponses, nil
+}
+
+func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
+	ctx := context.Background()
+	lyThuyets := scheduleResponses.LyThuyet
+	for _, lyThuyet := range lyThuyets {
+		schedule := models.Schedule{}
+		schedule.SubjectName = lyThuyet.SubjectName
+		schedule.TeacherName = lyThuyet.Teacher
+		schedule.Time = lyThuyet.Time
+		err := schedule.Insert(ctx, st, boil.Infer())
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[Insert] Create schedule error : ", err)
+			return errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		scheduleD, err := models.Schedules(
+			qm.OrderBy("id DESC"),
+			qm.Limit(1)).One(ctx, st)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[Schedules] Find Schedules error : ", err)
+			return errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		for _, content := range lyThuyet.Schedule {
+			contentSchedule := models.ScheduleContent{}
+			contentSchedule.Weekday = content.WeekDay
+			contentSchedule.Date = content.Date
+			contentSchedule.ScheduleID = null.Int64From(scheduleD.ID)
+			err := contentSchedule.Insert(ctx, st, boil.Infer())
+			if err != nil {
+				logrus.WithFields(logrus.Fields{}).Error("[Insert] Create contentSchedule error : ", err)
+				return errors.New("Lỗi hệ thống vui lòng thử lại")
+			}
+			contentScheduleD, err := models.ScheduleContents(
+				qm.OrderBy("id DESC"),
+				qm.Limit(1)).One(ctx, st)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{}).Error("[ScheduleContents] Find ScheduleContents error : ", err)
+				return errors.New("Lỗi hệ thống vui lòng thử lại")
+			}
+			for _, schedule := range content.SubjectContents {
+				scheduleSubject := models.ScheduleSubject{}
+				scheduleSubject.Name = schedule.Name
+				scheduleSubject.LT = schedule.Lt
+				scheduleSubject.TH = schedule.Th
+				scheduleSubject.ScheduleSubjectID = contentScheduleD.ID
+				err := scheduleSubject.Insert(ctx, st, boil.Infer())
+				if err != nil {
+					logrus.WithFields(logrus.Fields{}).Error("[Insert] Create scheduleSubject error : ", err)
+					return errors.New("Lỗi hệ thống vui lòng thử lại")
+				}
+			}
+		}
+	}
+
+	thucHanhs := scheduleResponses.ThucHanh
+	for _, thucHanh := range thucHanhs {
+		contentSchedule1 := models.ScheduleContent{}
+		contentSchedule1.Weekday = thucHanh.WeekDay
+		contentSchedule1.Date = thucHanh.Date
+		contentSchedule1.SubjectName = null.StringFrom(thucHanh.SubjectName)
+		contentSchedule1.HourStudent = null.StringFrom(thucHanh.HourStudent)
+		contentSchedule1.KMStudent = null.StringFrom(thucHanh.KmStudent)
+		contentSchedule1.HourPerDateVehicle = null.IntFrom(thucHanh.HourPerDateVehicle)
+		contentSchedule1.KMDateVehicle = null.IntFrom(thucHanh.KmDateVehicle)
+		err := contentSchedule1.Insert(ctx, st, boil.Infer())
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Error("[Insert] Create contentSchedule error : ", err)
+			return errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+	}
+	return nil
 }
 
 func generateThucHanhB2(st *sql.DB) ([]ThucHanhResponse, error) {

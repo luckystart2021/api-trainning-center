@@ -21,6 +21,8 @@ var TableNames = struct {
 	RankVehicle       string
 	Role              string
 	Schedule          string
+	ScheduleContent   string
+	ScheduleSubject   string
 	Seo               string
 	Slide             string
 	Student           string
@@ -48,6 +50,8 @@ var TableNames = struct {
 	RankVehicle:       "rank_vehicle",
 	Role:              "role",
 	Schedule:          "schedule",
+	ScheduleContent:   "schedule_content",
+	ScheduleSubject:   "schedule_subject",
 	Seo:               "seo",
 	Slide:             "slide",
 	Student:           "student",
