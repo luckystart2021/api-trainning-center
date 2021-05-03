@@ -107,6 +107,9 @@ func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
 		schedule.SubjectName = lyThuyet.SubjectName
 		schedule.TeacherName = lyThuyet.Teacher
 		schedule.Time = lyThuyet.Time
+		schedule.CourseID = int64(courseId)
+		schedule.TotalLythuyet = lyThuyet.TotalLT
+		schedule.TotalThuchanh = lyThuyet.TotalTH
 		err := schedule.Insert(ctx, st, boil.Infer())
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Error("[Insert] Create schedule error : ", err)
@@ -161,6 +164,7 @@ func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
 		contentSchedule1.KMStudent = null.StringFrom(thucHanh.KmStudent)
 		contentSchedule1.HourPerDateVehicle = null.IntFrom(thucHanh.HourPerDateVehicle)
 		contentSchedule1.KMDateVehicle = null.IntFrom(thucHanh.KmDateVehicle)
+		contentSchedule1.CourseID = null.IntFrom(courseId)
 		err := contentSchedule1.Insert(ctx, st, boil.Infer())
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Error("[Insert] Create contentSchedule error : ", err)
@@ -293,7 +297,7 @@ func generateB2(st *sql.DB, course *models.Course) ([]ScheduleResponse, error) {
 	for index, subject := range subjects {
 		scheduleResponse := ScheduleResponse{}
 		scheduleResponse.SubjectName = subject.Name
-		scheduleResponse.Time = subject.Time
+		scheduleResponse.Time = subject.Time.Int
 		teacher, err := models.FindTeacher(context.Background(), st, subject.TeacherID.Int)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{}).Error("[FindTeacher] error : ", err)

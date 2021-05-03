@@ -2,13 +2,14 @@ package subject
 
 import (
 	"api-trainning-center/internal/models"
+	"api-trainning-center/service/response"
 	"database/sql"
 )
 
 type ISubjectService interface {
-	// CreateSubject(req models.Teacher, userName string) (response.MessageResponse, error)
-	// UpdateSubject(id int, req models.Teacher, userName string) (response.MessageResponse, error)
-	// ShowSubject(idTeacher int) (models.Teacher, error)
+	CreateSubject(req models.Subject, userName string) (response.MessageResponse, error)
+	UpdateSubject(subjectID int, req models.Subject, userName string) (response.MessageResponse, error)
+	ShowSubject(subjectID int) (models.Subject, error)
 	ShowSubjects() (models.SubjectSlice, error)
 }
 

@@ -26,7 +26,7 @@ import (
 type Subject struct {
 	ID              int         `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Time            int         `boil:"time" json:"time" toml:"time" yaml:"time"`
+	Time            null.Int    `boil:"time" json:"time,omitempty" toml:"time" yaml:"time,omitempty"`
 	CreatedBy       string      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
 	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedBy       string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
@@ -83,7 +83,7 @@ var SubjectColumns = struct {
 var SubjectWhere = struct {
 	ID              whereHelperint
 	Name            whereHelperstring
-	Time            whereHelperint
+	Time            whereHelpernull_Int
 	CreatedBy       whereHelperstring
 	CreatedAt       whereHelpertime_Time
 	UpdatedBy       whereHelperstring
@@ -99,7 +99,7 @@ var SubjectWhere = struct {
 }{
 	ID:              whereHelperint{field: "\"subject\".\"id\""},
 	Name:            whereHelperstring{field: "\"subject\".\"name\""},
-	Time:            whereHelperint{field: "\"subject\".\"time\""},
+	Time:            whereHelpernull_Int{field: "\"subject\".\"time\""},
 	CreatedBy:       whereHelperstring{field: "\"subject\".\"created_by\""},
 	CreatedAt:       whereHelpertime_Time{field: "\"subject\".\"created_at\""},
 	UpdatedBy:       whereHelperstring{field: "\"subject\".\"updated_by\""},

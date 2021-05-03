@@ -3,28 +3,16 @@ package schedule
 import (
 	"api-trainning-center/service/admin/schedule"
 	"api-trainning-center/service/response"
-	"database/sql"
 	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/go-redis/redis"
 )
 
-func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
-	st := schedule.NewStoreSchedule(db)
-	return func(router chi.Router) {
-		router.Route("/schedule", func(router chi.Router) {
-			router.Get("/{id}/generate", GenerateSchedule(st))
-			router.Get("/{course_id}/view", GetSchedule(st))
-		})
-	}
-}
-
-func GenerateSchedule(service schedule.IScheduleService) http.HandlerFunc {
+func GetSchedule(service schedule.IScheduleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
+		id := chi.URLParam(r, "course_id")
 		if id == "" {
 			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không được rỗng"))
 			return
@@ -37,7 +25,7 @@ func GenerateSchedule(service schedule.IScheduleService) http.HandlerFunc {
 			return
 		}
 
-		resp, err := service.GenerateSchedule(idCourse)
+		resp, err := service.RetrieveSchedule(idCourse)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

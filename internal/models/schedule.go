@@ -23,64 +23,74 @@ import (
 
 // Schedule is an object representing the database table.
 type Schedule struct {
-	ID          int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	CreatedBy   string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	UpdatedBy   string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
-	CourseID    int64     `boil:"course_id" json:"course_id" toml:"course_id" yaml:"course_id"`
-	SubjectName string    `boil:"subject_name" json:"subject_name" toml:"subject_name" yaml:"subject_name"`
-	TeacherName string    `boil:"teacher_name" json:"teacher_name" toml:"teacher_name" yaml:"teacher_name"`
-	Time        int       `boil:"time" json:"time" toml:"time" yaml:"time"`
+	ID            int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CreatedAt     time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	CreatedBy     string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	UpdatedAt     time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	UpdatedBy     string    `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	CourseID      int64     `boil:"course_id" json:"course_id" toml:"course_id" yaml:"course_id"`
+	SubjectName   string    `boil:"subject_name" json:"subject_name" toml:"subject_name" yaml:"subject_name"`
+	TeacherName   string    `boil:"teacher_name" json:"teacher_name" toml:"teacher_name" yaml:"teacher_name"`
+	Time          int       `boil:"time" json:"time" toml:"time" yaml:"time"`
+	TotalLythuyet int       `boil:"total_lythuyet" json:"total_lythuyet" toml:"total_lythuyet" yaml:"total_lythuyet"`
+	TotalThuchanh int       `boil:"total_thuchanh" json:"total_thuchanh" toml:"total_thuchanh" yaml:"total_thuchanh"`
 
 	R *scheduleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L scheduleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var ScheduleColumns = struct {
-	ID          string
-	CreatedAt   string
-	CreatedBy   string
-	UpdatedAt   string
-	UpdatedBy   string
-	CourseID    string
-	SubjectName string
-	TeacherName string
-	Time        string
+	ID            string
+	CreatedAt     string
+	CreatedBy     string
+	UpdatedAt     string
+	UpdatedBy     string
+	CourseID      string
+	SubjectName   string
+	TeacherName   string
+	Time          string
+	TotalLythuyet string
+	TotalThuchanh string
 }{
-	ID:          "id",
-	CreatedAt:   "created_at",
-	CreatedBy:   "created_by",
-	UpdatedAt:   "updated_at",
-	UpdatedBy:   "updated_by",
-	CourseID:    "course_id",
-	SubjectName: "subject_name",
-	TeacherName: "teacher_name",
-	Time:        "time",
+	ID:            "id",
+	CreatedAt:     "created_at",
+	CreatedBy:     "created_by",
+	UpdatedAt:     "updated_at",
+	UpdatedBy:     "updated_by",
+	CourseID:      "course_id",
+	SubjectName:   "subject_name",
+	TeacherName:   "teacher_name",
+	Time:          "time",
+	TotalLythuyet: "total_lythuyet",
+	TotalThuchanh: "total_thuchanh",
 }
 
 // Generated where
 
 var ScheduleWhere = struct {
-	ID          whereHelperint64
-	CreatedAt   whereHelpertime_Time
-	CreatedBy   whereHelperstring
-	UpdatedAt   whereHelpertime_Time
-	UpdatedBy   whereHelperstring
-	CourseID    whereHelperint64
-	SubjectName whereHelperstring
-	TeacherName whereHelperstring
-	Time        whereHelperint
+	ID            whereHelperint64
+	CreatedAt     whereHelpertime_Time
+	CreatedBy     whereHelperstring
+	UpdatedAt     whereHelpertime_Time
+	UpdatedBy     whereHelperstring
+	CourseID      whereHelperint64
+	SubjectName   whereHelperstring
+	TeacherName   whereHelperstring
+	Time          whereHelperint
+	TotalLythuyet whereHelperint
+	TotalThuchanh whereHelperint
 }{
-	ID:          whereHelperint64{field: "\"schedule\".\"id\""},
-	CreatedAt:   whereHelpertime_Time{field: "\"schedule\".\"created_at\""},
-	CreatedBy:   whereHelperstring{field: "\"schedule\".\"created_by\""},
-	UpdatedAt:   whereHelpertime_Time{field: "\"schedule\".\"updated_at\""},
-	UpdatedBy:   whereHelperstring{field: "\"schedule\".\"updated_by\""},
-	CourseID:    whereHelperint64{field: "\"schedule\".\"course_id\""},
-	SubjectName: whereHelperstring{field: "\"schedule\".\"subject_name\""},
-	TeacherName: whereHelperstring{field: "\"schedule\".\"teacher_name\""},
-	Time:        whereHelperint{field: "\"schedule\".\"time\""},
+	ID:            whereHelperint64{field: "\"schedule\".\"id\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"schedule\".\"created_at\""},
+	CreatedBy:     whereHelperstring{field: "\"schedule\".\"created_by\""},
+	UpdatedAt:     whereHelpertime_Time{field: "\"schedule\".\"updated_at\""},
+	UpdatedBy:     whereHelperstring{field: "\"schedule\".\"updated_by\""},
+	CourseID:      whereHelperint64{field: "\"schedule\".\"course_id\""},
+	SubjectName:   whereHelperstring{field: "\"schedule\".\"subject_name\""},
+	TeacherName:   whereHelperstring{field: "\"schedule\".\"teacher_name\""},
+	Time:          whereHelperint{field: "\"schedule\".\"time\""},
+	TotalLythuyet: whereHelperint{field: "\"schedule\".\"total_lythuyet\""},
+	TotalThuchanh: whereHelperint{field: "\"schedule\".\"total_thuchanh\""},
 }
 
 // ScheduleRels is where relationship names are stored.
@@ -104,8 +114,8 @@ func (*scheduleR) NewStruct() *scheduleR {
 type scheduleL struct{}
 
 var (
-	scheduleAllColumns            = []string{"id", "created_at", "created_by", "updated_at", "updated_by", "course_id", "subject_name", "teacher_name", "time"}
-	scheduleColumnsWithoutDefault = []string{"created_by", "updated_by", "course_id", "subject_name", "teacher_name", "time"}
+	scheduleAllColumns            = []string{"id", "created_at", "created_by", "updated_at", "updated_by", "course_id", "subject_name", "teacher_name", "time", "total_lythuyet", "total_thuchanh"}
+	scheduleColumnsWithoutDefault = []string{"created_by", "updated_by", "course_id", "subject_name", "teacher_name", "time", "total_lythuyet", "total_thuchanh"}
 	scheduleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	schedulePrimaryKeyColumns     = []string{"id"}
 )

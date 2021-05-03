@@ -34,6 +34,7 @@ type ScheduleContent struct {
 	KMStudent          null.String `boil:"km_student" json:"km_student,omitempty" toml:"km_student" yaml:"km_student,omitempty"`
 	HourPerDateVehicle null.Int    `boil:"hour_per_date_vehicle" json:"hour_per_date_vehicle,omitempty" toml:"hour_per_date_vehicle" yaml:"hour_per_date_vehicle,omitempty"`
 	KMDateVehicle      null.Int    `boil:"km_date_vehicle" json:"km_date_vehicle,omitempty" toml:"km_date_vehicle" yaml:"km_date_vehicle,omitempty"`
+	CourseID           null.Int    `boil:"course_id" json:"course_id,omitempty" toml:"course_id" yaml:"course_id,omitempty"`
 
 	R *scheduleContentR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L scheduleContentL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -50,6 +51,7 @@ var ScheduleContentColumns = struct {
 	KMStudent          string
 	HourPerDateVehicle string
 	KMDateVehicle      string
+	CourseID           string
 }{
 	ID:                 "id",
 	Weekday:            "weekday",
@@ -61,6 +63,7 @@ var ScheduleContentColumns = struct {
 	KMStudent:          "km_student",
 	HourPerDateVehicle: "hour_per_date_vehicle",
 	KMDateVehicle:      "km_date_vehicle",
+	CourseID:           "course_id",
 }
 
 // Generated where
@@ -99,6 +102,7 @@ var ScheduleContentWhere = struct {
 	KMStudent          whereHelpernull_String
 	HourPerDateVehicle whereHelpernull_Int
 	KMDateVehicle      whereHelpernull_Int
+	CourseID           whereHelpernull_Int
 }{
 	ID:                 whereHelperint64{field: "\"schedule_content\".\"id\""},
 	Weekday:            whereHelperstring{field: "\"schedule_content\".\"weekday\""},
@@ -110,6 +114,7 @@ var ScheduleContentWhere = struct {
 	KMStudent:          whereHelpernull_String{field: "\"schedule_content\".\"km_student\""},
 	HourPerDateVehicle: whereHelpernull_Int{field: "\"schedule_content\".\"hour_per_date_vehicle\""},
 	KMDateVehicle:      whereHelpernull_Int{field: "\"schedule_content\".\"km_date_vehicle\""},
+	CourseID:           whereHelpernull_Int{field: "\"schedule_content\".\"course_id\""},
 }
 
 // ScheduleContentRels is where relationship names are stored.
@@ -136,8 +141,8 @@ func (*scheduleContentR) NewStruct() *scheduleContentR {
 type scheduleContentL struct{}
 
 var (
-	scheduleContentAllColumns            = []string{"id", "weekday", "date", "schedule_id", "created_at", "subject_name", "hour_student", "km_student", "hour_per_date_vehicle", "km_date_vehicle"}
-	scheduleContentColumnsWithoutDefault = []string{"weekday", "date", "schedule_id", "subject_name", "hour_student", "km_student", "hour_per_date_vehicle", "km_date_vehicle"}
+	scheduleContentAllColumns            = []string{"id", "weekday", "date", "schedule_id", "created_at", "subject_name", "hour_student", "km_student", "hour_per_date_vehicle", "km_date_vehicle", "course_id"}
+	scheduleContentColumnsWithoutDefault = []string{"weekday", "date", "schedule_id", "subject_name", "hour_student", "km_student", "hour_per_date_vehicle", "km_date_vehicle", "course_id"}
 	scheduleContentColumnsWithDefault    = []string{"id", "created_at"}
 	scheduleContentPrimaryKeyColumns     = []string{"id"}
 )

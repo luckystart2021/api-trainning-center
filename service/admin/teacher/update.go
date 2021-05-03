@@ -53,6 +53,7 @@ func (st StoreTeacher) UpdateTeacher(id int, req models.Teacher, userName string
 	teacher.IsContract = req.IsContract
 	teacher.IsPractice = req.IsPractice
 	teacher.Status = req.Status
+	teacher.UpdatedBy = userName
 
 	rowsAff, err := teacher.Update(ctx, st.db, boil.Infer())
 	if err != nil {
