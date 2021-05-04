@@ -11,6 +11,7 @@ type ISubjectService interface {
 	UpdateSubject(subjectID int, req models.Subject, userName string) (response.MessageResponse, error)
 	ShowSubject(subjectID int) (models.Subject, error)
 	ShowSubjects() (models.SubjectSlice, error)
+	DeleteSubject(idSubject int) (response.MessageResponse, error)
 }
 
 type StoreSubject struct {

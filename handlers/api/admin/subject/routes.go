@@ -21,6 +21,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Route("/{id}", func(router chi.Router) {
 				router.Get("/view-detail", getSubject(st))
 				router.Put("/update", updateSubject(st, db))
+				router.Delete("/delete", deleteSubject(st))
 			})
 		})
 	}
