@@ -1,15 +1,36 @@
 package student
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/service/response"
+	"context"
 	"database/sql"
 	"errors"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string, cnsk bool, gplx string, exp, numberKm int) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
+	ctx := context.Background()
+	countStudent, err := models.Students(
+		qm.Where("class_id = ?", idClass),
+	).Count(ctx, st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[CountStudent]Count student DB err  %v", err)
+		return resp, errors.New("Lỗi hệ thống, vui lòng thử lại")
+	}
+	class, err := models.FindClass(ctx, st.db, idClass)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[CountClass]Count class DB err  %v", err)
+		return resp, errors.New("Lỗi hệ thống, vui lòng thử lại")
+	}
+	if countStudent == int64(class.Quantity) {
+		logrus.WithFields(logrus.Fields{}).Errorf("[CreateStudent]Create Student DB err  %v", err)
+		return resp, errors.New("Số lượng học viên vượt quá danh sách lớp")
+	}
+
 	if err := CreateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, cnsk, gplx, exp, numberKm); err != nil {
 		return resp, err
 	}
