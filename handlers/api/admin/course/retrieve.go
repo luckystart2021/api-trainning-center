@@ -11,7 +11,12 @@ import (
 
 func RetrieveCourses(service course.ICourseService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		showCourses, err := service.ShowCoursesActive()
+		code := chi.URLParam(r, "id_system")
+		if code == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không tồn tại"))
+			return
+		}
+		showCourses, err := service.ShowCoursesActive(code)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

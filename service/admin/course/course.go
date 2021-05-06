@@ -6,7 +6,7 @@ import (
 )
 
 type ICourseService interface {
-	ShowCoursesActive() ([]Course, error)
+	ShowCoursesActive(systemID string) ([]Course, error)
 	ShowCoursesInActive() ([]Course, error)
 	ShowCourses(idCourse string) (Course, error)
 	CreateCourse(userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)

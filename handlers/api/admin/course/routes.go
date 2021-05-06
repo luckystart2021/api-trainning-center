@@ -18,7 +18,7 @@ func CourseRoute(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Route("/course", func(router chi.Router) {
 			// router.Get("/view/active", RetrieveCourses(st))
 			// router.Get("/view/in-active", RetrieveInActiveCourses(st))
-			router.Get("/view", RetrieveCourses(st))
+			router.Get("/{id_system}/views", RetrieveCourses(st))
 			router.Post("/create", CreateCourse(st))
 			router.Get("/{id_course}/view", RetrieveCourse(st))
 			router.Put("/{id_course}/update", UpdateCourse(st))
