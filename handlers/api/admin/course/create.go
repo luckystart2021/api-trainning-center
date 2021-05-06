@@ -60,6 +60,9 @@ func (c Course) validate() error {
 	if len(c.TrainingSystem) > 50 {
 		return errors.New("Hệ đào tạo không hợp lệ")
 	}
+	if !checkSystem(c.TrainingSystem) {
+		return errors.New("Hệ đào tạo không hợp lệ")
+	}
 
 	if c.StartDate == "" {
 		return errors.New("Ngày bắt đầu khóa học chưa được nhập")
@@ -94,4 +97,16 @@ func (c Course) validate() error {
 	}
 
 	return nil
+}
+
+func checkSystem(name string) bool {
+	systemLst := map[string]string{
+		"B2": "B2",
+		"C":  "C",
+		"D":  "D",
+		"E":  "E",
+		"F":  "F",
+	}
+	_, ok := systemLst[name]
+	return ok
 }
