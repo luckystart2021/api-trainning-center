@@ -48,6 +48,10 @@ func validateCreate(s models.Holiday) error {
 		return errors.New("Nội dung ngày nghỉ chưa nhập")
 	}
 
+	if len(s.Name.String) > 255 {
+		return errors.New("Nội dung ngày nghỉ vượt quá giới hạn")
+	}
+
 	_, err := utils.ParseStringToTime(s.Date)
 	if err != nil {
 		return errors.New("Ngày nghỉ không hợp lệ")
