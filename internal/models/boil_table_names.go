@@ -14,6 +14,7 @@ var TableNames = struct {
 	Contact           string
 	Course            string
 	DetailSchedule    string
+	Holiday           string
 	Information       string
 	Notification      string
 	Photos            string
@@ -43,6 +44,7 @@ var TableNames = struct {
 	Contact:           "contact",
 	Course:            "course",
 	DetailSchedule:    "detail_schedule",
+	Holiday:           "holiday",
 	Information:       "information",
 	Notification:      "notification",
 	Photos:            "photos",

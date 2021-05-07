@@ -33,7 +33,7 @@ type ChildSubject struct {
 	UpdatedBy string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
 	UpdatedAt time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	SubjectID int         `boil:"subject_id" json:"subject_id" toml:"subject_id" yaml:"subject_id"`
-	Group     null.String `boil:"group" json:"group,omitempty" toml:"group" yaml:"	,omitempty"`
+	Group     null.String `boil:"group" json:"group,omitempty" toml:"group" yaml:"group,omitempty"`
 
 	R *childSubjectR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L childSubjectL  `boil:"-" json:"-" toml:"-" yaml:"-"`

@@ -26,7 +26,7 @@ func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, 
 		logrus.WithFields(logrus.Fields{}).Errorf("[CountClass]Count class DB err  %v", err)
 		return resp, errors.New("Lỗi hệ thống, vui lòng thử lại")
 	}
-	if countStudent == int64(class.Quantity) {
+	if countStudent >= int64(class.Quantity) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateStudent]Create Student DB err  %v", err)
 		return resp, errors.New("Số lượng học viên vượt quá danh sách lớp")
 	}
