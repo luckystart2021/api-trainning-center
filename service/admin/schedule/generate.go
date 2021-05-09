@@ -65,18 +65,30 @@ func ConvertDayString(day int) string {
 }
 
 var (
-	holiday = map[string]string{
-		"30-04-2020": "holiday",
-		"01-05-2020": "holiday",
-		"23-04-2020": "holiday",
-		"10-05-2020": "holiday",
-	}
+	holiday      = map[string]string{}
 	continueDate time.Time
 )
 
 func (st StoreSchedule) GenerateSchedule(courseId int) (Schedule, error) {
 	scheduleResponses := Schedule{}
-	course, _ := models.FindCourse(context.Background(), st.db, courseId)
+	ctx := context.Background()
+	holidayFromDB, err := models.Holidays(
+		qm.OrderBy("id"),
+	).All(ctx, st.db)
+	for _, data := range holidayFromDB {
+		dateHoliday := data.Date
+		holiday[dateHoliday] = data.Name.String
+	}
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindHoliday] error : ", err)
+		return scheduleResponses, err
+	}
+	course, err := models.FindCourse(ctx, st.db, courseId)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[FindCourse] error : ", err)
+		return scheduleResponses, err
+	}
 	if course.TrainingSystem == "B2" {
 		lyThuyet, err := generateB2(st.db, course)
 		if err != nil {
@@ -91,7 +103,7 @@ func (st StoreSchedule) GenerateSchedule(courseId int) (Schedule, error) {
 		}
 		scheduleResponses.ThucHanh = thucHanh
 	}
-	err := saveSchedules(courseId, st.db, scheduleResponses)
+	err = saveSchedules(courseId, st.db, scheduleResponses)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[saveSchedules] error : ", err)
 		return scheduleResponses, err
