@@ -7,6 +7,7 @@ import (
 type IScheduleService interface {
 	GenerateSchedule(courseID int) (Schedule, error)
 	RetrieveSchedule(courseID int) (Schedule, error)
+	SearchScheduleByCourseCode(code string) (Schedule, error)
 }
 
 type StoreSchedule struct {

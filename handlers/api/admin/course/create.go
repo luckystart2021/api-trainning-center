@@ -71,19 +71,19 @@ func (c Course) validate() error {
 		return errors.New("Ngày bắt đầu khóa học không đúng định dạng")
 	}
 
-	if c.EndDate == "" {
-		return errors.New("Ngày kết thúc khóa học chưa được nhập")
-	}
-	if len(c.EndDate) > 10 || !validate.CheckDate(c.EndDate) {
-		return errors.New("Ngày kết thúc khóa học không đúng định dạng")
-	}
+	// if c.EndDate == "" {
+	// 	return errors.New("Ngày kết thúc khóa học chưa được nhập")
+	// }
+	// if len(c.EndDate) > 10 || !validate.CheckDate(c.EndDate) {
+	// 	return errors.New("Ngày kết thúc khóa học không đúng định dạng")
+	// }
 
-	if c.TestDate == "" {
-		return errors.New("Ngày thi sát hạch chưa được nhập")
-	}
-	if len(c.TestDate) > 10 || !validate.CheckDate(c.TestDate) {
-		return errors.New("Ngày thi sát hạch không đúng định dạng")
-	}
+	// if c.TestDate == "" {
+	// 	return errors.New("Ngày thi sát hạch chưa được nhập")
+	// }
+	// if len(c.TestDate) > 10 || !validate.CheckDate(c.TestDate) {
+	// 	return errors.New("Ngày thi sát hạch không đúng định dạng")
+	// }
 
 	if len(c.GraduationDate) > 10 || !validate.CheckDate(c.GraduationDate) {
 		return errors.New("Ngày tốt nghiệp khóa học không đúng định dạng")

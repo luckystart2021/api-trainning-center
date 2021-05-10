@@ -28,9 +28,9 @@ type Course struct {
 	Code           string    `boil:"code" json:"code" toml:"code" yaml:"code"`
 	Name           string    `boil:"name" json:"name" toml:"name" yaml:"name"`
 	StartDate      time.Time `boil:"start_date" json:"start_date" toml:"start_date" yaml:"start_date"`
-	EndDate        time.Time `boil:"end_date" json:"end_date" toml:"end_date" yaml:"end_date"`
+	EndDate        null.Time `boil:"end_date" json:"end_date,omitempty" toml:"end_date" yaml:"end_date,omitempty"`
 	GraduationDate null.Time `boil:"graduation_date" json:"graduation_date,omitempty" toml:"graduation_date" yaml:"graduation_date,omitempty"`
-	TestDate       time.Time `boil:"test_date" json:"test_date" toml:"test_date" yaml:"test_date"`
+	TestDate       null.Time `boil:"test_date" json:"test_date,omitempty" toml:"test_date" yaml:"test_date,omitempty"`
 	TrainingSystem string    `boil:"training_system" json:"training_system" toml:"training_system" yaml:"training_system"`
 	Status         bool      `boil:"status" json:"status" toml:"status" yaml:"status"`
 	CreatedBy      string    `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
@@ -105,9 +105,9 @@ var CourseWhere = struct {
 	Code           whereHelperstring
 	Name           whereHelperstring
 	StartDate      whereHelpertime_Time
-	EndDate        whereHelpertime_Time
+	EndDate        whereHelpernull_Time
 	GraduationDate whereHelpernull_Time
-	TestDate       whereHelpertime_Time
+	TestDate       whereHelpernull_Time
 	TrainingSystem whereHelperstring
 	Status         whereHelperbool
 	CreatedBy      whereHelperstring
@@ -120,9 +120,9 @@ var CourseWhere = struct {
 	Code:           whereHelperstring{field: "\"course\".\"code\""},
 	Name:           whereHelperstring{field: "\"course\".\"name\""},
 	StartDate:      whereHelpertime_Time{field: "\"course\".\"start_date\""},
-	EndDate:        whereHelpertime_Time{field: "\"course\".\"end_date\""},
+	EndDate:        whereHelpernull_Time{field: "\"course\".\"end_date\""},
 	GraduationDate: whereHelpernull_Time{field: "\"course\".\"graduation_date\""},
-	TestDate:       whereHelpertime_Time{field: "\"course\".\"test_date\""},
+	TestDate:       whereHelpernull_Time{field: "\"course\".\"test_date\""},
 	TrainingSystem: whereHelperstring{field: "\"course\".\"training_system\""},
 	Status:         whereHelperbool{field: "\"course\".\"status\""},
 	CreatedBy:      whereHelperstring{field: "\"course\".\"created_by\""},

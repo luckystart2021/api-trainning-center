@@ -32,6 +32,7 @@ type ThucHanhResponse struct {
 }
 type ScheduleResponse struct {
 	SubjectName string    `json:"subject_name"`
+	SubjectID   int       `json:"subject_id"`
 	Time        int       `json:"time"`
 	Teacher     string    `json:"teacher"`
 	Schedule    []Content `json:"schedule"`
@@ -46,9 +47,10 @@ type Content struct {
 }
 
 type SubjectContent struct {
-	Name string `json:"name"`
-	Lt   int    `json:"lt"`
-	Th   int    `json:"th"`
+	ChildSubjectID int    `json:"child_subject_id"`
+	Name           string `json:"name"`
+	Lt             int    `json:"lt"`
+	Th             int    `json:"th"`
 }
 
 func ConvertDayString(day int) string {
@@ -139,6 +141,7 @@ func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
 			contentSchedule.Weekday = content.WeekDay
 			contentSchedule.Date = content.Date
 			contentSchedule.ScheduleID = null.Int64From(scheduleD.ID)
+			contentSchedule.CourseID = null.IntFrom(courseId)
 			err := contentSchedule.Insert(ctx, st, boil.Infer())
 			if err != nil {
 				logrus.WithFields(logrus.Fields{}).Error("[Insert] Create contentSchedule error : ", err)
@@ -309,6 +312,7 @@ func generateB2(st *sql.DB, course *models.Course) ([]ScheduleResponse, error) {
 	for index, subject := range subjects {
 		scheduleResponse := ScheduleResponse{}
 		scheduleResponse.SubjectName = subject.Name
+		scheduleResponse.SubjectID = subject.ID
 		scheduleResponse.Time = subject.Time.Int
 		teacher, err := models.FindTeacher(context.Background(), st, subject.TeacherID.Int)
 		if err != nil {
@@ -352,6 +356,7 @@ func generateB2(st *sql.DB, course *models.Course) ([]ScheduleResponse, error) {
 					for _, data := range childSubject {
 						subjectContent := SubjectContent{}
 						subjectContent.Name = data.Name
+						subjectContent.ChildSubjectID = data.ID
 						subjectContent.Lt = data.LT.Int
 						subjectContent.Th = data.TH.Int
 						totalLT += data.LT.Int
@@ -410,6 +415,7 @@ func generateB2(st *sql.DB, course *models.Course) ([]ScheduleResponse, error) {
 					for _, data := range childSubject {
 						subjectContent := SubjectContent{}
 						subjectContent.Name = data.Name
+						subjectContent.ChildSubjectID = data.ID
 						subjectContent.Lt = data.LT.Int
 						subjectContent.Th = data.TH.Int
 						totalLT += data.LT.Int
