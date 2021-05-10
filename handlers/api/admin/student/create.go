@@ -11,17 +11,18 @@ import (
 )
 
 type StudentRequest struct {
-	IdClass     int    `json:"id_class"`
-	Sex         string `json:"sex"`
-	DateOfBirth string `json:"date_of_birth"`
-	Phone       string `json:"phone"`
-	Address     string `json:"address"`
-	FullName    string `json:"full_name"`
-	CMND        string `json:"cmnd"`
-	CNSK        bool   `json:"cnsk"`
-	GPLX        string `json:"gplx"`
-	Exp         int    `json:"exp"`
-	NumberOfKm  int    `json:"number_of_km"`
+	IdClass     int     `json:"id_class"`
+	Sex         string  `json:"sex"`
+	DateOfBirth string  `json:"date_of_birth"`
+	Phone       string  `json:"phone"`
+	Address     string  `json:"address"`
+	FullName    string  `json:"full_name"`
+	CMND        string  `json:"cmnd"`
+	CNSK        bool    `json:"cnsk"`
+	GPLX        string  `json:"gplx"`
+	Exp         int     `json:"exp"`
+	NumberOfKm  int     `json:"number_of_km"`
+	Amount      float64 `json:"amount"`
 }
 
 func CreateStudent(service student.IStudentService) http.HandlerFunc {
@@ -41,7 +42,7 @@ func CreateStudent(service student.IStudentService) http.HandlerFunc {
 		userRole := r.Context().Value("values").(middlewares.Vars)
 		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address,
 			req.FullName, userRole.UserName, req.IdClass, req.CMND,
-			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm)
+			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.Amount)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

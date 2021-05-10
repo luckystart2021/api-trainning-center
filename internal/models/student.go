@@ -24,23 +24,24 @@ import (
 
 // Student is an object representing the database table.
 type Student struct {
-	ID               int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Code             string      `boil:"code" json:"code" toml:"code" yaml:"code"`
-	Sex              string      `boil:"sex" json:"sex" toml:"sex" yaml:"sex"`
-	Dateofbirth      string      `boil:"dateofbirth" json:"dateofbirth" toml:"dateofbirth" yaml:"dateofbirth"`
-	Phone            string      `boil:"phone" json:"phone" toml:"phone" yaml:"phone"`
-	Address          string      `boil:"address" json:"address" toml:"address" yaml:"address"`
-	Fullname         string      `boil:"fullname" json:"fullname" toml:"fullname" yaml:"fullname"`
-	ClassID          int         `boil:"class_id" json:"class_id" toml:"class_id" yaml:"class_id"`
-	CreatedBy        string      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	CreatedAt        time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedBy        string      `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
-	UpdatedAt        time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CMND             string      `boil:"cmnd" json:"cmnd" toml:"cmnd" yaml:"cmnd"`
-	CNSK             bool        `boil:"cnsk" json:"cnsk" toml:"cnsk" yaml:"cnsk"`
-	GPLX             null.String `boil:"gplx" json:"gplx,omitempty" toml:"gplx" yaml:"gplx,omitempty"`
-	ExperienceDriver int         `boil:"experience_driver" json:"experience_driver" toml:"experience_driver" yaml:"experience_driver"`
-	KMSafe           int         `boil:"km_safe" json:"km_safe" toml:"km_safe" yaml:"km_safe"`
+	ID               int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code             string       `boil:"code" json:"code" toml:"code" yaml:"code"`
+	Sex              string       `boil:"sex" json:"sex" toml:"sex" yaml:"sex"`
+	Dateofbirth      string       `boil:"dateofbirth" json:"dateofbirth" toml:"dateofbirth" yaml:"dateofbirth"`
+	Phone            string       `boil:"phone" json:"phone" toml:"phone" yaml:"phone"`
+	Address          string       `boil:"address" json:"address" toml:"address" yaml:"address"`
+	Fullname         string       `boil:"fullname" json:"fullname" toml:"fullname" yaml:"fullname"`
+	ClassID          int          `boil:"class_id" json:"class_id" toml:"class_id" yaml:"class_id"`
+	CreatedBy        string       `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	CreatedAt        time.Time    `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedBy        string       `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	UpdatedAt        time.Time    `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CMND             string       `boil:"cmnd" json:"cmnd" toml:"cmnd" yaml:"cmnd"`
+	CNSK             bool         `boil:"cnsk" json:"cnsk" toml:"cnsk" yaml:"cnsk"`
+	GPLX             null.String  `boil:"gplx" json:"gplx,omitempty" toml:"gplx" yaml:"gplx,omitempty"`
+	ExperienceDriver int          `boil:"experience_driver" json:"experience_driver" toml:"experience_driver" yaml:"experience_driver"`
+	KMSafe           int          `boil:"km_safe" json:"km_safe" toml:"km_safe" yaml:"km_safe"`
+	Amount           null.Float64 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
 
 	R *studentR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L studentL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -64,6 +65,7 @@ var StudentColumns = struct {
 	GPLX             string
 	ExperienceDriver string
 	KMSafe           string
+	Amount           string
 }{
 	ID:               "id",
 	Code:             "code",
@@ -82,9 +84,33 @@ var StudentColumns = struct {
 	GPLX:             "gplx",
 	ExperienceDriver: "experience_driver",
 	KMSafe:           "km_safe",
+	Amount:           "amount",
 }
 
 // Generated where
+
+type whereHelpernull_Float64 struct{ field string }
+
+func (w whereHelpernull_Float64) EQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Float64) NEQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Float64) LT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Float64) LTE(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Float64) GT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
 
 var StudentWhere = struct {
 	ID               whereHelperint
@@ -104,6 +130,7 @@ var StudentWhere = struct {
 	GPLX             whereHelpernull_String
 	ExperienceDriver whereHelperint
 	KMSafe           whereHelperint
+	Amount           whereHelpernull_Float64
 }{
 	ID:               whereHelperint{field: "\"student\".\"id\""},
 	Code:             whereHelperstring{field: "\"student\".\"code\""},
@@ -122,6 +149,7 @@ var StudentWhere = struct {
 	GPLX:             whereHelpernull_String{field: "\"student\".\"gplx\""},
 	ExperienceDriver: whereHelperint{field: "\"student\".\"experience_driver\""},
 	KMSafe:           whereHelperint{field: "\"student\".\"km_safe\""},
+	Amount:           whereHelpernull_Float64{field: "\"student\".\"amount\""},
 }
 
 // StudentRels is where relationship names are stored.
@@ -145,8 +173,8 @@ func (*studentR) NewStruct() *studentR {
 type studentL struct{}
 
 var (
-	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe"}
-	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe"}
+	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "amount"}
+	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe", "amount"}
 	studentColumnsWithDefault    = []string{"id", "created_at", "updated_at", "cnsk"}
 	studentPrimaryKeyColumns     = []string{"id"}
 )

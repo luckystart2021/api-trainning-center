@@ -39,7 +39,7 @@ func UpdateStudent(service student.IStudentService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.UpdateStudent(idStudent, req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName, req.IdClass, req.CMND, req.CNSK, req.GPLX, req.Exp, req.NumberOfKm)
+		resp, err := service.UpdateStudent(idStudent, req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName, req.IdClass, req.CMND, req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.Amount)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
