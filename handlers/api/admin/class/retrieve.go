@@ -12,7 +12,20 @@ import (
 
 func GetClass(service class.IClassService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		showAllClass, err := service.GetListClass()
+		id := chi.URLParam(r, "id_course")
+		if id == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không được rỗng"))
+			return
+		}
+
+		idCourse, err := strconv.Atoi(id)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không hợp lệ"))
+			return
+		}
+
+		showAllClass, err := service.GetListClass(idCourse)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return

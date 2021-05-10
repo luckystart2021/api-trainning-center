@@ -1,22 +1,40 @@
 package class
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/models/admin/class"
 	"api-trainning-center/utils"
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
-func (st StoreClass) GetListClass() ([]class.Class, error) {
-	classLst, err := FindAllClass(st.db)
+// func (st StoreClass) GetListClass(idCourse int) ([]class.Class, error) {
+// 	classLst, err := FindAllClass(st.db)
+// 	if err != nil {
+// 		logrus.WithFields(logrus.Fields{}).Error("[GetListClass] error : ", err)
+// 		return nil, err
+// 	}
+// 	return classLst, nil
+// }
+
+func (st StoreClass) GetListClass(idCourse int) (models.ClassSlice, error) {
+	ctx := context.Background()
+	classes, err := models.Classes(
+		qm.Where("course_id = ?", idCourse),
+	).All(ctx, st.db)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[GetListClass] error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[findAllClasses] error : ", err)
 		return nil, err
 	}
-	return classLst, nil
+	if classes == nil {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return classes, nil
 }
 
 func (st StoreClass) GetDetailClass(idClass int) (class.Class, error) {
