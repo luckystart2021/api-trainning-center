@@ -1,13 +1,16 @@
 package vehicle
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/models/admin/vehicle"
 	"api-trainning-center/utils"
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreVehicle) ShowVehicles() ([]vehicle.Vehicle, error) {
@@ -15,6 +18,21 @@ func (st StoreVehicle) ShowVehicles() ([]vehicle.Vehicle, error) {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[findAllVehicles] error : ", err)
 		return nil, err
+	}
+	return vehicles, nil
+}
+
+func (st StoreVehicle) ShowVehiclesAvailable() (models.VehicleSlice, error) {
+	ctx := context.Background()
+	vehicles, err := models.Vehicles(
+		qm.Where("status = ?", false),
+	).All(ctx, st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowVehiclesAvailable] error : ", err)
+		return nil, err
+	}
+	if vehicles == nil {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return vehicles, nil
 }

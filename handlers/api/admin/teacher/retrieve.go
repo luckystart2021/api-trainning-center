@@ -10,6 +10,11 @@ import (
 	"github.com/go-chi/chi"
 )
 
+type TeacherR struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func getTeachers(service teacher.ITeacherService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		showTeachers, err := service.ShowTeachers()
@@ -19,6 +24,25 @@ func getTeachers(service teacher.ITeacherService) http.HandlerFunc {
 		}
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, showTeachers)
+	}
+}
+
+func getTeachersAvailable(service teacher.ITeacherService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showTeachersAvalible, err := service.ShowTeacherByAvalible()
+		if err != nil {
+			response.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+		teachers := []TeacherR{}
+		for _, data := range showTeachersAvalible {
+			teacher := TeacherR{}
+			teacher.Id = data.ID
+			teacher.Name = data.Fullname
+			teachers = append(teachers, teacher)
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, teachers)
 	}
 }
 

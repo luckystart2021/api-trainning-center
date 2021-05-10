@@ -10,6 +10,11 @@ import (
 	"github.com/go-chi/chi"
 )
 
+type VehicleR struct {
+	Id              int    `json:"id"`
+	CarNumberPlates string `json:"car_number_plates"`
+}
+
 func GetVehicles(service vehicle.IVehicleService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		showVehicles, err := service.ShowVehicles()
@@ -19,6 +24,25 @@ func GetVehicles(service vehicle.IVehicleService) http.HandlerFunc {
 		}
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, showVehicles)
+	}
+}
+
+func GetVehiclesAvalible(service vehicle.IVehicleService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		showVehicles, err := service.ShowVehiclesAvailable()
+		if err != nil {
+			response.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+		vehicles := []VehicleR{}
+		for _, data := range showVehicles {
+			vehicle := VehicleR{}
+			vehicle.Id = data.ID
+			vehicle.CarNumberPlates = data.Biensoxe
+			vehicles = append(vehicles, vehicle)
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, vehicles)
 	}
 }
 

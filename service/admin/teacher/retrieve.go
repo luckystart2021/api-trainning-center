@@ -7,7 +7,23 @@ import (
 	"errors"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
+
+func (st StoreTeacher) ShowTeacherByAvalible() (models.TeacherSlice, error) {
+	ctx := context.Background()
+	teachers, err := models.Teachers(
+		qm.Where("status = ?", false),
+	).All(ctx, st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[findAllTeacherStatusFalse] error : ", err)
+		return nil, err
+	}
+	if teachers == nil {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return teachers, nil
+}
 
 func (st StoreTeacher) ShowTeachers() (models.TeacherSlice, error) {
 	ctx := context.Background()

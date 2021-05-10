@@ -11,6 +11,7 @@ type ITeacherService interface {
 	UpdateTeacher(id int, req models.Teacher, userName string) (response.MessageResponse, error)
 	ShowTeachers() (models.TeacherSlice, error)
 	ShowTeacher(idTeacher int) (models.Teacher, error)
+	ShowTeacherByAvalible() (models.TeacherSlice, error)
 }
 
 type StoreTeacher struct {

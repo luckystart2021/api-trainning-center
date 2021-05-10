@@ -1,6 +1,7 @@
 package vehicle
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/models/admin/vehicle"
 	"api-trainning-center/service/response"
 	"database/sql"
@@ -11,6 +12,7 @@ type IVehicleService interface {
 	UpdateVehicle(id int, req vehicle.VehicleUpdateRequest, userName string) (response.MessageResponse, error)
 	ShowVehicles() ([]vehicle.Vehicle, error)
 	ShowVehicle(id int) (vehicle.FindOneVehicle, error)
+	ShowVehiclesAvailable() (models.VehicleSlice, error)
 }
 
 type StoreVehicle struct {

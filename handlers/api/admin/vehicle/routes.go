@@ -17,6 +17,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Route("/vehicle", func(router chi.Router) {
 			router.Get("/views", GetVehicles(st))
+			router.Get("/views-available", GetVehiclesAvalible(st))
 			router.Post("/create", CreateVehicle(st))
 			router.Route("/{id}", func(router chi.Router) {
 				router.Get("/view-detail", GetVehicle(st))
