@@ -32,7 +32,7 @@ func UpdateCourse(service course.ICourseService) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if err := req.validate(); err != nil {
+		if err := req.validateUpdate(); err != nil {
 			// If input is wrong, return an HTTP error
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
