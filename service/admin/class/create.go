@@ -9,6 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreClass) CreateClass(userName string, idCource, quantity, teacherId, vehicleId int64) (response.MessageResponse, error) {
@@ -19,6 +20,31 @@ func (st StoreClass) CreateClass(userName string, idCource, quantity, teacherId,
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[CreateClass] err  %v", err)
 		return resp, errors.New("Lỗi hệ thống, vui lòng thử lại")
+	}
+
+	lookupTeacher := make(map[int]int)
+	lookupVehicle := make(map[int]int)
+
+	classes, err := models.Classes(
+		qm.Where("course_id = ?", idCource),
+	).All(ctx, tx)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindAllCourses] err  %v", err)
+		return resp, errors.New("Lỗi hệ thống, vui lòng thử lại")
+	}
+
+	for _, data := range classes {
+		lookupTeacher[data.TeacherID.Int] = data.TeacherID.Int
+		lookupVehicle[data.VehicleID.Int] = data.VehicleID.Int
+	}
+
+	_, ok := lookupTeacher[int(teacherId)]
+	if ok {
+		return resp, errors.New("Giáo viên đã tồn tại ở lớp khác, vui lòng chọn giáo viên khác")
+	}
+	_, ok = lookupVehicle[int(vehicleId)]
+	if ok {
+		return resp, errors.New("Xe đã tồn tại ở lớp khác, vui lòng chọn xe khác")
 	}
 
 	if err := CreateClassByRequest(ctx, tx, userName, idCource, quantity, teacherId, vehicleId); err != nil {
