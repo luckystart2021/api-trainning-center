@@ -1,12 +1,15 @@
 package course
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/utils"
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 type Course struct {
@@ -162,4 +165,19 @@ func RetrieveCourses(status bool, db *sql.DB, systemID string) ([]Course, error)
 		return courses, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return courses, nil
+}
+
+func (tc StoreCourse) ShowCoursesByDate(startTime, endTime time.Time) (models.CourseSlice, error) {
+	ctx := context.Background()
+	course, err := models.Courses(
+		qm.Where("start_date >=", startTime),
+		qm.And("start_date <=", endTime),
+		qm.And("status = ?", true),
+	).All(ctx, tc.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCoursesByDate] error : ", err)
+		return nil, err
+	}
+
+	return course, nil
 }

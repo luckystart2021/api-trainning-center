@@ -1,8 +1,10 @@
 package course
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/service/response"
 	"database/sql"
+	"time"
 )
 
 type ICourseService interface {
@@ -13,6 +15,7 @@ type ICourseService interface {
 	UpdateCourse(idCourse int, userName, name, startDate, endDate, graduationDate, testDate, trainingSystem, time string) (response.MessageResponse, error)
 	ActiveCourse(idCourse int, userName string) (response.MessageResponse, error)
 	InActiveCourse(idCourse int, userName string) (response.MessageResponse, error)
+	ShowCoursesByDate(startTime, endTime time.Time) (models.CourseSlice, error)
 }
 
 type StoreCourse struct {

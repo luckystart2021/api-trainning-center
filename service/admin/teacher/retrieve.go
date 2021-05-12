@@ -14,6 +14,7 @@ func (st StoreTeacher) ShowTeacherByAvalible() (models.TeacherSlice, error) {
 	ctx := context.Background()
 	teachers, err := models.Teachers(
 		qm.Where("status = ?", false),
+		qm.And("is_deleted = ?", false),
 	).All(ctx, st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[findAllTeacherStatusFalse] error : ", err)

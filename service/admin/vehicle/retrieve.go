@@ -26,6 +26,7 @@ func (st StoreVehicle) ShowVehiclesAvailable() (models.VehicleSlice, error) {
 	ctx := context.Background()
 	vehicles, err := models.Vehicles(
 		qm.Where("status = ?", false),
+		qm.And("is_deleted = ?", false),
 	).All(ctx, st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowVehiclesAvailable] error : ", err)
