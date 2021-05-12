@@ -12,7 +12,8 @@ type IClassService interface {
 	UpdateClass(idClass int, userName string, idCource, quantity int64, isDeleted bool, teacherId, vehicleId int64) (response.MessageResponse, error)
 	GetListClass(idCourse int) (models.ClassSlice, error)
 	GetDetailClass(idClass int) (class.Class, error)
-	InActiveClass(idClass int) (response.MessageResponse, error)
+	InActiveClass(idClass int, userName string) (response.MessageResponse, error)
+	ActiveClass(idClass int, userName string) (response.MessageResponse, error)
 }
 
 type StoreClass struct {
