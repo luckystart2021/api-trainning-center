@@ -170,6 +170,7 @@ func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
 	}
 
 	thucHanhs := scheduleResponses.ThucHanh
+	var endDate time.Time
 	for _, thucHanh := range thucHanhs {
 		contentSchedule1 := models.ScheduleContent{}
 		contentSchedule1.Weekday = thucHanh.WeekDay
@@ -185,7 +186,28 @@ func saveSchedules(courseId int, st *sql.DB, scheduleResponses Schedule) error {
 			logrus.WithFields(logrus.Fields{}).Error("[Insert] Create contentSchedule error : ", err)
 			return errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
+		time, err := utils.ParseStringToTime(thucHanh.Date)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{}).Errorf("[ParseStartTime] parse end time error %v", err)
+			return errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
+		endDate = time
 	}
+
+	updateCourse, err := models.FindCourse(ctx, st, courseId)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[Insert] Create Course error : ", err)
+		return errors.New("Không có dữ liệu từ hệ thống")
+	}
+	testDate := endDate.AddDate(0, 0, 1)
+	updateCourse.EndDate = null.TimeFrom(endDate)
+	updateCourse.TestDate = null.TimeFrom(testDate)
+	_, err = updateCourse.Update(ctx, st, boil.Infer())
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[UpdateCourse] Update Course error : ", err)
+		return errors.New("Lỗi hệ thống vui lòng thử lại")
+	}
+
 	return nil
 }
 
