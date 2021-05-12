@@ -20,6 +20,8 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Put("/{id}/update", UpdateClass(st))
 			router.Get("/{id}/view-detail", GetDetailClass(st))
 			router.Get("/{id_course}/views", GetClass(st))
+			router.Get("/{id_class}/in-active", InActiveClass(st))
+			// router.Get("/{id_course}/views", GetClass(st))
 		})
 	}
 }

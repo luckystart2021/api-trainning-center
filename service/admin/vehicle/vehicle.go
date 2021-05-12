@@ -10,7 +10,7 @@ import (
 type IVehicleService interface {
 	CreateVehicle(req vehicle.VehicleRequest, userName string) (response.MessageResponse, error)
 	UpdateVehicle(id int, req vehicle.VehicleUpdateRequest, userName string) (response.MessageResponse, error)
-	ShowVehicles() ([]vehicle.Vehicle, error)
+	ShowVehicles() (models.VehicleSlice, error)
 	ShowVehicle(id int) (vehicle.FindOneVehicle, error)
 	ShowVehiclesAvailable() (models.VehicleSlice, error)
 }

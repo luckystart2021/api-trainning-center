@@ -13,10 +13,10 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
-func (st StoreVehicle) ShowVehicles() ([]vehicle.Vehicle, error) {
-	vehicles, err := findAllVehicles(st.db)
+func (st StoreVehicle) ShowVehicles() (models.VehicleSlice, error) {
+	vehicles, err := models.Vehicles().All(context.Background(), st.db)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[findAllVehicles] error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[FindAllVehicles] error : ", err)
 		return nil, err
 	}
 	return vehicles, nil
@@ -80,45 +80,4 @@ func findOneVehicle(db *sql.DB, id int) (vehicle.FindOneVehicle, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[findOneVehicle] Scan error  %v", err)
 	}
 	return vehicle, nil
-}
-
-func findAllVehicles(db *sql.DB) ([]vehicle.Vehicle, error) {
-	vehicles := []vehicle.Vehicle{}
-	query := `
-	SELECT
-		id,
-		biensoxe,
-		loaixe,
-		status,
-		is_deleted,
-		is_contract
-	FROM
-		vehicle;
-	`
-	rows, err := db.Query(query)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[findAllVehicles] query error  %v", err)
-		return vehicles, errors.New("Lỗi hệ thống vui lòng thử lại")
-	}
-	defer rows.Close()
-	for rows.Next() {
-		vehicle := vehicle.Vehicle{}
-		err = rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted, &vehicle.IsContract)
-		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Errorf("[findAllVehicles] Scan error  %v", err)
-			return vehicles, errors.New("Lỗi hệ thống vui lòng thử lại")
-		}
-		vehicles = append(vehicles, vehicle)
-	}
-	err = rows.Err()
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[findAllVehicles] Rows error  %v", err)
-		return nil, errors.New("Lỗi hệ thống vui lòng thử lại")
-	}
-
-	if len(vehicles) == 0 {
-		logrus.WithFields(logrus.Fields{}).Errorf("[findAllVehicles] No Data  %v", err)
-		return vehicles, errors.New("Không có dữ liệu từ hệ thống")
-	}
-	return vehicles, nil
 }
