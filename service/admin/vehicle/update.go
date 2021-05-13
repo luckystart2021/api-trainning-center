@@ -1,8 +1,10 @@
 package vehicle
 
 import (
+	"api-trainning-center/internal/models"
 	"api-trainning-center/models/admin/vehicle"
 	"api-trainning-center/service/response"
+	"context"
 	"database/sql"
 	"errors"
 	"time"
@@ -12,6 +14,19 @@ import (
 
 func (st StoreVehicle) UpdateVehicle(id int, req vehicle.VehicleUpdateRequest, userName string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
+	ctx := context.Background()
+
+	vehicle, err := models.FindVehicle(ctx, st.db, id)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindVehicle] Find Vehicle DB err  %v", err)
+		return resp, err
+	}
+
+	if vehicle.Status {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindVehicle] Find Vehicle DB err  %v", err)
+		return resp, errors.New("Xe đang tồn tại trong lớp học, vui lòng cập nhật xe khác trước khi xóa")
+	}
+
 	count, err := updateVehicleByRequest(st.db, id, req, userName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateVehicleByRequest] Update Vehicle DB err  %v", err)
