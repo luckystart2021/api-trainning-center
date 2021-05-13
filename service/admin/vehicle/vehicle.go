@@ -11,8 +11,10 @@ type IVehicleService interface {
 	CreateVehicle(req vehicle.VehicleRequest, userName string) (response.MessageResponse, error)
 	UpdateVehicle(id int, req vehicle.VehicleUpdateRequest, userName string) (response.MessageResponse, error)
 	ShowVehicles() (models.VehicleSlice, error)
-	ShowVehicle(id int) (vehicle.FindOneVehicle, error)
+	ShowVehicle(id int) (models.Vehicle, error)
 	ShowVehiclesAvailable() (models.VehicleSlice, error)
+	InActiveVehicle(id int, userName string) (response.MessageResponse, error)
+	ActiveVehicle(id int, userName string) (response.MessageResponse, error)
 }
 
 type StoreVehicle struct {

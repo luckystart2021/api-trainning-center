@@ -2,12 +2,8 @@ package vehicle
 
 import (
 	"api-trainning-center/internal/models"
-	"api-trainning-center/models/admin/vehicle"
-	"api-trainning-center/utils"
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -38,46 +34,11 @@ func (st StoreVehicle) ShowVehiclesAvailable() (models.VehicleSlice, error) {
 	return vehicles, nil
 }
 
-func (st StoreVehicle) ShowVehicle(id int) (vehicle.FindOneVehicle, error) {
-	v := vehicle.FindOneVehicle{}
-	vehicle, err := findOneVehicle(st.db, id)
+func (st StoreVehicle) ShowVehicle(id int) (models.Vehicle, error) {
+	vehicle, err := models.FindVehicle(context.Background(), st.db, id)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[findOneVehicle] error : ", err)
-		return v, err
+		return models.Vehicle{}, err
 	}
-	return vehicle, nil
-}
-
-func findOneVehicle(db *sql.DB, id int) (vehicle.FindOneVehicle, error) {
-	vehicle := vehicle.FindOneVehicle{}
-	query := `
-	SELECT
-		id,
-		biensoxe,
-		loaixe,
-		status,
-		is_deleted,
-		created_by,
-		created_at,
-		updated_at,
-		updated_by,
-		is_contract
-	FROM
-		vehicle
-	WHERE
-		id = $1
-	`
-	rows := db.QueryRow(query, id)
-	var createdAt, updatedAt time.Time
-	err := rows.Scan(&vehicle.Id, &vehicle.BienSoXe, &vehicle.LoaiXe, &vehicle.Status, &vehicle.IsDeleted, &vehicle.CreatedBy, &createdAt, &updatedAt, &vehicle.UpdatedBy, &vehicle.IsContract)
-	vehicle.CreatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
-	vehicle.UpdatedAt = utils.TimeIn(createdAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
-	if err == sql.ErrNoRows {
-		logrus.WithFields(logrus.Fields{}).Errorf("[findOneVehicle] No Data  %v", err)
-		return vehicle, errors.New("Không có dữ liệu từ hệ thống")
-	}
-	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[findOneVehicle] Scan error  %v", err)
-	}
-	return vehicle, nil
+	return *vehicle, nil
 }
