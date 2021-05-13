@@ -23,6 +23,7 @@ func (st StoreVehicle) ShowVehiclesAvailable() (models.VehicleSlice, error) {
 	vehicles, err := models.Vehicles(
 		qm.Where("status = ?", false),
 		qm.And("is_deleted = ?", false),
+		qm.OrderBy("created_at DESC"),
 	).All(ctx, st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowVehiclesAvailable] error : ", err)
