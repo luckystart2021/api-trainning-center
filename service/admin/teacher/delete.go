@@ -1,4 +1,4 @@
-package vehicle
+package teacher
 
 import (
 	"api-trainning-center/internal/models"
@@ -10,25 +10,25 @@ import (
 	"github.com/volatiletech/sqlboiler/boil"
 )
 
-func (st StoreVehicle) InActiveVehicle(id int, userName string) (response.MessageResponse, error) {
+func (st StoreTeacher) InActive(idTeacher int, userName string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	ctx := context.Background()
 
-	vehicle, err := models.FindVehicle(ctx, st.db, id)
+	teacher, err := models.FindTeacher(ctx, st.db, idTeacher)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[FindVehicle] Find Vehicle DB err  %v", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindTeacher] Find Teacher DB err  %v", err)
 		return resp, err
 	}
 	var rowsAff int64
-	if vehicle.Status {
-		logrus.WithFields(logrus.Fields{}).Errorf("[FindVehicle] Find Vehicle DB err  %v", err)
-		return resp, errors.New("Xe đang tồn tại trong lớp học, vui lòng cập nhật xe khác trước khi xóa")
+	if teacher.Status {
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindTeacher] Find Teacher DB err  %v", err)
+		return resp, errors.New("Giáo viên đang tồn tại trong lớp học, vui lòng cập nhật giáo viên khác trước khi xóa")
 	} else {
-		vehicle.IsDeleted = true
-		vehicle.UpdatedBy = userName
-		rowsAff, err = vehicle.Update(ctx, st.db, boil.Infer())
+		teacher.IsDeleted = true
+		teacher.UpdatedBy = userName
+		rowsAff, err = teacher.Update(ctx, st.db, boil.Infer())
 		if err != nil {
-			logrus.WithFields(logrus.Fields{}).Error("[UpdateVehicle] Update Vehicle error : ", err)
+			logrus.WithFields(logrus.Fields{}).Error("[UpdateTeacher] Update Teacher error : ", err)
 			return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
 		}
 	}
@@ -39,20 +39,22 @@ func (st StoreVehicle) InActiveVehicle(id int, userName string) (response.Messag
 		resp.Status = false
 		resp.Message = "Cập nhật thông tin không thành công"
 	}
+
 	return resp, nil
 }
 
-func (st StoreVehicle) ActiveVehicle(id int, userName string) (response.MessageResponse, error) {
+func (st StoreTeacher) Active(idTeacher int, userName string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	ctx := context.Background()
-	vehicle, err := models.FindVehicle(ctx, st.db, id)
+
+	teacher, err := models.FindTeacher(ctx, st.db, idTeacher)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Errorf("[FindVehicle] Find Vehicle DB err  %v", err)
+		logrus.WithFields(logrus.Fields{}).Errorf("[FindTeacher] Find Teacher DB err  %v", err)
 		return resp, err
 	}
-	vehicle.IsDeleted = false
-	vehicle.UpdatedBy = userName
-	rowsAff, err := vehicle.Update(ctx, st.db, boil.Infer())
+	teacher.IsDeleted = false
+	teacher.UpdatedBy = userName
+	rowsAff, err := teacher.Update(ctx, st.db, boil.Infer())
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[UpdateTeacher] Update Teacher error : ", err)
 		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
@@ -64,5 +66,6 @@ func (st StoreVehicle) ActiveVehicle(id int, userName string) (response.MessageR
 		resp.Status = false
 		resp.Message = "Cập nhật thông tin không thành công"
 	}
+
 	return resp, nil
 }

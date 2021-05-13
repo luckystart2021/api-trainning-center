@@ -22,6 +22,8 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Route("/{id}", func(router chi.Router) {
 				router.Get("/view-detail", getTeacher(st))
 				router.Put("/update", updateTeacher(st))
+				router.Put("/in-active", inActive(st))
+				router.Put("/active", active(st))
 			})
 		})
 	}

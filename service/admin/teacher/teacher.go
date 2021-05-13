@@ -12,6 +12,8 @@ type ITeacherService interface {
 	ShowTeachers() (models.TeacherSlice, error)
 	ShowTeacher(idTeacher int) (models.Teacher, error)
 	ShowTeacherByAvalible() (models.TeacherSlice, error)
+	InActive(idTeacher int, userName string) (response.MessageResponse, error)
+	Active(idTeacher int, userName string) (response.MessageResponse, error)
 }
 
 type StoreTeacher struct {
