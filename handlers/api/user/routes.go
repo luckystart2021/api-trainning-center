@@ -3,6 +3,7 @@ package user
 import (
 	"api-trainning-center/handlers/api/user/about"
 	"api-trainning-center/handlers/api/user/contact"
+	"api-trainning-center/handlers/api/user/course"
 	"api-trainning-center/handlers/api/user/information"
 	"api-trainning-center/handlers/api/user/news"
 	"api-trainning-center/handlers/api/user/photo"
@@ -26,5 +27,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Group(seo.Router(db))
 		router.Group(photo.Router(db))
 		router.Group(schedule.Router(db))
+		router.Group(course.Router(db))
 	}
 }

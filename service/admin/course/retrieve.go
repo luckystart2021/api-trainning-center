@@ -169,14 +169,25 @@ func RetrieveCourses(status bool, db *sql.DB, systemID string) ([]Course, error)
 
 func (tc StoreCourse) ShowCoursesByDate(startTime, endTime time.Time) (models.CourseSlice, error) {
 	ctx := context.Background()
+
+	year, month, day := startTime.Date()
+	year1, month1, day1 := endTime.Date()
+
+	start := time.Date(year, month, day, 0, 0, 0, 0, time.Now().Location())
+	end := time.Date(year1, month1, day1, 23, 59, 59, 0, time.Now().Location())
+
 	course, err := models.Courses(
-		qm.Where("start_date >=", startTime),
-		qm.And("start_date <=", endTime),
+		qm.Where("start_date >= ?", start),
+		qm.And("start_date <= ?", end),
 		qm.And("status = ?", true),
 	).All(ctx, tc.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[ShowCoursesByDate] error : ", err)
 		return nil, err
+	}
+
+	if course == nil {
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
 	}
 
 	return course, nil
