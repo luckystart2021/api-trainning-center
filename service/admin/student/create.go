@@ -63,9 +63,14 @@ func CreateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, add
 	ctx := context.Background()
 
 	countSt, err := models.Students().Count(ctx, db)
+
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[CountStudent] Count Student error : ", err)
-		return errors.New("Lỗi hệ thống vui lòng thử lại")
+		if sql.ErrNoRows == err {
+			logrus.WithFields(logrus.Fields{}).Error("[CountStudent] Count Student : 0")
+		} else {
+			logrus.WithFields(logrus.Fields{}).Error("[CountStudent] Count Student error : ", err)
+			return errors.New("Lỗi hệ thống vui lòng thử lại")
+		}
 	}
 
 	student := models.Student{}
