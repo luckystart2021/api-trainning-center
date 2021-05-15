@@ -20,4 +20,7 @@ type Student struct {
 	NumberOfKm     int    `json:"number_of_km"`
 	AmountComplete string `json:"amount"`
 	AmountRemain   string `json:"amount_remain"`
+	DiemLyThuyet   string `json:"diem_ly_thuyet"`
+	DiemThucHanh   string `json:"diem_thuc_hanh"`
+	KetQua         string `json:"ket_qua"`
 }

@@ -42,6 +42,9 @@ type Student struct {
 	ExperienceDriver int          `boil:"experience_driver" json:"experience_driver" toml:"experience_driver" yaml:"experience_driver"`
 	KMSafe           int          `boil:"km_safe" json:"km_safe" toml:"km_safe" yaml:"km_safe"`
 	Amount           null.Float64 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
+	DiemLyThuyet     null.String  `boil:"diem_ly_thuyet" json:"diem_ly_thuyet,omitempty" toml:"diem_ly_thuyet" yaml:"diem_ly_thuyet,omitempty"`
+	DiemThucHanh     null.String  `boil:"diem_thuc_hanh" json:"diem_thuc_hanh,omitempty" toml:"diem_thuc_hanh" yaml:"diem_thuc_hanh,omitempty"`
+	KetQua           null.Bool    `boil:"ket_qua" json:"ket_qua,omitempty" toml:"ket_qua" yaml:"ket_qua,omitempty"`
 
 	R *studentR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L studentL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -66,6 +69,9 @@ var StudentColumns = struct {
 	ExperienceDriver string
 	KMSafe           string
 	Amount           string
+	DiemLyThuyet     string
+	DiemThucHanh     string
+	KetQua           string
 }{
 	ID:               "id",
 	Code:             "code",
@@ -85,6 +91,9 @@ var StudentColumns = struct {
 	ExperienceDriver: "experience_driver",
 	KMSafe:           "km_safe",
 	Amount:           "amount",
+	DiemLyThuyet:     "diem_ly_thuyet",
+	DiemThucHanh:     "diem_thuc_hanh",
+	KetQua:           "ket_qua",
 }
 
 // Generated where
@@ -112,6 +121,29 @@ func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
+type whereHelpernull_Bool struct{ field string }
+
+func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Bool) NEQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Bool) LT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Bool) LTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Bool) GT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 var StudentWhere = struct {
 	ID               whereHelperint
 	Code             whereHelperstring
@@ -131,6 +163,9 @@ var StudentWhere = struct {
 	ExperienceDriver whereHelperint
 	KMSafe           whereHelperint
 	Amount           whereHelpernull_Float64
+	DiemLyThuyet     whereHelpernull_String
+	DiemThucHanh     whereHelpernull_String
+	KetQua           whereHelpernull_Bool
 }{
 	ID:               whereHelperint{field: "\"student\".\"id\""},
 	Code:             whereHelperstring{field: "\"student\".\"code\""},
@@ -150,6 +185,9 @@ var StudentWhere = struct {
 	ExperienceDriver: whereHelperint{field: "\"student\".\"experience_driver\""},
 	KMSafe:           whereHelperint{field: "\"student\".\"km_safe\""},
 	Amount:           whereHelpernull_Float64{field: "\"student\".\"amount\""},
+	DiemLyThuyet:     whereHelpernull_String{field: "\"student\".\"diem_ly_thuyet\""},
+	DiemThucHanh:     whereHelpernull_String{field: "\"student\".\"diem_thuc_hanh\""},
+	KetQua:           whereHelpernull_Bool{field: "\"student\".\"ket_qua\""},
 }
 
 // StudentRels is where relationship names are stored.
@@ -173,8 +211,8 @@ func (*studentR) NewStruct() *studentR {
 type studentL struct{}
 
 var (
-	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "amount"}
-	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe", "amount"}
+	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua"}
+	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua"}
 	studentColumnsWithDefault    = []string{"id", "created_at", "updated_at", "cnsk"}
 	studentPrimaryKeyColumns     = []string{"id"}
 )

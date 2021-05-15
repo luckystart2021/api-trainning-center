@@ -8,12 +8,15 @@ import (
 
 	"github.com/leekchan/accounting"
 	"github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreStudent) ShowStudents() ([]student.Student, error) {
 	students := []student.Student{}
 	ctx := context.Background()
-	studentsDB, err := models.Students().All(ctx, st.db)
+	studentsDB, err := models.Students(
+		qm.OrderBy("id DESC"),
+	).All(ctx, st.db)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[Find Students] error : ", err)
 		return nil, err
@@ -47,6 +50,16 @@ func (st StoreStudent) ShowStudents() ([]student.Student, error) {
 		ac := accounting.Accounting{Precision: 0}
 		student.AmountComplete = ac.FormatMoney(data.Amount.Float64)
 		student.AmountRemain = ac.FormatMoney(amountDB.Amount - data.Amount.Float64)
+		student.DiemLyThuyet = data.DiemLyThuyet.String
+		student.DiemThucHanh = data.DiemThucHanh.String
+		student.KetQua = "Không đậu"
+		if data.KetQua.Bool {
+			student.KetQua = "Đậu"
+		}
+		if !data.KetQua.Valid {
+			student.KetQua = "Chưa có kết quả"
+		}
+
 		students = append(students, student)
 	}
 
@@ -88,6 +101,13 @@ func (st StoreStudent) ShowStudent(idStudent int) (student.Student, error) {
 	ac := accounting.Accounting{Precision: 0}
 	student.AmountComplete = ac.FormatMoney(data.Amount.Float64)
 	student.AmountRemain = ac.FormatMoney(amountDB.Amount - data.Amount.Float64)
+	student.KetQua = "Không đậu"
+	if data.KetQua.Bool {
+		student.KetQua = "Đậu"
+	}
+	if !data.KetQua.Valid {
+		student.KetQua = "Chưa có kết quả"
+	}
 
 	return student, nil
 }
