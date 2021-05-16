@@ -9,6 +9,7 @@ import (
 type IStudentService interface {
 	ShowStudents() ([]student.Student, error)
 	ShowStudent(idStudent int) (student.Student, error)
+	SearchStudentInformation(codeStudent string) (student.Student, error)
 	CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int,
 		cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64) (response.MessageResponse, error)
 	UpdateStudent(idStudent int, sex, dayOfBirth, phone, address, fullName, userName string,

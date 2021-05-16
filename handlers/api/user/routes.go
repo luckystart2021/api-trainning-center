@@ -11,6 +11,7 @@ import (
 	"api-trainning-center/handlers/api/user/schedule"
 	"api-trainning-center/handlers/api/user/seo"
 	"api-trainning-center/handlers/api/user/slide"
+	"api-trainning-center/handlers/api/user/student"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -28,5 +29,6 @@ func Router(db *sql.DB) func(chi.Router) {
 		router.Group(photo.Router(db))
 		router.Group(schedule.Router(db))
 		router.Group(course.Router(db))
+		router.Group(student.Router(db))
 	}
 }

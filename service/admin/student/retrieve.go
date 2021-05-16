@@ -11,6 +11,55 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
+func (st StoreStudent) SearchStudentInformation(codeStudent string) (student.Student, error) {
+	ctx := context.Background()
+	student := student.Student{}
+
+	amountDB, err := models.Fees().One(context.Background(), st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[Find Fee] error : ", err)
+		return student, err
+	}
+
+	data, err := models.Students(
+		qm.Where("code = ?", codeStudent),
+	).One(ctx, st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[Find Students by code] error : ", err)
+		return student, err
+	}
+
+	student.Id = int64(data.ID)
+	student.Code = data.Code
+	student.Sex = data.Sex
+	student.DateOfBirth = data.Dateofbirth
+	student.Phone = data.Phone
+	student.Address = data.Address
+	student.FullName = data.Fullname
+	student.IdClass = int64(data.ClassID)
+	student.CreatedAt = utils.TimeIn(data.CreatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	student.CreatedBy = data.CreatedBy
+	student.UpdatedAt = utils.TimeIn(data.UpdatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+	student.UpdatedBy = data.UpdatedBy
+	student.CMND = data.CMND
+	student.CNSK = data.CNSK
+	student.GPLX = data.GPLX.String
+	student.Exp = data.ExperienceDriver
+	student.NumberOfKm = data.KMSafe
+	ac := accounting.Accounting{Precision: 0}
+	student.AmountComplete = ac.FormatMoney(data.Amount.Float64)
+	student.AmountRemain = ac.FormatMoney(amountDB.Amount - data.Amount.Float64)
+	student.KetQua = "Không đậu"
+	if data.KetQua.Bool {
+		student.KetQua = "Đậu"
+	}
+	if !data.KetQua.Valid {
+		student.KetQua = "Chưa có kết quả"
+	}
+
+	return student, nil
+}
+
 func (st StoreStudent) ShowStudents() ([]student.Student, error) {
 	students := []student.Student{}
 	ctx := context.Background()
