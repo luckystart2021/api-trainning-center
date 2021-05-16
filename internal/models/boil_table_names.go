@@ -32,6 +32,7 @@ var TableNames = struct {
 	Teacher           string
 	Testsuite         string
 	TestsuiteQuestion string
+	TrainingCosts     string
 	Users             string
 	Vehicle           string
 }{
@@ -63,6 +64,7 @@ var TableNames = struct {
 	Teacher:           "teacher",
 	Testsuite:         "testsuite",
 	TestsuiteQuestion: "testsuite_question",
+	TrainingCosts:     "training_costs",
 	Users:             "users",
 	Vehicle:           "vehicle",
 }
