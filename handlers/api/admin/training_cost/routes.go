@@ -17,13 +17,11 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Use(middlewares.CheckScopeAccess(client, constant.ADMIN))
 		router.Route("/cost", func(router chi.Router) {
 			router.Get("/{course_id}/views", GetCost(st))
-			// router.Get("/views-available", getTeachersAvailable(st))
 			router.Post("/{course_id}/{class_id}/create", CreateCost(st))
+			router.Put("/{cost_id}/{course_id}/{class_id}/update", UpdateCost(st))
 			router.Route("/{id}", func(router chi.Router) {
 				router.Get("/view-detail", GetDetailCost(st))
-				// router.Put("/update", updateTeacher(st))
-				// router.Put("/in-active", inActive(st))
-				// router.Put("/active", active(st))
+				router.Delete("/delete", DeleteCost(st))
 			})
 		})
 	}

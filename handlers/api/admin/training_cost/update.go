@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func CreateCost(service training_cost.ICostService) http.HandlerFunc {
+func UpdateCost(service training_cost.ICostService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := models.TrainingCost{}
 		id := chi.URLParam(r, "course_id")
@@ -42,6 +42,19 @@ func CreateCost(service training_cost.ICostService) http.HandlerFunc {
 			return
 		}
 
+		idCost := chi.URLParam(r, "cost_id")
+		if idCost == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không được rỗng"))
+			return
+		}
+
+		costID, err := strconv.Atoi(idCost)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã không hợp lệ"))
+			return
+		}
+
 		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			// If the structure of the body is wrong, return an HTTP error
@@ -54,7 +67,7 @@ func CreateCost(service training_cost.ICostService) http.HandlerFunc {
 			return
 		}
 		userRole := r.Context().Value("values").(middlewares.Vars)
-		resp, err := service.CreateCost(req, courseID, classID, userRole.UserName)
+		resp, err := service.UpdateCost(costID, req, userRole.UserName, courseID, classID)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -62,11 +75,4 @@ func CreateCost(service training_cost.ICostService) http.HandlerFunc {
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, resp)
 	}
-}
-
-func validateCreate(s models.TrainingCost) error {
-	if s.Amount == 0 {
-		return errors.New("Vui lòng nhập số tiền")
-	}
-	return nil
 }
