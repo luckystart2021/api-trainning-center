@@ -12,6 +12,7 @@ type ICostService interface {
 	ShowCost(courseID int) ([]TrainingCost, error)
 	ShowDetailCost(costID int) (TrainingCost, error)
 	DeleteCost(costID int) (response.MessageResponse, error)
+	ShowCostByClass(classID int) ([]TrainingCost, error)
 }
 
 type StoreCost struct {

@@ -4,6 +4,7 @@ import (
 	"api-trainning-center/internal/models"
 	"api-trainning-center/utils"
 	"context"
+	"errors"
 
 	"github.com/leekchan/accounting"
 	"github.com/sirupsen/logrus"
@@ -21,6 +22,41 @@ type TrainingCost struct {
 	CreatedBy string `json:"created_by"`
 	UpdatedAt string `json:"updated_at"`
 	UpdatedBy string `json:"updated_by"`
+}
+
+func (st StoreCost) ShowCostByClass(classID int) ([]TrainingCost, error) {
+	trainingCosts := []TrainingCost{}
+	ctx := context.Background()
+	costs, err := models.TrainingCosts(
+		qm.Where("class_id = ?", classID),
+		qm.OrderBy("created_at DESC"),
+	).All(ctx, st.db)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCostByClass] error : ", err)
+		return nil, err
+	}
+
+	for _, cost := range costs {
+		trainingCost := TrainingCost{}
+		trainingCost.ID = cost.ID
+		ac := accounting.Accounting{Precision: 0}
+		trainingCost.Amount = ac.FormatMoney(cost.Amount)
+		trainingCost.Type = cost.Type.String
+		trainingCost.Note = cost.Note.String
+		trainingCost.ClassID = cost.ClassID
+		trainingCost.CourseID = cost.CourseID
+		trainingCost.CreatedAt = utils.TimeIn(cost.CreatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+		trainingCost.CreatedBy = cost.CreatedBy
+		trainingCost.UpdatedAt = utils.TimeIn(cost.UpdatedAt, utils.TIMEZONE, utils.LAYOUTTIMEDDMMYYYYHHMMSS)
+		trainingCost.UpdatedBy = cost.UpdatedBy
+
+		trainingCosts = append(trainingCosts, trainingCost)
+	}
+	if len(trainingCosts) == 0 {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCostByClass] No data : ", err)
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
+	}
+	return trainingCosts, nil
 }
 
 func (st StoreCost) ShowCost(course int) ([]TrainingCost, error) {
@@ -49,6 +85,10 @@ func (st StoreCost) ShowCost(course int) ([]TrainingCost, error) {
 		trainingCost.UpdatedBy = cost.UpdatedBy
 
 		trainingCosts = append(trainingCosts, trainingCost)
+	}
+	if len(trainingCosts) == 0 {
+		logrus.WithFields(logrus.Fields{}).Error("[ShowCostByClass] No data : ", err)
+		return nil, errors.New("Không có dữ liệu từ hệ thống")
 	}
 	return trainingCosts, nil
 }

@@ -32,7 +32,30 @@ func GetCost(service training_cost.ICostService) http.HandlerFunc {
 		// send Result response
 		response.RespondWithJSON(w, http.StatusOK, resp)
 	}
+}
 
+func GetCostByClass(service training_cost.ICostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "class_id")
+		if id == "" {
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không được rỗng"))
+			return
+		}
+
+		classID, err := strconv.Atoi(id)
+		if err != nil {
+			// If the structure of the body is wrong, return an HTTP error
+			response.RespondWithError(w, http.StatusBadRequest, errors.New("Mã khóa học không hợp lệ"))
+			return
+		}
+		resp, err := service.ShowCostByClass(classID)
+		if err != nil {
+			response.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+		// send Result response
+		response.RespondWithJSON(w, http.StatusOK, resp)
+	}
 }
 
 func GetDetailCost(service training_cost.ICostService) http.HandlerFunc {
