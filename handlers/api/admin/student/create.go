@@ -8,21 +8,24 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/badoux/checkmail"
 )
 
 type StudentRequest struct {
-	IdClass      int     `json:"id_class"`
-	Sex          string  `json:"sex"`
-	DateOfBirth  string  `json:"date_of_birth"`
-	Phone        string  `json:"phone"`
-	Address      string  `json:"address"`
-	FullName     string  `json:"full_name"`
-	CMND         string  `json:"cmnd"`
-	CNSK         bool    `json:"cnsk"`
-	GPLX         string  `json:"gplx"`
-	Exp          int     `json:"exp"`
-	NumberOfKm   int     `json:"number_of_km"`
-	Amount       float64 `json:"amount"`
+	IdClass     int     `json:"id_class"`
+	Sex         string  `json:"sex"`
+	DateOfBirth string  `json:"date_of_birth"`
+	Phone       string  `json:"phone"`
+	Address     string  `json:"address"`
+	FullName    string  `json:"full_name"`
+	CMND        string  `json:"cmnd"`
+	CNSK        bool    `json:"cnsk"`
+	GPLX        string  `json:"gplx"`
+	Exp         int     `json:"exp"`
+	NumberOfKm  int     `json:"number_of_km"`
+	Amount      float64 `json:"amount"`
+	Email       string  `json:"email"`
 }
 
 func CreateStudent(service student.IStudentService) http.HandlerFunc {
@@ -42,7 +45,7 @@ func CreateStudent(service student.IStudentService) http.HandlerFunc {
 		userRole := r.Context().Value("values").(middlewares.Vars)
 		resp, err := service.CreateStudent(req.Sex, req.DateOfBirth, req.Phone, req.Address,
 			req.FullName, userRole.UserName, req.IdClass, req.CMND,
-			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.Amount)
+			req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.Amount, req.Email)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
 			return
@@ -98,6 +101,10 @@ func (s StudentRequest) validate() error {
 
 	if len(s.GPLX) > 50 {
 		return errors.New("Giấy phép lái xe không hợp lệ")
+	}
+
+	if err := checkmail.ValidateFormat(s.Email); err != nil {
+		return errors.New("Email không đúng định dạng")
 	}
 
 	return nil

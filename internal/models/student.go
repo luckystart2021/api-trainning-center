@@ -45,6 +45,7 @@ type Student struct {
 	DiemLyThuyet     null.String  `boil:"diem_ly_thuyet" json:"diem_ly_thuyet,omitempty" toml:"diem_ly_thuyet" yaml:"diem_ly_thuyet,omitempty"`
 	DiemThucHanh     null.String  `boil:"diem_thuc_hanh" json:"diem_thuc_hanh,omitempty" toml:"diem_thuc_hanh" yaml:"diem_thuc_hanh,omitempty"`
 	KetQua           null.Bool    `boil:"ket_qua" json:"ket_qua,omitempty" toml:"ket_qua" yaml:"ket_qua,omitempty"`
+	Email            null.String  `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
 
 	R *studentR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L studentL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -72,6 +73,7 @@ var StudentColumns = struct {
 	DiemLyThuyet     string
 	DiemThucHanh     string
 	KetQua           string
+	Email            string
 }{
 	ID:               "id",
 	Code:             "code",
@@ -94,6 +96,7 @@ var StudentColumns = struct {
 	DiemLyThuyet:     "diem_ly_thuyet",
 	DiemThucHanh:     "diem_thuc_hanh",
 	KetQua:           "ket_qua",
+	Email:            "email",
 }
 
 // Generated where
@@ -166,6 +169,7 @@ var StudentWhere = struct {
 	DiemLyThuyet     whereHelpernull_String
 	DiemThucHanh     whereHelpernull_String
 	KetQua           whereHelpernull_Bool
+	Email            whereHelpernull_String
 }{
 	ID:               whereHelperint{field: "\"student\".\"id\""},
 	Code:             whereHelperstring{field: "\"student\".\"code\""},
@@ -188,6 +192,7 @@ var StudentWhere = struct {
 	DiemLyThuyet:     whereHelpernull_String{field: "\"student\".\"diem_ly_thuyet\""},
 	DiemThucHanh:     whereHelpernull_String{field: "\"student\".\"diem_thuc_hanh\""},
 	KetQua:           whereHelpernull_Bool{field: "\"student\".\"ket_qua\""},
+	Email:            whereHelpernull_String{field: "\"student\".\"email\""},
 }
 
 // StudentRels is where relationship names are stored.
@@ -211,8 +216,8 @@ func (*studentR) NewStruct() *studentR {
 type studentL struct{}
 
 var (
-	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua"}
-	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua"}
+	studentAllColumns            = []string{"id", "code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "created_at", "updated_by", "updated_at", "cmnd", "cnsk", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua", "email"}
+	studentColumnsWithoutDefault = []string{"code", "sex", "dateofbirth", "phone", "address", "fullname", "class_id", "created_by", "updated_by", "cmnd", "gplx", "experience_driver", "km_safe", "amount", "diem_ly_thuyet", "diem_thuc_hanh", "ket_qua", "email"}
 	studentColumnsWithDefault    = []string{"id", "created_at", "updated_at", "cnsk"}
 	studentPrimaryKeyColumns     = []string{"id"}
 )

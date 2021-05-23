@@ -11,10 +11,10 @@ type IStudentService interface {
 	ShowStudent(idStudent int) (student.Student, error)
 	SearchStudentInformation(codeStudent string) (student.Student, error)
 	CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int,
-		cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64) (response.MessageResponse, error)
+		cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64, email string) (response.MessageResponse, error)
 	UpdateStudent(idStudent int, sex, dayOfBirth, phone, address, fullName, userName string,
 		idClass int, cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64,
-		diemLyThuyet, diemThucHanh string, ketQua bool,
+		diemLyThuyet, diemThucHanh string, ketQua bool, email string,
 	) (response.MessageResponse, error)
 	DeleteStudent(idStudent int) (response.MessageResponse, error)
 }

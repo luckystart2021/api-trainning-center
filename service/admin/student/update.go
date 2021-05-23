@@ -14,10 +14,10 @@ import (
 
 func (st StoreStudent) UpdateStudent(id int, sex, dayOfBirth, phone, address, fullName, userName string,
 	idClass int, cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64,
-	diemLyThuyet, diemThucHanh string, ketQua bool,
+	diemLyThuyet, diemThucHanh string, ketQua bool, email string,
 ) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
-	count, err := updateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, id, cnsk, gplx, exp, numberKm, amount, diemLyThuyet, diemThucHanh, ketQua)
+	count, err := updateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, id, cnsk, gplx, exp, numberKm, amount, diemLyThuyet, diemThucHanh, ketQua, email)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Errorf("[updateStudentByRequest] Update student DB err  %v", err)
 		return resp, err
@@ -34,7 +34,7 @@ func (st StoreStudent) UpdateStudent(id int, sex, dayOfBirth, phone, address, fu
 
 func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string,
 	id int, cnsk bool, gplx string, exp, numberKm int, amount float64,
-	diemLyThuyet, diemThucHanh string, ketQua bool,
+	diemLyThuyet, diemThucHanh string, ketQua bool, email string,
 ) (int64, error) {
 
 	ctx := context.Background()
@@ -62,6 +62,7 @@ func updateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, add
 	student.KetQua = null.BoolFrom(ketQua)
 	student.CreatedBy = userName
 	student.UpdatedBy = userName
+	student.Email = null.StringFrom(email)
 
 	rowsAff, err := student.Update(ctx, db, boil.Infer())
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/badoux/checkmail"
 	"github.com/go-chi/chi"
 )
 
@@ -29,6 +30,7 @@ type StudentRequestUpdate struct {
 	DiemLyThuyet string  `json:"diem_ly_thuyet"`
 	DiemThucHanh string  `json:"diem_thuc_hanh"`
 	KetQua       bool    `json:"ket_qua"`
+	Email        string  `json:"email"`
 }
 
 func UpdateStudent(service student.IStudentService) http.HandlerFunc {
@@ -60,7 +62,7 @@ func UpdateStudent(service student.IStudentService) http.HandlerFunc {
 		userRole := r.Context().Value("values").(middlewares.Vars)
 		resp, err := service.UpdateStudent(idStudent, req.Sex, req.DateOfBirth, req.Phone, req.Address, req.FullName, userRole.UserName,
 			req.IdClass, req.CMND, req.CNSK, req.GPLX, req.Exp, req.NumberOfKm, req.Amount,
-			req.DiemLyThuyet, req.DiemThucHanh, req.KetQua,
+			req.DiemLyThuyet, req.DiemThucHanh, req.KetQua, req.Email,
 		)
 		if err != nil {
 			response.RespondWithError(w, http.StatusBadRequest, err)
@@ -117,6 +119,10 @@ func (s StudentRequestUpdate) validateUpdate() error {
 
 	if len(s.GPLX) > 50 {
 		return errors.New("Giấy phép lái xe không hợp lệ")
+	}
+
+	if err := checkmail.ValidateFormat(s.Email); err != nil {
+		return errors.New("Email không đúng định dạng")
 	}
 
 	return nil

@@ -31,6 +31,7 @@ func (st StoreStudent) SearchStudentInformation(codeStudent string) (student.Stu
 
 	student.Id = int64(data.ID)
 	student.Code = data.Code
+	student.Email = data.Email.String
 	student.Sex = data.Sex
 	student.DateOfBirth = data.Dateofbirth
 	student.Phone = data.Phone
@@ -80,6 +81,7 @@ func (st StoreStudent) ShowStudents() ([]student.Student, error) {
 	for _, data := range studentsDB {
 		student := student.Student{}
 		student.Id = int64(data.ID)
+		student.Email = data.Email.String
 		student.Code = data.Code
 		student.Sex = data.Sex
 		student.DateOfBirth = data.Dateofbirth
@@ -132,6 +134,7 @@ func (st StoreStudent) ShowStudent(idStudent int) (student.Student, error) {
 
 	student.Id = int64(data.ID)
 	student.Code = data.Code
+	student.Email = data.Email.String
 	student.Sex = data.Sex
 	student.DateOfBirth = data.Dateofbirth
 	student.Phone = data.Phone

@@ -23,4 +23,5 @@ type Student struct {
 	DiemLyThuyet   string `json:"diem_ly_thuyet"`
 	DiemThucHanh   string `json:"diem_thuc_hanh"`
 	KetQua         string `json:"ket_qua"`
+	Email          string `json:"email"`
 }

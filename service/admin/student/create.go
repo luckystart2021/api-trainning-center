@@ -15,7 +15,7 @@ import (
 )
 
 func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, userName string, idClass int, cmnd string, cnsk bool,
-	gplx string, exp, numberKm int, amount float64) (response.MessageResponse, error) {
+	gplx string, exp, numberKm int, amount float64, email string) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	ctx := context.Background()
 	countStudent, err := models.Students(
@@ -35,7 +35,7 @@ func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, 
 		return resp, errors.New("Số lượng học viên vượt quá danh sách lớp")
 	}
 
-	if err := CreateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, cnsk, gplx, exp, numberKm, amount); err != nil {
+	if err := CreateStudentByRequest(st.db, idClass, sex, dayOfBirth, phone, address, fullName, userName, cmnd, cnsk, gplx, exp, numberKm, amount, email); err != nil {
 		return resp, err
 	}
 	resp.Status = true
@@ -43,23 +43,7 @@ func (st StoreStudent) CreateStudent(sex, dayOfBirth, phone, address, fullName, 
 	return resp, nil
 }
 
-func CreateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64) error {
-	// query := `
-	// INSERT INTO student
-	// 	(code, sex, dateofbirth, phone, address, fullname, class_id, created_by, updated_by, cmnd, cnsk, gplx, experience_driver, km_safe, amount)
-	// (
-	// SELECT
-	// 	CONCAT('HV', COUNT(*)+1), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-	// FROM
-	// 	student
-	// );
-	// `
-	// _, err := db.Exec(query, sex, dayOfBirth, phone, address, fullName, idClass, userName, userName, cmnd, cnsk, gplx, exp, numberKm, amount)
-	// if err != nil {
-	// 	logrus.WithFields(logrus.Fields{}).Errorf("[CreateStudentByRequest]Insert student DB err  %v", err)
-	// 	return errors.New("Lỗi hệ thống, vui lòng thử lại")
-	// }
-	// return nil
+func CreateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, address, fullName, userName, cmnd string, cnsk bool, gplx string, exp, numberKm int, amount float64, email string) error {
 	ctx := context.Background()
 
 	countSt, err := models.Students().Count(ctx, db)
@@ -92,6 +76,7 @@ func CreateStudentByRequest(db *sql.DB, idClass int, sex, dayOfBirth, phone, add
 	// student.KetQua = null.BoolFrom(ketQua)
 	student.CreatedBy = userName
 	student.UpdatedBy = userName
+	student.Email = null.StringFrom(email)
 
 	err = student.Insert(ctx, db, boil.Infer())
 	if err != nil {
