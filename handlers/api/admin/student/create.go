@@ -103,8 +103,10 @@ func (s StudentRequest) validate() error {
 		return errors.New("Giấy phép lái xe không hợp lệ")
 	}
 
-	if err := checkmail.ValidateFormat(s.Email); err != nil {
-		return errors.New("Email không đúng định dạng")
+	if s.Email != "" {
+		if err := checkmail.ValidateFormat(s.Email); err != nil {
+			return errors.New("Email không đúng định dạng")
+		}
 	}
 
 	return nil
