@@ -21,7 +21,20 @@ func ParseStringToTime(date string) (time.Time, error) {
 		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStringToTime] parse error %v", err)
 		return time.Now(), errors.New("Thời gian không hợp lệ")
 	}
+
 	return myDate, nil
+}
+
+func ParseStringToTimeRegister(date string, layout string) (time.Time, error) {
+	logrus.WithFields(logrus.Fields{}).Infof("[ParseStringToTime] input date %s", date)
+	myDate, err := time.Parse("02-01-2006 15:04:05 -0700", date+" +0700")
+	if err != nil {
+		logrus.WithFields(logrus.Fields{}).Errorf("[ParseStringToTime] parse error %v", err)
+		return time.Now(), errors.New("Thời gian không hợp lệ")
+	}
+	loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+
+	return myDate.In(loc), nil
 }
 
 var countryTz = map[string]string{

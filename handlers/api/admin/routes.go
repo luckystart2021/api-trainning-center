@@ -14,6 +14,7 @@ import (
 	"api-trainning-center/handlers/api/admin/news"
 	"api-trainning-center/handlers/api/admin/photo"
 	"api-trainning-center/handlers/api/admin/question"
+	"api-trainning-center/handlers/api/admin/register"
 	"api-trainning-center/handlers/api/admin/schedule"
 	"api-trainning-center/handlers/api/admin/seo"
 	"api-trainning-center/handlers/api/admin/seo_tag"
@@ -57,5 +58,6 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 		router.Group(holiday.Router(db, client))
 		router.Group(fee.Router(db, client))
 		router.Group(training_cost.Router(db, client))
+		router.Group(register.Router(db, client))
 	}
 }

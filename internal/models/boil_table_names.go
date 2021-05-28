@@ -21,6 +21,7 @@ var TableNames = struct {
 	Photos            string
 	Question          string
 	RankVehicle       string
+	RegisterGround    string
 	Role              string
 	Schedule          string
 	ScheduleContent   string
@@ -53,6 +54,7 @@ var TableNames = struct {
 	Photos:            "photos",
 	Question:          "question",
 	RankVehicle:       "rank_vehicle",
+	RegisterGround:    "register_ground",
 	Role:              "role",
 	Schedule:          "schedule",
 	ScheduleContent:   "schedule_content",

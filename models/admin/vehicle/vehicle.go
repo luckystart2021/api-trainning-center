@@ -1,13 +1,13 @@
 package vehicle
 
-type Vehicle struct {
-	Id         int    `json:"id"`
-	BienSoXe   string `json:"bien_so_xe"`
-	LoaiXe     string `json:"loai_xe"`
-	Status     bool   `json:"status"`
-	IsContract bool   `json:"is_contract"`
-	IsDeleted  string `json:"is_deleted"`
-}
+// type Vehicle struct {
+// 	Id         int    `json:"id"`
+// 	BienSoXe   string `json:"bien_so_xe"`
+// 	LoaiXe     string `json:"loai_xe"`
+// 	Status     bool   `json:"status"`
+// 	IsContract bool   `json:"is_contract"`
+// 	IsDeleted  bool   `json:"is_deleted"`
+// }
 
 type FindOneVehicle struct {
 	Id         int    `json:"id"`
