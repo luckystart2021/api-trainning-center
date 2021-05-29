@@ -8,14 +8,34 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 func (st StoreRegister) UpdateRegister(id int, req models.RegisterGround) (response.MessageResponse, error) {
 	resp := response.MessageResponse{}
 	ctx := context.Background()
 
-	register, err := models.FindRegisterGround(ctx, st.db, id)
-	if register == nil {
+	countDuplicate, err := models.RegisterGrounds(
+		qm.Where("start_date = ?", req.StartDate),
+		qm.And("end_date = ?", req.EndDate),
+		qm.And("ground_number = ?", req.GroundNumber),
+		qm.And("class_id = ?", req.ClassID),
+	).Count(ctx, st.db)
+	if countDuplicate > 0 {
+		logrus.WithFields(logrus.Fields{}).Error("[CreateTeacher] Create Teacher error : ", err)
+		return resp, errors.New("Thời gian đăng ký đã bị trùng")
+	}
+
+	countRegister, err := models.RegisterGrounds(
+		qm.Where("end_date > ?", req.StartDate),
+	).Count(ctx, st.db)
+	if countRegister > 0 {
+		logrus.WithFields(logrus.Fields{}).Error("[Count RegisterGrounds] count RegisterGrounds error : ", err)
+		return resp, errors.New("Thời gian đăng ký đã có lớp học khác đăng ký")
+	}
+
+	registerDB, err := models.FindRegisterGround(ctx, st.db, id)
+	if registerDB == nil {
 		return resp, errors.New("Thông tin không tồn tại, vui lòng thử lại")
 	}
 	if err != nil {
@@ -23,10 +43,13 @@ func (st StoreRegister) UpdateRegister(id int, req models.RegisterGround) (respo
 		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
-	register.StartDate = req.StartDate
-	register.GroundNumber = req.GroundNumber
+	registerDB.StartDate = req.StartDate
+	registerDB.EndDate = req.EndDate
+	registerDB.ClassID = req.ClassID
+	registerDB.TeacherID = req.TeacherID
+	registerDB.GroundNumber = req.GroundNumber
 
-	rowsAff, err := register.Update(ctx, st.db, boil.Infer())
+	rowsAff, err := registerDB.Update(ctx, st.db, boil.Infer())
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error("[Update register] Update register error : ", err)
 		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")

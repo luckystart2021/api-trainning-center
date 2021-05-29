@@ -15,17 +15,28 @@ func (st StoreRegister) CreateRegister(req models.RegisterGround) (response.Mess
 	ctx := context.Background()
 	resp := response.MessageResponse{}
 
+	countDuplicate, err := models.RegisterGrounds(
+		qm.Where("start_date = ?", req.StartDate),
+		qm.And("end_date = ?", req.EndDate),
+		qm.And("ground_number = ?", req.GroundNumber),
+		qm.And("class_id = ?", req.ClassID),
+	).Count(ctx, st.db)
+	if countDuplicate > 0 {
+		logrus.WithFields(logrus.Fields{}).Error("[CreateTeacher] Create Teacher error : ", err)
+		return resp, errors.New("Thời gian đăng ký đã bị trùng")
+	}
+
 	countRegister, err := models.RegisterGrounds(
 		qm.Where("end_date > ?", req.StartDate),
 	).Count(ctx, st.db)
 	if countRegister > 0 {
-		logrus.WithFields(logrus.Fields{}).Error("[CreateTeacher] Create Teacher error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[Count RegisterGrounds] count RegisterGrounds error : ", err)
 		return resp, errors.New("Thời gian đăng ký đã có lớp học khác đăng ký")
 	}
 
 	err = req.Insert(ctx, st.db, boil.Infer())
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error("[CreateTeacher] Create Teacher error : ", err)
+		logrus.WithFields(logrus.Fields{}).Error("[CreateRegisterGround] Create RegisterGround error : ", err)
 		return resp, errors.New("Lỗi hệ thống vui lòng thử lại")
 	}
 
