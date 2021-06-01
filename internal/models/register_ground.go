@@ -27,7 +27,6 @@ type RegisterGround struct {
 	ClassID      int       `boil:"class_id" json:"class_id" toml:"class_id" yaml:"class_id"`
 	StartDate    time.Time `boil:"start_date" json:"start_date" toml:"start_date" yaml:"start_date"`
 	TeacherID    int       `boil:"teacher_id" json:"teacher_id" toml:"teacher_id" yaml:"teacher_id"`
-	Status       bool      `boil:"status" json:"status" toml:"status" yaml:"status"`
 	CreatedAt    time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt    time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	GroundNumber string    `boil:"ground_number" json:"ground_number" toml:"ground_number" yaml:"ground_number"`
@@ -42,7 +41,6 @@ var RegisterGroundColumns = struct {
 	ClassID      string
 	StartDate    string
 	TeacherID    string
-	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 	GroundNumber string
@@ -52,7 +50,6 @@ var RegisterGroundColumns = struct {
 	ClassID:      "class_id",
 	StartDate:    "start_date",
 	TeacherID:    "teacher_id",
-	Status:       "status",
 	CreatedAt:    "created_at",
 	UpdatedAt:    "updated_at",
 	GroundNumber: "ground_number",
@@ -66,7 +63,6 @@ var RegisterGroundWhere = struct {
 	ClassID      whereHelperint
 	StartDate    whereHelpertime_Time
 	TeacherID    whereHelperint
-	Status       whereHelperbool
 	CreatedAt    whereHelpertime_Time
 	UpdatedAt    whereHelpertime_Time
 	GroundNumber whereHelperstring
@@ -76,7 +72,6 @@ var RegisterGroundWhere = struct {
 	ClassID:      whereHelperint{field: "\"register_ground\".\"class_id\""},
 	StartDate:    whereHelpertime_Time{field: "\"register_ground\".\"start_date\""},
 	TeacherID:    whereHelperint{field: "\"register_ground\".\"teacher_id\""},
-	Status:       whereHelperbool{field: "\"register_ground\".\"status\""},
 	CreatedAt:    whereHelpertime_Time{field: "\"register_ground\".\"created_at\""},
 	UpdatedAt:    whereHelpertime_Time{field: "\"register_ground\".\"updated_at\""},
 	GroundNumber: whereHelperstring{field: "\"register_ground\".\"ground_number\""},
@@ -100,9 +95,9 @@ func (*registerGroundR) NewStruct() *registerGroundR {
 type registerGroundL struct{}
 
 var (
-	registerGroundAllColumns            = []string{"id", "class_id", "start_date", "teacher_id", "status", "created_at", "updated_at", "ground_number", "end_date"}
+	registerGroundAllColumns            = []string{"id", "class_id", "start_date", "teacher_id", "created_at", "updated_at", "ground_number", "end_date"}
 	registerGroundColumnsWithoutDefault = []string{"class_id", "start_date", "teacher_id", "ground_number", "end_date"}
-	registerGroundColumnsWithDefault    = []string{"id", "status", "created_at", "updated_at"}
+	registerGroundColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	registerGroundPrimaryKeyColumns     = []string{"id"}
 )
 

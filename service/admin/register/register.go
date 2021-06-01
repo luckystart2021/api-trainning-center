@@ -7,13 +7,6 @@ import (
 )
 
 type IRegisterService interface {
-	// CreateTeacher(req models.Teacher, userName string) (response.MessageResponse, error)
-	// UpdateTeacher(id int, req models.Teacher, userName string) (response.MessageResponse, error)
-	// ShowTeachers() (models.TeacherSlice, error)
-	// ShowTeacher(idTeacher int) (models.Teacher, error)
-	// ShowTeacherByAvalible() (models.TeacherSlice, error)
-	// InActive(idTeacher int, userName string) (response.MessageResponse, error)
-	// Active(idTeacher int, userName string) (response.MessageResponse, error)
 	ShowRegisterByClassId(classID int) (models.RegisterGroundSlice, error)
 	ShowRegisterById(Id int) (models.RegisterGround, error)
 	CreateRegister(req models.RegisterGround) (response.MessageResponse, error)

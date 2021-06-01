@@ -20,6 +20,7 @@ func Router(db *sql.DB, client *redis.Client) func(chi.Router) {
 			router.Get("/{id}/view-detail", GetRegisterDetail(st))
 			router.Post("/create", Register(st))
 			router.Put("/{id}/update", UpdateRegister(st))
+			router.Delete("/{id}/delete", DeleteRegister(st))
 		})
 	}
 }
